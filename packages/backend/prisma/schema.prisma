@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+// Admin seriamos nosotros, 
+// Broker seria la empresa en si (ej. Aseguros),
+// Sub-Broker son los empleados.
+enum Role{
+  ADMIN
+  BROKER
+  SUB_BROKER
+}
+
+model User{
+  id String @id @default(uuid())
+  email String @unique
+  password String
+  nombre String
+  role Role
+
+  // Si el usuario es un sub-broker, este campo referencia al broker al que pertenece
+  brokerId String?
+  subBrokers User[] @relation("BrokerSubBrokers")
+  broker User? @relation("BrokerSubBrokers", fields: [brokerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model Client{
+//   id String @id @default(uuid())
+//   nombre String 
+//   apellido String
+//   documentoId String 
+//   email String
+//   telefono Int
+//   brokerId String
+// }
+
+// model Poliza{
+//   numPoliza Int @id @default(uuid()) // !!en prisma no se pueden usar Int con uuid, asi que se puede usar String y luego parsearlo a Int en el codigo
+//   compania String 
+//   fechaInicio String
+//   FechaFin String 
+//   planCobertura String
+//   subCorredor Int
+// }

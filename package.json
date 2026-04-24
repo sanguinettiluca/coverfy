@@ -1,0 +1,20 @@
+{
+  "name": "coverfy",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/frontend",
+    "packages/backend"
+  ],
+  "scripts": {
+    "frontend": "npm run dev --workspace=packages/frontend",
+    "backend": "npm run dev --workspace=packages/backend",
+    "dev": "npm run frontend & npm run backend"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
+  }
+}

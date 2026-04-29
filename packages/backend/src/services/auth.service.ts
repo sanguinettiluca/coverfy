@@ -95,3 +95,11 @@ export async function login(data: LoginDTO): Promise<AuthResponse> {
             }
         }
 }
+
+export async function logout(token: string): Promise<void> {
+    await prisma.tokenBlacklist.create({
+        data: {
+            token
+        }
+    })
+}

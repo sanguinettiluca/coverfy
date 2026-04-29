@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
 import { JwtPayload } from "../domain/user"
 import { Role } from "../generated/prisma"
+import prisma from "../config/prisma"
 
 // Este middleware se encarga de verificar el token JWT enviado desde el header Aut
 
@@ -18,7 +19,7 @@ declare global{
 // Verificar JWT
 // Middleware para proteger rutas que requieren autenticación
 // Verifica que el token JWT enviado en el header Authorization sea válido
-export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
     console.log('Headers recibidos:', req.headers.authorization)
 
@@ -34,6 +35,15 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     const token = authHeader.substring(7)
 
     try{
+        const blacklisted = await prisma.tokenBlacklist.findFirst({
+            where: { token }
+        })
+
+        if(blacklisted){
+            res.status(401).json({ message: 'Token invalido o expirado' })
+            return
+        }
+
         // Decodifica el token usando la clave definida en el .env (process.env.JWT_SECRET)
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload
 

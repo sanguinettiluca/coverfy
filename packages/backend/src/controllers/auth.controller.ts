@@ -62,6 +62,17 @@ export async function loginController(req: Request, res: Response): Promise<void
     }
 }
 
+// LOGOUT:
+export async function logoutController(req: Request, res: Response): Promise<void> {
+    try{
+        const token = req.headers.authorization!.substring(7)
+        await authService.logout(token)
+        res.status(200).json({ message: 'Logout exitoso' })
+    }catch (error) {
+        res.status(500).json({message: "Error interno"})
+    }
+}
+
 // PERFIL:
 export async function meController(req: Request, res: Response): Promise<void> {
     try{

@@ -42,6 +42,28 @@ model TokenBlacklist {
   createdAt DateTime @default(now())
 }
 
+model Cliente{
+  id String @id @default(uuid())
+  nombres String
+  apellidos String
+  documento String
+  fechaNacimiento DateTime?
+  celular String
+  celularAlternativo String?
+  email String
+  direccion String
+  notas String?
+
+  // Quien lo registro RELACION BROKER-CLIENTE:
+  creadoPorId String
+  creadoPor User @relation("BrokerCreador", fields: [creadoPorId], references: [id])
+
+  // Polizas del cliente:
+  polizas Poliza[]
+
+  createdAr DateTime @default(now())
+}
+
 // model Client{
 //   id String @id @default(uuid())
 //   nombre String 

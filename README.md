@@ -18,8 +18,8 @@
 ## Stack Tecnológico
 
 - **Frontend:** [Por definir]
-- **Backend:** [Por definir]
-- **Base de datos:** [Por definir]
+- **Backend:** Node.js, Express, TypeScript, Prisma, JWT, Bcryptjs
+- **Base de datos:** PostgreSQL, Supabase
 - **Herramientas:** [Por definir]
 
 ---

@@ -3,6 +3,7 @@ import cors from "cors"
 import dotenv from "dotenv"
 import authRoutes from "./routes/auth.routes"
 import path from "path"
+import clientRoutes from "./routes/cliente.routes"
 
 // Cargamos las variables de entorno del archivo .env
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
@@ -23,6 +24,9 @@ app.get('/health', (req, res) => {
 
 // Rutas de autenticación (login, crear usuario, perfil)
 app.use('/api/auth', authRoutes)
+
+// Rutas de clientes
+app.use('/api/clientes', clientRoutes)
 
 // ─── Servidor ─────────────────────────────────────────────────
 app.listen(PORT, () => {

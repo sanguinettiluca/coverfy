@@ -1,0 +1,102 @@
+import { Request, Response } from "express";
+import {
+    crearPoliza,
+    listarPolizas,
+    actualizarPoliza,
+    eliminarPoliza,
+    obtenerPolizaPorId
+} from '../services/poliza.service'
+
+export async function crearPolizaController(req: Request, res: Response): Promise<void>{
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const poliza = await crearPoliza(req.body, brokerId)
+        res.status(201).json({
+            message: 'Póliza creada correctamente',
+            poliza
+        })
+    }
+    catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}
+
+export async function listarPolizasController(req: Request, res: Response): Promise<void>{
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const { pagina = '1', porPagina = '10', estado, tipoSeguro } = req.query    
+        const filtros = {
+            busqueda: req.query.busqueda as string | undefined,
+            pagina: Number(pagina),
+            porPagina: Number(porPagina),
+            estado: estado as string | undefined,
+            tipoSeguro: tipoSeguro as string | undefined
+        }
+        const resultado = await listarPolizas(brokerId, filtros)
+        res.status(200).json(resultado)
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}
+
+export async function actualizarPolizaController(req: Request, res: Response): Promise<void>{
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const polizaActualizada = await actualizarPoliza(id, brokerId, req.body)
+        res.status(200).json({
+            message: 'Póliza actualizada correctamente',
+            poliza: polizaActualizada
+        })
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}
+
+export async function eliminarPolizaController(req: Request, res: Response): Promise<void>{
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const polizaEliminada = await eliminarPoliza(id, brokerId)
+        res.status(200).json({ message: 'Póliza eliminada exitosamente', poliza: polizaEliminada })
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}
+
+export async function obtenerPolizaPorIdController(req: Request, res: Response): Promise<void>{
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const poliza = await obtenerPolizaPorId(id, brokerId)
+        res.status(200).json(poliza)
+    }
+    catch(error){
+        if(error instanceof Error){
+            res.status(404).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}

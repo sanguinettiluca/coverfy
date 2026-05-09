@@ -119,6 +119,7 @@ model CompaniaSeguros{
 model Poliza{
   id String @id @default(uuid())
   numeroPoliza String @default("")
+  numeroReferencia String @default("")
   tipoSeguro TipoSeguro
   estado EstadoPoliza @default(ACTIVA)
   fechaInicio DateTime?

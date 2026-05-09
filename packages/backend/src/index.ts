@@ -6,6 +6,7 @@ import path from "path"
 import clientRoutes from "./routes/cliente.routes"
 import companiaRoutes from './routes/compania.routes'
 import coberturaRoutes from './routes/cobertura.routes'
+import polizaRoutes from './routes/poliza.routes'
 
 // Cargamos las variables de entorno del archivo .env
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
@@ -35,6 +36,9 @@ app.use('/api/companias', companiaRoutes)
 
 // Rutas de coberturas
 app.use('/api/coberturas', coberturaRoutes)
+
+// Rutas de pólizas
+app.use('/api/polizas', polizaRoutes)
 
 // --- Servidor -----------------------------------------------
 app.listen(PORT, () => {

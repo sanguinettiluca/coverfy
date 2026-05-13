@@ -3,27 +3,26 @@ import { EstadoPoliza } from "../generated/prisma";
 import { MetodoPago } from "../generated/prisma";
 
 export interface CreatePolizaDTO {
-    numeroPoliza: String;
-    numeroReferencia: String;
+    numeroPoliza: string;
+    numeroReferencia: string;
     tipoSeguro: TipoSeguro;
     estado: EstadoPoliza;
     fechaInicio: Date;
     fechaVencimiento: Date;
-    MontoTotal: Number;
-    cuotas: Number;
+    montoTotal: number;
+    cuotas: number;
     metodoPago: MetodoPago;
-    clienteId: String;
-    coberturaId: String;
-    companiaId: String;
-    creadoPor: String;
+    clienteId: string;
+    coberturaId: string;
+    companiaId: string;
 }
 
 export interface UpdatePolizaDTO{
     estado?: EstadoPoliza;
     fechaInicio?: Date;
     fechaVencimiento?: Date;
-    MontoTotal?: Number;
-    cuotas?: Number;
+    MontoTotal?: number;
+    cuotas?: number;
     metodoPago?: MetodoPago;
 }
 

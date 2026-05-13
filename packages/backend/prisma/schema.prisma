@@ -141,9 +141,9 @@ model Poliza{
   coberturaId String?
   cobertura Cobertura? @relation(fields: [coberturaId], references: [id])
 
-  // Quien registro la poliza:
-  creadoPorId String
-  creadoPor User @relation("PolizaCreador", fields: [creadoPorId], references: [id])
+  // Quien registro la poliza (BROKER o SUB_BROKER):
+  brokerId String
+  broker User @relation("PolizaCreador", fields: [brokerId], references: [id])
 
   // Relacion 1:1 con cada tabla de detalle por tipo de seguro:
   // Solo una de estas relaciones se llenara dependiendo del tipo de seguro:

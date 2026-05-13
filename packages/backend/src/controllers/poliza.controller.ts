@@ -30,13 +30,10 @@ export async function listarPolizasController(req: Request, res: Response): Prom
     try{
         const {userId, role, brokerId: brokerIdToken} = req.user!
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
-        const { pagina = '1', porPagina = '10', estado, tipoSeguro } = req.query    
         const filtros = {
             busqueda: req.query.busqueda as string | undefined,
-            pagina: Number(pagina),
-            porPagina: Number(porPagina),
-            estado: estado as string | undefined,
-            tipoSeguro: tipoSeguro as string | undefined
+            pagina: req.query.pagina ? Number(req.query.pagina) : 1,
+            porPagina: req.query.porPagina ? Number(req.query.porPagina) : 10
         }
         const resultado = await listarPolizas(brokerId, filtros)
         res.status(200).json(resultado)
@@ -73,8 +70,8 @@ export async function eliminarPolizaController(req: Request, res: Response): Pro
         const {userId, role, brokerId: brokerIdToken} = req.user!
         const id = req.params.id as string
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
-        const polizaEliminada = await eliminarPoliza(id, brokerId)
-        res.status(200).json({ message: 'Póliza eliminada exitosamente', poliza: polizaEliminada })
+        const resultado = await eliminarPoliza(id, brokerId)
+        res.status(200).json(resultado)
     }catch(error){
         if(error instanceof Error){
             res.status(400).json({ message: error.message })

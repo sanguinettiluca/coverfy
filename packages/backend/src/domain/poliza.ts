@@ -38,13 +38,56 @@ export interface DetalleOtrosDTO {
     descripcion: string;
 }
 
+export interface DetalleAlquilerDTO {
+    direccion: string;
+    tipoInmueble: string;
+    valorAlquiler: number;
+    deposito: number;
+}
+
+export interface DetalleComercioDTO {
+    razonSocial: string;
+    rubro: string;
+    direccion: number;
+}
+
+export interface DetalleHogarDTO {
+    direccion: string;
+    tipoConstruccion: string;
+    metrosCuadrados?: number;
+    valorPropiedad: number;
+}
+
+export interface DetalleVehiculoDTO {
+    marca: string;
+    modelo: string;
+    anio: number;
+    matricula: string;
+    padron: string;
+    chasis: string;
+    motor: string;
+}
+
+export interface DetalleViajeDTO {
+    destino: string;
+    fechaSalida: Date;
+    fechaRegreso: Date;
+    pasajeros: number;
+}
+
+
 // FIN DETALLES.
 
 export type CreatePolizaDTO =
   | (PolizaBaseDTO & { tipoSeguro: "RESPONSABILIDAD_CIVIL"; detalleResponsabilidadCivil: DetalleResponsabilidadCivilDTO })
   | (PolizaBaseDTO & { tipoSeguro: "FIANZA"; detalleFianza: DetalleFianzaDTO })
   | (PolizaBaseDTO & { tipoSeguro: "VIDA"; detalleVida: DetalleVidaDTO })
-  | (PolizaBaseDTO & { tipoSeguro: "OTROS"; detalleOtros: DetalleOtrosDTO });
+  | (PolizaBaseDTO & { tipoSeguro: "OTROS"; detalleOtros: DetalleOtrosDTO })
+  | (PolizaBaseDTO & { tipoSeguro: "ALQUILER"; detalleAlquiler: DetalleAlquilerDTO })
+  | (PolizaBaseDTO & { tipoSeguro: "COMERCIO"; detalleComercio: DetalleComercioDTO })
+  | (PolizaBaseDTO & { tipoSeguro: "HOGAR"; detalleHogar: DetalleHogarDTO })
+  | (PolizaBaseDTO & { tipoSeguro: "VEHICULO"; detalleVehiculo: DetalleVehiculoDTO })
+  | (PolizaBaseDTO & { tipoSeguro: "VIAJE"; detalleViaje: DetalleViajeDTO });
 
 export interface UpdatePolizaDTO {
     estado?: EstadoPoliza;
@@ -59,6 +102,10 @@ export interface UpdatePolizaDTO {
     detalleFianza?: Partial<DetalleFianzaDTO>;
     detalleVida?: Partial<DetalleVidaDTO>;
     detalleOtros?: Partial<DetalleOtrosDTO>;
+    detalleAlquiler?: Partial<DetalleAlquilerDTO>;
+    detalleComercio?: Partial<DetalleComercioDTO>;
+    detalleHogar?: Partial<DetalleHogarDTO>;
+    detalleVehiculo?: Partial<DetalleVehiculoDTO>;
 }
 
 export interface FilterPolizaDTO {

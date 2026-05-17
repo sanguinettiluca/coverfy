@@ -6,9 +6,14 @@ import {CreatePolizaDTO, UpdatePolizaDTO, FilterPolizaDTO} from "../domain/poliz
 // if o switch, por lo que vi es mejor y mas eficiente.
 const detalleCreateMap: Record<string, string> = {
     RESPONSABILIDAD_CIVIL: "detalleResponsabilidadCivil",
-    FIANZA:                "detalleFianza",
-    VIDA:                  "detalleVida",
-    OTROS:                 "detalleOtros",
+    FIANZA: "detalleFianza",
+    VIDA: "detalleVida",
+    OTROS: "detalleOtros",
+    ALQUILER: "detalleAlquiler",
+    COMERCIO: "detalleComercio",
+    HOGAR: "detalleHogar",
+    VEHCIULO: "detalleVehiculo",
+    VIAJE: "detalleViaje"
 }
 
 // Extrae el detalle del body segun el tipo del seguro (tipoSeguro) y lo retorna
@@ -43,7 +48,18 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
         throw new Error("Ya existe una poliza con ese numero para este cliente");
     }
 
-    const {detalleResponsabilidadCivil, detalleFianza, detalleVida, detalleOtros, ...camposPoliza} = data as any;
+    const {
+        detalleResponsabilidadCivil,
+        detalleFianza, 
+        detalleVida, 
+        detalleOtros,
+        detalleAlquiler,
+        detalleComercio,
+        detalleHogar,
+        detalleVehiculo,
+        detalleViaje,
+        ...camposPoliza
+    } = data as any;
     const detalle = buildDetalleCreate(data);
     const poliza = await prisma.poliza.create({
         data: {
@@ -55,7 +71,12 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
             detalleResponsabilidadCivil: true,
             detalleFianza: true,
             detalleVida: true,
-            detalleOtros: true
+            detalleOtros: true,
+            detalleAlquiler: true,
+            detalleComercio: true,
+            detalleHogar: true,
+            detalleVehiculo: true,
+            detalleViaje: true
         }
     })
 
@@ -84,7 +105,12 @@ export async function listarPolizas(brokerId: string, filtros: FilterPolizaDTO) 
                 detalleResponsabilidadCivil: true,
                 detalleFianza: true,
                 detalleVida: true,
-                detalleOtros: true
+                detalleOtros: true,
+                detalleAlquiler: true,
+                detalleComercio: true,
+                detalleHogar: true,
+                detalleVehiculo: true,
+                detalleViaje: true
             }
         }),
         prisma.poliza.count({where}),
@@ -107,76 +133,134 @@ export async function actualizarPoliza(id: string, brokerId: string, data: Updat
         throw new Error('Póliza no encontrada')
     }
 
-    const polizaActualizada = await prisma.poliza.update({
-        where: { id },
-        data
-    })
+    const {
+        detalleResponsabilidadCivil,
+        detalleFianza,
+        detalleVida,
+        detalleOtros,
+        detalleAlquiler,
+        detalleComercio,
+        detalleHogar,
+        detalleVehiculo,
+        detalleViaje,
+        ...camposBase
+    } = data;
 
-    return polizaActualizada;
+    // string: las claves vienen en forma de texto, unknown: el valor puede ser cualquier cosa
+    // luego se le iran asignando propiedades segun que detalle venga en el request
+    const detallesUpdate: Record<string, unknown> = {};
+
+    // Si existe detalleResponsabilidadCivil en los datos de UpdatePolizaDTO entonces se agrega
+    // para actualizarlo.
+    if(detalleResponsabilidadCivil){
+        // Se agrega dinamicamente la propiedad detalle... a detallesUpdate.
+        // detallesUpdate = {
+        //   detalleResponsabilidadCivil: {...}
+        // } -- Espero se entienda esto
+        detallesUpdate.detalleResponsabilidadCivil = {
+            upsert: {create: detalleResponsabilidadCivil, update: detalleResponsabilidadCivil}
+        }
+    }
+
+    if(detalleFianza){
+        detallesUpdate.detalleFianza = {
+            upsert: {create: detalleFianza, update: detalleFianza}
+        }
+    }
+
+    if(detalleVida){
+        detallesUpdate.detalleVida = {
+            upsert: {create: detalleVida, update: detalleVida}
+        }
+    }
+
+    if(detalleOtros){
+        detallesUpdate.detalleOtros = {
+            upsert: {create: detalleOtros, update: detalleOtros}
+        }
+    }
+
+    if(detalleViaje){
+        detallesUpdate.detalleViaje = {
+            upsert: {create: detalleViaje, update: detalleViaje}
+        }
+    }
+
+    if(detalleAlquiler){
+        detallesUpdate.detalleAlquiler = {
+            upsert: {create: detalleAlquiler, update: detalleAlquiler}
+        }
+    }
+
+    if(detalleComercio){
+        detallesUpdate.detalleComercio = {
+            upsert: {create: detalleComercio, update: detalleComercio}
+        }
+    }
+
+    if(detalleHogar){
+        detallesUpdate.detalleHogar = {
+            upsert: {create: detalleHogar, update: detalleHogar}
+        }
+    }
+
+    if(detalleVehiculo){
+        detallesUpdate.detalleVehiculo = {
+            upsert: {create: detalleVehiculo, update: detalleVehiculo}
+        }
+    }
+
+    const polizaActualizada = await prisma.poliza.update({
+        where: {id},
+        data: {...camposBase, ...detallesUpdate},
+        include: {
+            detalleResponsabilidadCivil: true,
+            detalleFianza: true,
+            detalleVida: true,
+            detalleOtros: true,
+            detalleAlquiler: true,
+            detalleComercio: true,
+            detalleHogar: true,
+            detalleVehiculo: true,
+            detalleViaje: true
+        }
+    });
+    return polizaActualizada
 }
 
 export async function eliminarPoliza(id: string, brokerId: string){
     const poliza = await prisma.poliza.findFirst({
         where: {id, brokerId}
     })
-    if (!poliza) {
-        throw new Error('Póliza no encontrada')
+
+    if(!poliza){
+        throw new Error("Poliza no encontrada");
     }
 
-    await prisma.poliza.delete({
-        where: {id}
-    })
-
-    return {message: 'Póliza eliminada exitosamente'}
+    await prisma.poliza.delete({where: {id}});
+    return {message: "Poliza eliminada exitosamente"};
 }
 
 export async function obtenerPolizaPorId(id: string, brokerId: string){
     const poliza = await prisma.poliza.findFirst({
-        where: { id, cliente: { brokerId } },
+        where: {id, cliente: {brokerId}},
         include: {
-            broker:{
-                select: {id: true, nombre: true, role: true}
-            }
+            broker: { select: { id: true, nombre: true, role: true } },
+            detalleResponsabilidadCivil: true,
+            detalleFianza: true,
+            detalleVida: true,
+            detalleOtros: true,
+            detalleAlquiler: true,
+            detalleComercio: true,
+            detalleHogar: true,
+            detalleVehiculo: true,
+            detalleViaje: true
         }
     })
-    if (!poliza) {
-        throw new Error('Póliza no encontrada')
+
+    if(!poliza){
+        throw new Error("Poliza no encontrada")
     }
 
-    return poliza;
+    return poliza
 }
-
-
-//obtener polizas por numero de poliza o numero de referencia
-
-// export async function obtenerPolizaPorNumero(numeroPoliza: string, brokerId: string){
-//     const poliza = await prisma.poliza.findFirst({
-//         where: {numeroPoliza, brokerId},
-//         include: {
-//             creadoPor:{
-//                 select: {id: true, nombre: true, role: true}
-//             }
-//         }
-//     })
-//     if (!poliza) {
-//         throw new Error('Póliza no encontrada')
-//     }
-
-//     return poliza;
-// }
-
-// export async function obtenerPolizaPorNumeroReferencia(numeroReferencia: string, brokerId: string){
-//     const poliza = await prisma.poliza.findFirst({
-//         where: {numeroReferencia, brokerId},
-//         include: {
-//             creadoPor:{
-//                 select: {id: true, nombre: true, role: true}
-//             }
-//         }
-//     })
-//     if (!poliza) {
-//         throw new Error('Póliza no encontrada')
-//     }
-
-//     return poliza;
-// }

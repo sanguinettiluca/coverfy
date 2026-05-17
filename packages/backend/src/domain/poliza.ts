@@ -106,6 +106,7 @@ export interface UpdatePolizaDTO {
     detalleComercio?: Partial<DetalleComercioDTO>;
     detalleHogar?: Partial<DetalleHogarDTO>;
     detalleVehiculo?: Partial<DetalleVehiculoDTO>;
+    detalleViaje?: Partial<DetalleViajeDTO>;
 }
 
 export interface FilterPolizaDTO {

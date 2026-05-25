@@ -1,5 +1,6 @@
 import prisma from "../config/prisma";
 import { CreateCoberturaDTO, UpdateCoberturaDTO } from "../domain/cobertura";
+import { TipoSeguro } from "../generated/prisma";
 
 export async function crearCobertura(data: CreateCoberturaDTO, brokerId: string){
     const compania = await prisma.companiaSeguros.findFirst({
@@ -33,7 +34,7 @@ export async function crearCobertura(data: CreateCoberturaDTO, brokerId: string)
     return cobertura
 }
 
-export async function listarCoberturas(companiaId: string, brokerId: string, tipoSeguro?: string) {
+export async function listarCoberturas(companiaId: string, brokerId: string, tipoSeguro?: TipoSeguro) {
     const compania = await prisma.companiaSeguros.findFirst({
         where: {id: companiaId, brokerId}
     })
@@ -44,7 +45,9 @@ export async function listarCoberturas(companiaId: string, brokerId: string, tip
 
     const coberturas = await prisma.cobertura.findMany({
         where:{
-            companiaId
+            companiaId,
+            // Si se proporciona un tipo de seguro, filtramos por él
+            ...(tipoSeguro && { tipoSeguro })
         },
         orderBy: {nombre: 'asc'}
     })

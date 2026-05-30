@@ -42,6 +42,8 @@ model User{
   polizasCreadas Poliza[] @relation("PolizaCreador")
   clientesCreados Cliente[] @relation("ClienteCreador")
 
+  siniestrosCreados Siniestro[] @relation("SiniestroCreador")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -103,6 +105,11 @@ enum MetodoPago{
   Efectivo
 }
 
+enum EstadoSiniestro{
+  ABIERTO
+  CERRADO
+}
+
 model CompaniaSeguros{
   id String @id @default(uuid())
   nombre String
@@ -144,6 +151,9 @@ model Poliza{
   // Quien registro la poliza (BROKER o SUB_BROKER):
   brokerId String
   broker User @relation("PolizaCreador", fields: [brokerId], references: [id])
+
+  // Siniestros asociados a esta poliza (solo para polizas de vehiculo):
+  siniestros Siniestro[]
 
   // Relacion 1:1 con cada tabla de detalle por tipo de seguro:
   // Solo una de estas relaciones se llenara dependiendo del tipo de seguro:
@@ -259,6 +269,25 @@ model DetalleOtros{
   polizaId String @unique
   poliza Poliza @relation(fields: [polizaId], references: [id], onDelete: Cascade)
   descripcion String @default("")
+}
+
+model Siniestro{
+  id String @id @default(uuid())
+  fechaSiniestro DateTime
+  fechaContacto DateTime?
+  notas String?
+  estado EstadoSiniestro @default(ABIERTO)
+
+  // Los siniestros solo se dan en polizas de vehiculo.
+  polizaId String
+  poliza Poliza @relation(fields: [polizaId], references: [id], onDelete: Cascade)
+
+  // Auditoria: quien registro este siniestro.
+  brokerId String
+  broker User @relation("SiniestroCreador", fields: [brokerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Documentos:

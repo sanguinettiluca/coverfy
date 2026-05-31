@@ -44,7 +44,7 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
     const polizaExistente = await prisma.poliza.findFirst({
         where: {numeroPoliza: data.numeroPoliza, clienteId: data.clienteId}
     });
-    if(!polizaExistente){
+    if(polizaExistente){
         throw new Error("Ya existe una poliza con ese numero para este cliente");
     }
 
@@ -84,8 +84,12 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
 }
 
 export async function listarPolizas(brokerId: string, filtros: FilterPolizaDTO) {
-    const { busqueda, pagina = 1, porPagina = 10 } = filtros;
+    const { busqueda, clienteId, pagina = 1, porPagina = 10 } = filtros;
     const where: any = {cliente: {brokerId}};
+
+    if(clienteId){
+        where.clienteId = clienteId;
+    }
 
     if(busqueda){
         where.OR = [

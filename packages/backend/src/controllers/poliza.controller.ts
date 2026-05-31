@@ -14,7 +14,18 @@ export async function crearPolizaController(req: Request, res: Response): Promis
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
         
         // Describir explicitamente los tipos de poliza permitidos:
-        const tiposPermitidos = ["RESPONSABILIDAD_CIVIL", "FIANZA", "VIDA", "OTROS"];
+        const tiposPermitidos = [
+            "VEHICULO",
+            "VIAJE",
+            "ALQUILER",
+            "HOGAR",
+            "COMERCIO",
+            "RESPONSABILIDAD_CIVIL",
+            "FIANZA",
+            "VIDA",
+            "OTROS",
+        ];
+        
         if(!req.body.tipoSeguro || !tiposPermitidos.includes(req.body.tipoSeguro)){
             res.status(400).json({message: "El tipo de seguro no es valido."});
             return;
@@ -37,6 +48,7 @@ export async function listarPolizasController(req: Request, res: Response): Prom
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
         const filtros = {
             busqueda: req.query.busqueda as string | undefined,
+            clienteId: req.query.clienteId as string | undefined,
             pagina: req.query.pagina ? Number(req.query.pagina) : 1,
             porPagina: req.query.porPagina ? Number(req.query.porPagina) : 10
         }

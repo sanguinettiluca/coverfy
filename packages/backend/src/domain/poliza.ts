@@ -111,6 +111,7 @@ export interface UpdatePolizaDTO {
 
 export interface FilterPolizaDTO {
     busqueda?: string;
+    clienteId?: string;
     pagina?: number;
     porPagina?: number;
 }

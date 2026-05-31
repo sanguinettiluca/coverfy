@@ -30,7 +30,7 @@ export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
   const { data: polizas = [] } = useQuery({
     queryKey: ["polizas", clienteId],
     queryFn: async () => {
-      const { data } = await api.get("/polizas");
+      const { data } = await api.get("/polizas", {params: {clienteId}});
       const lista: Poliza[] = data.polizas ?? data;
       return lista;
     },

@@ -5,6 +5,7 @@ import {
     actualizarCobertura,
     eliminarCobertura
 } from '../services/cobertura.service'
+import { TipoSeguro } from "../generated/prisma";
 
 export async function crearCoberturaController(req: Request, res: Response): Promise<void> {
     try{
@@ -32,7 +33,7 @@ export async function listarCoberturasController(req: Request, res: Response): P
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
 
         const companiaId = req.query.companiaId as string
-        const tipoSeguro = req.query.tipoSeguro as string | undefined
+        const tipoSeguro = req.query.tipoSeguro as TipoSeguro | undefined
 
         if(!companiaId){
             res.status(400).json({message: 'Compania es requerida'})

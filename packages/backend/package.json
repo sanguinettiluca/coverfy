@@ -9,7 +9,12 @@
   },
   "dependencies": {
     "@prisma/client": "latest",
+    "@types/bcryptjs": "latest",
+    "@types/cors": "latest",
+    "@types/express": "latest",
+    "@types/jsonwebtoken": "latest",
     "@types/multer": "^2.1.0",
+    "@types/node": "latest",
     "bcryptjs": "latest",
     "cors": "latest",
     "dotenv": "^16.6.1",
@@ -19,11 +24,6 @@
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "latest",
-    "@types/cors": "latest",
-    "@types/express": "latest",
-    "@types/jsonwebtoken": "latest",
-    "@types/node": "latest",
     "nodemon": "latest",
     "prisma": "latest",
     "ts-node": "latest",

@@ -8,7 +8,17 @@ export interface User {
     brokerId?: string;
 }
 
-export interface AuthResponse{
-    token: string;
+export interface AuthResponse {
+    accessToken: string;
     user: User;
+}
+
+export interface Cliente {
+    id: string;
+    nombres: string;
+    apellidos: string;
+    documento: string;
+    email: string;
+    celular: string;
+    direccion: string;
 }

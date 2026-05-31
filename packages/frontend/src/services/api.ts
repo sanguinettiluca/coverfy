@@ -4,16 +4,25 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000/api"
 });
 
-// Agregar el token en cada request
+// Inyectar token en cada request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Redirigir a login si falla autenticación
 api.interceptors.response.use(
-    (res)=> res,
-    (error) => {
-        if(error.response?.status === 401){
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-        }
-        return Promise.reject(error);
+  (res) => res,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
+    return Promise.reject(error);
+  }
 );
 
 export default api;

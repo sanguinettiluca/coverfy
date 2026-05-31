@@ -31,7 +31,7 @@ export interface DetalleFianzaDTO{
 
 export interface DetalleVidaDTO {
     sumaAsegurada?: number;
-    eneficiario: string;
+    beneficiario: string;
 }
 
 export interface DetalleOtrosDTO {
@@ -48,7 +48,7 @@ export interface DetalleAlquilerDTO {
 export interface DetalleComercioDTO {
     razonSocial: string;
     rubro: string;
-    direccion: number;
+    direccion: string;
 }
 
 export interface DetalleHogarDTO {

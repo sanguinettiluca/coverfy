@@ -250,6 +250,7 @@ export async function obtenerPolizaPorId(id: string, brokerId: string){
         where: {id, cliente: {brokerId}},
         include: {
             broker: { select: { id: true, nombre: true, role: true } },
+            cliente: { select: { id: true, nombres: true, apellidos: true } },
             detalleResponsabilidadCivil: true,
             detalleFianza: true,
             detalleVida: true,

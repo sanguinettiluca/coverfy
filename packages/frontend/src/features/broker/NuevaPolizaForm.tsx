@@ -106,6 +106,11 @@ export function NuevaPolizaForm({clienteId, onCreada, onCancelar} : NuevaPolizaF
     const [companiaId, setCompaniaId] = useState("");
     const [numeroPoliza, setNumeroPoliza] = useState("");
     const [detalle, setDetalle] = useState<Record<string, string>>({});
+    const [fechaInicio, setFechaInicio] = useState("");
+    const [fechaVencimiento, setFechaVencimiento] = useState("");
+    const [montoTotal, setMontoTotal] = useState("");
+    const [cuotas, setCuotas] = useState("");
+    const [metodoPago, setMetodoPago] = useState("");
 
     const { data: companias = [] } = useQuery({
         queryKey: ["companias"],
@@ -127,6 +132,11 @@ export function NuevaPolizaForm({clienteId, onCreada, onCancelar} : NuevaPolizaF
                 tipoSeguro: tipo,
                 clienteId,
                 companiaId,
+                fechaInicio: fechaInicio || null,
+                fechaVencimiento: fechaVencimiento || null,
+                montoTotal: montoTotal ? Number(montoTotal) : 0,
+                cuotas: cuotas ? Number(cuotas) : 1,
+                metodoPago: metodoPago || null,
                 [config.detalleKey]: detalleParseado,
             });
         },
@@ -159,7 +169,6 @@ export function NuevaPolizaForm({clienteId, onCreada, onCancelar} : NuevaPolizaF
         </select>
       </div>
 
-      {/* Tipo de seguro */}
       <div className="space-y-1">
         <Label className="text-xs">Tipo de seguro</Label>
         <select
@@ -177,7 +186,6 @@ export function NuevaPolizaForm({clienteId, onCreada, onCancelar} : NuevaPolizaF
         </select>
       </div>
 
-      {/* Número de póliza */}
       <div className="space-y-1">
         <Label className="text-xs">Número de póliza</Label>
         <Input
@@ -187,7 +195,40 @@ export function NuevaPolizaForm({clienteId, onCreada, onCancelar} : NuevaPolizaF
         />
       </div>
 
-      {/* Campos dinámicos según el tipo */}
+      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+        <div className="space-y-1">
+          <Label className="text-xs">Fecha de inicio</Label>
+          <Input type="date" className="h-9 text-sm" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Fecha de vencimiento</Label>
+          <Input type="date" className="h-9 text-sm" value={fechaVencimiento} onChange={(e) => setFechaVencimiento(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Monto total</Label>
+          <Input type="number" className="h-9 text-sm" value={montoTotal} onChange={(e) => setMontoTotal(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Cuotas</Label>
+          <Input type="number" className="h-9 text-sm" value={cuotas} onChange={(e) => setCuotas(e.target.value)} />
+        </div>
+        <div className="space-y-1 col-span-2">
+          <Label className="text-xs">Método de pago</Label>
+          <select
+            value={metodoPago}
+            onChange={(e) => setMetodoPago(e.target.value)}
+            className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="">Seleccionar...</option>
+            <option value="Debito">Débito</option>
+            <option value="Credito">Crédito</option>
+            <option value="Transferencia">Transferencia</option>
+            <option value="Efectivo">Efectivo</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Campos segun el tipo de seguro */}
       {config && (
         <div className="space-y-3 pt-2 border-t border-border">
           <p className="text-xs text-muted-foreground">Datos de {config.label}</p>

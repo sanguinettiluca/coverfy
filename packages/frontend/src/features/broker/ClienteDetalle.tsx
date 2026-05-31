@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { obtenerCliente } from "@/services/clientes.service";
 import api from "@/services/api";
 import { NuevaPolizaForm } from "./NuevaPolizaForm";
+import { PolizaDetalle } from "./PolizaDetalle";
 
 interface ClienteDetalleProps {
   clienteId: string;
@@ -20,17 +21,17 @@ interface Poliza {
 
 export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
   const [mostrarFormPoliza, setMostrarFormPoliza] = useState(false);
+  const [polizaSeleccionada, setPolizaSeleccionada] = useState<string | null>(null);
 
   const { data: cliente, isLoading } = useQuery({
     queryKey: ["cliente", clienteId],
     queryFn: () => obtenerCliente(clienteId),
   });
 
-  // Pólizas del cliente
   const { data: polizas = [] } = useQuery({
     queryKey: ["polizas", clienteId],
     queryFn: async () => {
-      const { data } = await api.get("/polizas", {params: {clienteId}});
+      const { data } = await api.get("/polizas", { params: { clienteId } });
       const lista: Poliza[] = data.polizas ?? data;
       return lista;
     },
@@ -41,6 +42,15 @@ export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
       <div className="flex justify-center py-12">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
+    );
+  }
+
+  if (polizaSeleccionada) {
+    return (
+      <PolizaDetalle
+        polizaId={polizaSeleccionada}
+        onVolver={() => setPolizaSeleccionada(null)}
+      />
     );
   }
 
@@ -61,7 +71,6 @@ export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
         </div>
       </div>
 
-      {/* Pólizas */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold">Pólizas</h3>
@@ -91,13 +100,17 @@ export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
         ) : (
           <div className="border border-border rounded-lg overflow-hidden">
             {polizas.map((p) => (
-              <div key={p.id} className="flex items-center justify-between px-4 py-3 border-b border-border last:border-0">
+              <button
+                key={p.id}
+                onClick={() => setPolizaSeleccionada(p.id)}
+                className="w-full flex items-center justify-between px-4 py-3 border-b border-border last:border-0 hover:bg-muted/50 text-left transition-colors"
+              >
                 <div>
                   <p className="text-sm font-medium">{p.numeroPoliza}</p>
                   <p className="text-xs text-muted-foreground">{p.tipoSeguro}</p>
                 </div>
                 <span className="text-xs px-2 py-1 rounded bg-secondary text-secondary-foreground">{p.estado}</span>
-              </div>
+              </button>
             ))}
           </div>
         )}

@@ -1,6 +1,5 @@
 import prisma from "../config/prisma";
 import {CreateClienteDTO, UpdateClienteDTO, FilterClienteDTO} from "../domain/cliente";
-import Tesseract from "Tesseract.js";
 
 // Crear cliente
 export async function crearCliente(

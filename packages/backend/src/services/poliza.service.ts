@@ -39,7 +39,7 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
     const polizaExistente = await prisma.poliza.findFirst({
         where: {numeroPoliza: data.numeroPoliza, clienteId: data.clienteId}
     });
-    if(!polizaExistente){
+    if(polizaExistente){
         throw new Error("Ya existe una poliza con ese numero para este cliente");
     }
 
@@ -106,12 +106,43 @@ export async function actualizarPoliza(id: string, brokerId: string, data: Updat
     if (!poliza) {
         throw new Error('Póliza no encontrada')
     }
+    // Construir el objeto `data` para Prisma, mapeando los detalles anidados
+    const {
+        detalleResponsabilidadCivil,
+        detalleFianza,
+        detalleVida,
+        detalleOtros,
+        detalleAlquiler,
+        detalleComercio,
+        detalleHogar,
+        detalleVehiculo,
+        ...camposPoliza
+    } = data as any;
+
+    const detalleUpdate: Record<string, any> = {};
+
+    function addUpsert(key: string, value: any){
+        if(value && Object.keys(value).length > 0){
+            detalleUpdate[key] = { upsert: { create: value, update: value } };
+        }
+    }
+
+    addUpsert('detalleResponsabilidadCivil', detalleResponsabilidadCivil);
+    addUpsert('detalleFianza', detalleFianza);
+    addUpsert('detalleVida', detalleVida);
+    addUpsert('detalleOtros', detalleOtros);
+    addUpsert('detalleAlquiler', detalleAlquiler);
+    addUpsert('detalleComercio', detalleComercio);
+    addUpsert('detalleHogar', detalleHogar);
+    addUpsert('detalleVehiculo', detalleVehiculo);
 
     const polizaActualizada = await prisma.poliza.update({
         where: { id },
-        data
+        data: {
+            ...camposPoliza,
+            ...detalleUpdate
+        }
     })
-
     return polizaActualizada;
 }
 

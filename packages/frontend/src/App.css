@@ -310,3 +310,66 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+.login-form,
+.cliente-list,
+.session-header {
+  margin-top: 20px;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+  max-width: 420px;
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cliente-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cliente-list th,
+.cliente-list td {
+  border: 1px solid #e5e7eb;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.cliente-list th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.cliente-list tbody tr:hover {
+  background: #f8fafc;
+}
+
+.cliente-list button {
+  min-width: 90px;
+}
+
+.note {
+  color: #475569;
+  font-size: 13px;
+}
+
+.error {
+  margin-top: 16px;
+  color: #b91c1c;
+}

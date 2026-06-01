@@ -7,6 +7,7 @@ import clientRoutes from "./routes/cliente.routes"
 import companiaRoutes from './routes/compania.routes'
 import coberturaRoutes from './routes/cobertura.routes'
 import polizaRoutes from './routes/poliza.routes'
+import ocrRoutes from './routes/ocr.routes'
 
 // Cargamos las variables de entorno del archivo .env
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
@@ -36,6 +37,9 @@ app.use('/api/companias', companiaRoutes)
 
 // Rutas de coberturas
 app.use('/api/coberturas', coberturaRoutes)
+
+// Rutas de OCR
+app.use('/api/ocr', ocrRoutes)
 
 // Rutas de pólizas
 app.use('/api/polizas', polizaRoutes)

@@ -12,7 +12,7 @@ const detalleCreateMap: Record<string, string> = {
     ALQUILER: "detalleAlquiler",
     COMERCIO: "detalleComercio",
     HOGAR: "detalleHogar",
-    VEHCIULO: "detalleVehiculo",
+    VEHICULO: "detalleVehiculo",
     VIAJE: "detalleViaje"
 }
 

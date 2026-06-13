@@ -128,16 +128,16 @@ export function NuevaPolizaForm({clienteId, onCreada, onCancelar} : NuevaPolizaF
             });
 
             return crearPoliza({
-                numeroPoliza,
-                tipoSeguro: tipo,
-                clienteId,
-                companiaId,
-                fechaInicio: fechaInicio || null,
-                fechaVencimiento: fechaVencimiento || null,
-                montoTotal: montoTotal ? Number(montoTotal) : 0,
-                cuotas: cuotas ? Number(cuotas) : 1,
-                metodoPago: metodoPago || null,
-                [config.detalleKey]: detalleParseado,
+              numeroPoliza,
+              tipoSeguro: tipo,
+              clienteId,
+              companiaId,
+              fechaInicio: fechaInicio ? new Date(fechaInicio).toISOString() : null,
+              fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento).toISOString() : null,
+              montoTotal: montoTotal ? Number(montoTotal) : 0,
+              cuotas: cuotas ? Number(cuotas) : 1,
+              metodoPago: metodoPago || null,
+              [config.detalleKey]: detalleParseado,
             });
         },
         onSuccess: () => {

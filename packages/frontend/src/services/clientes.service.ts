@@ -1,10 +1,9 @@
 import api from "./api";
 import type { Cliente } from "../types";
 
-export async function listarClientes(): Promise<Cliente[]> {
-    const { data } = await api.get("/clientes");
-    // El backend pagina, los clientes vienen en data.clientes
-    return data.clientes ?? data;
+export async function listarClientes(busqueda?: string): Promise<{ clientes: Cliente[]; total: number }> {
+    const { data } = await api.get("/clientes", { params: { busqueda: busqueda || undefined } });
+    return { clientes: data.clientes ?? data, total: data.total ?? (data.clientes ?? data).length };
 }
 
 export async function obtenerCliente(id: string): Promise<Cliente> {

@@ -7,6 +7,7 @@ import {
     obtenerPolizaPorId
 } from '../services/poliza.service'
 import { CreatePolizaDTO, UpdatePolizaDTO } from "../domain/poliza";
+import { EstadoPoliza } from "../generated/prisma";
 
 export async function crearPolizaController(req: Request, res: Response): Promise<void>{
     try{
@@ -46,9 +47,13 @@ export async function listarPolizasController(req: Request, res: Response): Prom
     try{
         const {userId, role, brokerId: brokerIdToken} = req.user!
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const estadoRaw = req.query.estado as string | undefined
         const filtros = {
             busqueda: req.query.busqueda as string | undefined,
             clienteId: req.query.clienteId as string | undefined,
+            companiaId: req.query.companiaId as string | undefined,
+            estado: estadoRaw && Object.values(EstadoPoliza).includes(estadoRaw as EstadoPoliza)
+                ? (estadoRaw as EstadoPoliza) : undefined,
             pagina: req.query.pagina ? Number(req.query.pagina) : 1,
             porPagina: req.query.porPagina ? Number(req.query.porPagina) : 10
         }

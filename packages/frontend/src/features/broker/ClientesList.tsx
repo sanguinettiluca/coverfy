@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import type { Cliente } from "@/types";
 import { escanearCedula } from "@/services/ocr.service";
 import { UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface ClientesListProps {
     onVerCliente: (clienteId: string) => void;
@@ -18,10 +19,16 @@ interface ClientesListProps {
 export function ClientesList({ onVerCliente }: ClientesListProps) {
     const queryClient = useQueryClient();
     const [mostrarForm, setMostrarForm] = useState(false);
-    const {data: clientes = [], isLoading} = useQuery({
-        queryKey: ["clientes"],
-        queryFn: listarClientes
+    const [busqueda, setBusqueda] = useState("");
+    const busquedaDebounced = useDebounce(busqueda);
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["clientes", busquedaDebounced],
+        queryFn: () => listarClientes(busquedaDebounced),
     });
+
+    const clientes = data?.clientes ?? [];
+    const total = data?.total ?? 0;
 
     if (isLoading) {
         return (
@@ -33,11 +40,28 @@ export function ClientesList({ onVerCliente }: ClientesListProps) {
 
     return (
         <div className="space-y-4">
+
+            <div className="bg-card border border-border rounded-xl p-5 w-fit min-w-[180px]">
+                <p className="text-xs text-muted-foreground">Total de clientes</p>
+                <p className="text-3xl font-bold text-primary mt-1">{total}</p>
+            </div>
+
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Clientes</h2>
                 <Button size="sm" className="gap-2 bg-primary text-primary-foreground" onClick={() => setMostrarForm(!mostrarForm)}>
                 <Plus className="h-4 w-4" /> Nuevo cliente
                 </Button>
+            </div>
+
+            {/* Buscador: */}
+            <div className="relative">
+                <Search className= "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    placeholder="Buscar por nombre, documento o email..."
+                    className="pl-9"
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                />
             </div>
 
             {mostrarForm && (

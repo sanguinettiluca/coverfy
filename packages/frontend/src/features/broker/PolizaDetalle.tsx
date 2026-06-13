@@ -67,8 +67,8 @@ export function PolizaDetalle({polizaId, onVolver}: PolizaDetalleProps){
         mutationFn: () => 
             actualizarPoliza(polizaId, {
                 estado: form.estado,
-                fechaInicio: form.fechaInicio || null,
-                fechaVencimiento: form.fechaVencimiento || null,
+                fechaInicio: form.fechaInicio ? new Date(form.fechaInicio).toISOString() : null,
+                fechaVencimiento: form.fechaVencimiento ? new Date(form.fechaVencimiento).toISOString() : null,
                 montoTotal: form.montoTotal ? Number(form.montoTotal) : undefined,
                 cuotas: form.cuotas ? Number(form.cuotas) : undefined
             }),

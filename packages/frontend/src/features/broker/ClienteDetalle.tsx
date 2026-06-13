@@ -6,6 +6,11 @@ import { obtenerCliente } from "@/services/clientes.service";
 import api from "@/services/api";
 import { NuevaPolizaForm } from "./NuevaPolizaForm";
 import { PolizaDetalle } from "./PolizaDetalle";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { listarCompanias } from "@/services/companias.service";
 
 interface ClienteDetalleProps {
   clienteId: string;
@@ -22,6 +27,10 @@ interface Poliza {
 export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
   const [mostrarFormPoliza, setMostrarFormPoliza] = useState(false);
   const [polizaSeleccionada, setPolizaSeleccionada] = useState<string | null>(null);
+  const [busquedaPoliza, setBusquedaPoliza] = useState("");
+  const busquedaPolizaDebounced = useDebounce(busquedaPoliza);
+  const [filtroCompania, setFiltroCompania] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("");
 
   const { data: cliente, isLoading } = useQuery({
     queryKey: ["cliente", clienteId],
@@ -29,12 +38,24 @@ export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
   });
 
   const { data: polizas = [] } = useQuery({
-    queryKey: ["polizas", clienteId],
+    queryKey: ["polizas", clienteId, busquedaPolizaDebounced, filtroCompania, filtroEstado],
     queryFn: async () => {
-      const { data } = await api.get("/polizas", { params: { clienteId } });
+      const { data } = await api.get("/polizas", {
+      params: {
+        clienteId,
+        busqueda: busquedaPolizaDebounced || undefined,
+        companiaId: filtroCompania || undefined,
+        estado: filtroEstado || undefined,
+      },
+      });
       const lista: Poliza[] = data.polizas ?? data;
       return lista;
     },
+  });
+
+  const {data: companias = []} = useQuery({
+    queryKey: ["companias"],
+    queryFn: listarCompanias,
   });
 
   if (isLoading || !cliente) {
@@ -81,6 +102,44 @@ export function ClienteDetalle({ clienteId, onVolver }: ClienteDetalleProps) {
           >
             <Plus className="h-4 w-4" /> Nueva póliza
           </Button>
+        </div>
+
+        {/* Listado de pólizas con buscador y filtros: */}
+
+        <div className="flex gap-2 mb-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por número de póliza o matrícula..."
+              className="pl-9 h-9 text-sm"
+              value={busquedaPoliza}
+              onChange={(e) => setBusquedaPoliza(e.target.value)}
+            />
+          </div>
+
+          <select
+            value={filtroCompania}
+            onChange={(e) => setFiltroCompania(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="">Todas las compañías</option>
+            {companias.map((c)=>(
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
+
+          <select
+            value={filtroEstado}
+            onChange={(e) => setFiltroEstado(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="">Todos los estados</option>
+              <option value="ACTIVA">Activas</option>
+              <option value="VENCIDA">Vencidas</option>
+              <option value="CANCELADA">Canceladas</option>
+              <option value="SUSPENDIDA">Suspendidas</option>
+            </select>
+
         </div>
 
         {mostrarFormPoliza && (

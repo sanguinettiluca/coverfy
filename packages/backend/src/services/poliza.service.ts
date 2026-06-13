@@ -84,17 +84,26 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
 }
 
 export async function listarPolizas(brokerId: string, filtros: FilterPolizaDTO) {
-    const { busqueda, clienteId, pagina = 1, porPagina = 10 } = filtros;
+    const { busqueda, clienteId, companiaId, estado, pagina = 1, porPagina = 10 } = filtros;
     const where: any = {cliente: {brokerId}};
 
     if(clienteId){
         where.clienteId = clienteId;
     }
 
+    if(companiaId){
+        where.companiaId = companiaId;
+    }
+
+    if(estado){
+        where.estado = estado;
+    }
+
     if(busqueda){
         where.OR = [
             {numeroPoliza: {contains: busqueda, mode: "insensitive"}},
-            {numeroReferencia: {contains: busqueda, mode: "insensitive"}}
+            {numeroReferencia: {contains: busqueda, mode: "insensitive"}},
+            {detalleVehiculo: {matricula: {contains: busqueda, mode: 'insensitive'}}}
         ];
     }
 
@@ -105,7 +114,8 @@ export async function listarPolizas(brokerId: string, filtros: FilterPolizaDTO) 
             take: porPagina,
             orderBy: {createdAt: "desc"},
             include:{
-                broker: {select: {id: true, nombre: true, role: true}},
+                broker: { select: {id: true, nombre: true, role: true} },
+                compania: { select: {id: true, nombre: true} },
                 detalleResponsabilidadCivil: true,
                 detalleFianza: true,
                 detalleVida: true,

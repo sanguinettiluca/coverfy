@@ -6,7 +6,6 @@ import { obtenerEstadisticas } from "@/services/reportes.service";
 import { listarClientes } from "@/services/clientes.service";
 import api from "@/services/api";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 type Vista = "graficos" | "clientes" | "polizas"; // Esto define los tipos de vistas disponibles
 
@@ -42,19 +41,37 @@ export function ReportesPage() {
     const exportarPDF = async () => {
         setExportandoURL(true);
         try{
-            const elemento = document.getElementById("contenido-exportar");
-            if(!elemento){
-                return;
+            const pdf = new jsPDF("p", "mm", "a4");
+            let y = 20;
+
+            pdf.setFontSize(18);
+            pdf.text("Coverfy - Reporte", 14, y);
+            pdf.setFontSize(10);
+            pdf.text(new Date().toLocaleDateString("es-UY"), 14, y + 6);
+            y += 20;
+
+            if (estadisticas) {
+                pdf.setFontSize(13);
+                pdf.text("Pólizas Activas por Compañía", 14, y);
+                y += 7;
+                pdf.setFontSize(10);
+                estadisticas.polizasActivasPorCompania.forEach((item) => {
+                    pdf.text(`${item.nombre}: ${item.cantidad}`, 16, y);
+                    y += 6;
+                });
+
+                y += 6;
+                pdf.setFontSize(13);
+                pdf.text("Clientes Acumulados por Mes", 14, y);
+                y += 7;
+                pdf.setFontSize(10);
+                estadisticas.clientesAcumuladosPorMes.forEach((item) => {
+                    pdf.text(`${item.mes}: ${item.total}`, 16, y);
+                    y += 6;
+                });
             }
 
-            const canvas = await html2canvas(elemento, {scale: 2});
-            const pdf = new jsPDF("p", "mm", "a4");
-            const imgData = canvas.toDataURL("image/png");
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-            pdf.save("reporte.pdf");
+            pdf.save("reporte-coverfy.pdf");
         }finally{
             setExportandoURL(false);
         }

@@ -1,4 +1,3 @@
-import { create } from "domain";
 import prisma from "../config/prisma";
 import {CreatePolizaDTO, UpdatePolizaDTO, FilterPolizaDTO} from "../domain/poliza";
 
@@ -116,7 +115,7 @@ export async function listarPolizas(brokerId: string, filtros: FilterPolizaDTO) 
             include:{
                 broker: { select: {id: true, nombre: true, role: true} },
                 compania: { select: {id: true, nombre: true} },
-                cliente: { select: {id: true, nombre: true} },
+                cliente: { select: {id: true, nombres: true, apellidos: true} },
                 detalleResponsabilidadCivil: true,
                 detalleFianza: true,
                 detalleVida: true,

@@ -212,7 +212,7 @@ export function ComisionesPage() {
                         <td className="px-4 py-3 font-mono">{p.numeroPoliza || "—"}</td>
                         <td className="px-4 py-3">{TIPO_LABEL[p.tipoSeguro] ?? p.tipoSeguro}</td>
                         <td className="px-4 py-3 text-muted-foreground">
-                          {p.cliente?.nombre ?? "—"}
+                          {p.cliente ? `${p.cliente.nombres} ${p.cliente.apellidos}` : "—"}
                         </td>
                         <td className="px-4 py-3 text-right">$ {formatMoney(p.montoTotal ?? 0)}</td>
                         <td className="px-4 py-3 text-right font-medium text-green-700">

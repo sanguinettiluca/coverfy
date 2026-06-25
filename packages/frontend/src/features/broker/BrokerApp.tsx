@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { LogOut, Users } from "lucide-react";
+import { LogOut, Users, BarChart3, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { ClientesList } from "./ClientesList";
 import { ClienteDetalle } from "./ClienteDetalle";
-import { BarChart3 } from "lucide-react";
 import { ReportesPage } from "./ReportesPage";
+import { ComisionesPage } from "./ComisionesPage";
 
-type Vista = { tipo: "lista" } | { tipo: "detalle"; clienteId: string } | { tipo: "reportes" };
+type Vista = { tipo: "lista" } | { tipo: "detalle"; clienteId: string } | { tipo: "reportes" } | { tipo: "comisiones" };
 
 export function BrokerApp() {
   const { logout, user } = useAuth();
@@ -49,6 +49,19 @@ export function BrokerApp() {
             <BarChart3 className="h-4 w-4" />
               Reportes
           </button>
+
+          <button
+            onClick={() => setVista({ tipo: "comisiones" })}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              vista.tipo === "comisiones"
+                ? "bg-secondary text-secondary-foreground"
+                : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            )}
+          >
+            <DollarSign className="h-4 w-4" />
+            Comisiones
+          </button>
         </nav>
 
         <div className="px-3 py-4 border-t border-primary-foreground/10 space-y-2">
@@ -69,9 +82,11 @@ export function BrokerApp() {
         <div className="max-w-4xl mx-auto">
           {vista.tipo === "reportes" ? (
             <ReportesPage />
+          ) : vista.tipo === "comisiones" ? (
+            <ComisionesPage />
           ) : vista.tipo === "lista" ? (
             <ClientesList onVerCliente={(clienteId) => setVista({ tipo: "detalle", clienteId })} />
-          ) :(
+          ) : (
             <ClienteDetalle clienteId={vista.clienteId} onVolver={() => setVista({ tipo: "lista" })} />
           )}
         </div>

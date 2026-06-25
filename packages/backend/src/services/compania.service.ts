@@ -12,7 +12,7 @@ export async function crearCompania(data: CreateCompaniaDTO, brokerId: string) {
     }
 
     const compania = await prisma.companiaSeguros.create({
-        data: {nombre: data.nombre, brokerId}
+        data: {nombre: data.nombre, porcentajeComision: data.porcentajeComision ?? 0, brokerId}
     })
 
     return compania;

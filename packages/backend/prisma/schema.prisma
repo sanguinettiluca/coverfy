@@ -113,6 +113,7 @@ enum EstadoSiniestro{
 model CompaniaSeguros{
   id String @id @default(uuid())
   nombre String
+  porcentajeComision Float @default(0)
 
   brokerId String
   broker User @relation(fields: [brokerId], references: [id])

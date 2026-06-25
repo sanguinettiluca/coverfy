@@ -116,6 +116,7 @@ export async function listarPolizas(brokerId: string, filtros: FilterPolizaDTO) 
             include:{
                 broker: { select: {id: true, nombre: true, role: true} },
                 compania: { select: {id: true, nombre: true} },
+                cliente: { select: {id: true, nombre: true} },
                 detalleResponsabilidadCivil: true,
                 detalleFianza: true,
                 detalleVida: true,

@@ -4,11 +4,18 @@ import prisma from "../config/prisma"
 import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse } from "../domain/user"
 import { Role } from "../generated/prisma"
 import e from "express"
+import { validatePassword } from "../utils/validators/password.validator"
 
 // Cuantas veces se aplica el algoritmo de hashing a la password
 const SALT_ROUNDS = 10
 
 export async function createUser(data: CreateUserDTO) {
+    const {valid, errors} = validatePassword(data.password)
+
+    if(!valid){
+        throw new Error(`La contraseña no es válida: ${errors.join(', ')}`)
+    }
+
     const existingUser = await prisma.user.findUnique({
             where: { email: data.email }
     })

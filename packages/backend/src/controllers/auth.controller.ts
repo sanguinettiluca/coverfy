@@ -29,7 +29,7 @@ export async function createUserController(req: Request, res: Response): Promise
     } catch (error) {
         // Captura errores conocidos del servicio (email duplicado, broker inválido, etc.)
         if (error instanceof Error) {
-            res.status(401).json({ message: error.message })
+            res.status(400).json({ message: error.message })
             return
         }
 

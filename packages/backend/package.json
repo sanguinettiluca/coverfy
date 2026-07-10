@@ -19,6 +19,7 @@
     "cors": "latest",
     "dotenv": "^16.6.1",
     "express": "latest",
+    "joi": "^18.2.3",
     "jsonwebtoken": "latest",
     "multer": "^2.1.1",
     "tesseract.js": "^7.0.0"

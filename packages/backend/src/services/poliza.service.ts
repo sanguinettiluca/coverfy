@@ -57,13 +57,19 @@ export async function crearPoliza(data: CreatePolizaDTO, brokerId: string){
         detalleHogar,
         detalleVehiculo,
         detalleViaje,
+        clienteId,
+        companiaId,
+        coberturaId,
         ...camposPoliza
     } = data as any;
     const detalle = buildDetalleCreate(data);
     const poliza = await prisma.poliza.create({
         data: {
             ...camposPoliza,
-            brokerId,
+            cliente: { connect: { id: clienteId } },
+            compania: { connect: { id: companiaId } },
+            ...(coberturaId ? { cobertura: { connect: { id: coberturaId } } } : {}),
+            broker: { connect: { id: brokerId } },
             ...detalle
         },
         include: {

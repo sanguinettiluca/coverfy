@@ -12,25 +12,8 @@ import { EstadoPoliza } from "../generated/prisma";
 export async function crearPolizaController(req: Request, res: Response): Promise<void>{
     try{
         const {userId, role, brokerId: brokerIdToken} = req.user!
+        //console.log("BODY RECIBIDO DESPUES DE VALIDATE:", JSON.stringify(req.body, null, 2))
         const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
-        
-        // Describir explicitamente los tipos de poliza permitidos:
-        const tiposPermitidos = [
-            "VEHICULO",
-            "VIAJE",
-            "ALQUILER",
-            "HOGAR",
-            "COMERCIO",
-            "RESPONSABILIDAD_CIVIL",
-            "FIANZA",
-            "VIDA",
-            "OTROS",
-        ];
-        
-        if(!req.body.tipoSeguro || !tiposPermitidos.includes(req.body.tipoSeguro)){
-            res.status(400).json({message: "El tipo de seguro no es valido."});
-            return;
-        }
 
         const poliza = await crearPoliza(req.body, brokerId);
         res.status(201).json({message: "Poliza creada exitosamente", poliza});

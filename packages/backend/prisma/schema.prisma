@@ -44,6 +44,11 @@ model User{
 
   siniestrosCreados Siniestro[] @relation("SiniestroCreador")
 
+  // Autentificacion 2 factores:
+  twoFactorSecret String?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorBackupCodes String[] @default([])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -52,6 +57,7 @@ model TokenBlacklist {
   id String @id @default(uuid())
   token String
   createdAt DateTime @default(now())
+  expiresAt DateTime?
 }
 
 model Cliente{

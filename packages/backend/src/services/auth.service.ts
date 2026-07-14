@@ -1,10 +1,11 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import prisma from "../config/prisma"
-import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse } from "../domain/user"
+import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse, PreAuthTokenPayload, LoginResult } from "../domain/user"
 import { Role } from "../generated/prisma"
-import e from "express"
-import { validatePassword } from "../utils/validators/password.validator"
+import { decrypt } from "../utils/crypto.util"
+import { validatePassword } from "../validators/password.validator"
+import { verificarCodigo, verificarBackupCode } from "./twoFactor.service"
 
 // Cuantas veces se aplica el algoritmo de hashing a la password
 const SALT_ROUNDS = 10
@@ -59,48 +60,113 @@ export async function createUser(data: CreateUserDTO) {
     return userWithoutPassword
 }
 
-export async function login(data: LoginDTO): Promise<AuthResponse> {
-    const user = await prisma.user.findUnique({
-            where: { email: data.email }
-        })
+function generarAuthResponse(user: {
+    id: string
+    email: string
+    nombre: string
+    role: Role
+    brokerId: string | null
+}): AuthResponse{
+    const payload: JwtPayload = {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        brokerId: user.brokerId
+    }
 
-        if(!user){
-            throw new Error('Credenciales inválidas')
-        }
+    const accessToken = jwt.sign(
+        payload,
+        process.env.JWT_SECRET as string,
+        {expiresIn: '7d'}
+    )
 
-        // Compara la password ingresada con el hash almacenado en la base de datos
-        const isPasswordValid = await bcrypt.compare(data.password, user.password)
-
-        if(!isPasswordValid){
-            throw new Error('Credenciales inválidas')
-        }
-
-        // Crea el payload del JWT con los datos necesarios
-        const payload: JwtPayload = {
-            userId: user.id,
+    return {
+        accessToken,
+        user: {
+            id: user.id,
             email: user.email,
+            nombre: user.nombre,
             role: user.role,
             brokerId: user.brokerId
         }
+    }
+}
 
-        // Firma el token con la clave secreta del .env
-        // El token expira en 7 dias (lo podemos cambiar a lo que queramos)
-        const accessToken = jwt.sign(
-            payload,
+export async function login(data: LoginDTO): Promise<LoginResult> {
+    const user = await prisma.user.findUnique({
+            where: { email: data.email }
+    })
+
+    if(!user){
+        throw new Error('Credenciales inválidas')
+    }
+
+    // Compara la password ingresada con el hash almacenado en la base de datos
+    const isPasswordValid = await bcrypt.compare(data.password, user.password)
+
+    if(!isPasswordValid){
+        throw new Error('Credenciales inválidas')
+    }
+
+    // Si el usuario tiene el 2FA activado, cortamos aca.
+    // Se emite un token temporal de 5 mins para que el fornt end complete el segundo paso
+    if(user.twoFactorEnabled){
+        const preAuthPayload: PreAuthTokenPayload = {
+            userId: user.id,
+            purpose: '2fa_pending'
+        }
+
+        const preAuthToken = jwt.sign(
+            preAuthPayload,
             process.env.JWT_SECRET as string,
-            {expiresIn: '7d'}
+            {expiresIn: '5m'}
         )
 
-        return {
-            accessToken,
-            user: {
-                id: user.id,
-                email: user.email,
-                nombre: user.nombre,
-                role: user.role,
-                brokerId: user.brokerId
-            }
+        return {twoFactorRequired: true, preAuthToken}
+    }
+
+    return generarAuthResponse(user)
+}
+
+export async function verifyTwoFactorLogin(preAuthToken: string, codigo: string): Promise<AuthResponse> {
+    let payload: PreAuthTokenPayload
+
+    try{
+        payload = jwt.verify(preAuthToken, process.env.JWT_SECRET as string) as PreAuthTokenPayload
+    }catch{
+        throw new Error('El token temporal expiro o es invalido, vuelva a iniciar sesion')
+    }
+
+    if(payload.purpose !== '2fa_pending'){
+        throw new Error("Token invalido")
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {id: payload.userId}
+    })
+
+    if(!user || !user.twoFactorEnabled || !user.twoFactorSecret){
+        throw new Error('Credenciales invalidas')
+    }
+
+    const secret = decrypt(user.twoFactorSecret)
+    const codigoValido = await verificarCodigo(secret, codigo)
+
+    if(!codigoValido){
+        const indice = await verificarBackupCode(codigo, user.twoFactorBackupCodes)
+
+        if(indice == -1){
+            throw new Error('Codigo invalido')
         }
+
+        const codigosRestantes = user.twoFactorBackupCodes.filter((_, i) => i !== indice)
+        await prisma.user.update({
+            where: {id: user.id},
+            data: {twoFactorBackupCodes: codigosRestantes}
+        })
+    }
+
+    return generarAuthResponse(user)
 }
 
 export async function logout(token: string): Promise<void> {

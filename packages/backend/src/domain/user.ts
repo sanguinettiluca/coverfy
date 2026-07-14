@@ -35,3 +35,15 @@ export interface AuthResponse {
         brokerId?: string | null
     }
 }
+
+export interface TwoFactorPendingResponse {
+    twoFactorRequired: true
+    preAuthToken: string
+}
+
+export type LoginResult = AuthResponse | TwoFactorPendingResponse
+
+export interface PreAuthTokenPayload{
+    userId: string
+    purpose: '2fa_pending'
+}

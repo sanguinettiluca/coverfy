@@ -81,3 +81,18 @@ export async function meController(req: Request, res: Response): Promise<void> {
         res.status(500).json({message: "Error interno"})
     }
 }
+
+export async function verifyTwoFactorLoginController(req: Request, res: Response): Promise<void>{
+    try{
+        const {preAuthToken, codigo} = req.body
+        const authResponse = await authService.verifyTwoFactorLogin(preAuthToken, codigo)
+
+        res.status(200).json(authResponse)
+    }catch(error){
+        if(error instanceof Error){
+            res.status(401).json({message: error.message})
+            return
+        }
+        res.status(500).json({message: "Error interno"})
+    }
+}

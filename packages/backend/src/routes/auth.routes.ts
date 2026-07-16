@@ -29,7 +29,7 @@ router.post('/users', authenticate, authorizeRoles(Role.ADMIN), createUserContro
 
 router.post('/logout', authenticate, logoutController)
 
-router.post('/2fa/sertup', authenticate, setupController)
+router.post('/2fa/setup', authenticate, setupController)
 router.post('/2fa/confirm', authenticate, validate(confirmSetupSchema), confirmController)
 router.post('/2fa/disable', authenticate, validate(disable2FASchema), disableController)
 

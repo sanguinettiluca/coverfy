@@ -3,39 +3,77 @@ import NoEncontrado from './components/NotFound'
 import Login from './components/Login'
 import Register from './components/Register'
 import Layout from './components/layouts/Layout'
+import { Provider } from 'react-redux'
+import store from "./store/store.ts"
+import { ToastContainer, Slide } from 'react-toastify'
 
-import PoliciesSearch from "./components/policies/PoliciesEdit";
-import PoliciesNew from "./components/policies/PoliciesNew";
-import PoliciesEdit from "./components/policies/PoliciesSearch";
+import PoliciesSearch from "./components/policies/PoliciesSearch";
+import PoliciesNew from "./components/policies/PoliciesNew/PoliciesNew.tsx";
+import PoliciesEdit from "./components/policies/PoliciesEdit/PoliciesEdit.tsx";
+import ClientsNew from "./components/clients/ClientsNew";
+import ClientsEdit from "./components/clients/ClientsEdit"
+import ClientsSearch from "./components/clients/ClientsSearch"
+import Settings from "./components/Settings.tsx"
+import Dashboard from "./components/Dashboard/Dashboard.tsx"
+import CompanyNew from "./components/Companies/CompanyNew.tsx"
+import CoverageNew from "./components/coverages/CoverageNew.tsx"
+import ProtectedRoute from './components/constants/ProtecterRoute'
 
 import './App.css'
 
 function App() {
-
   return (
     <>
-      <BrowserRouter>
-        <Routes>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
 
-          {/* Con sidebar */}
-          <Route element={<Layout />}>
-            <Route path="/register" element={<Register />} />
-            <Route path="/policies/search" element={<PoliciesSearch />} />
-            <Route path="/policies/new" element={<PoliciesNew />} />
-            <Route path="/policies/edit" element={<PoliciesEdit />} />
-          </Route>
+            {/* Con sidebar */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
 
+              {/* Solo ADMIN */}
+              <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/register" element={<Register />} />
+              </Route>
 
-          {/* Sin sidebar */}
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<NoEncontrado />} />
+              {/* Solo BROKER y SUB_BROKER */}
+              <Route element={<ProtectedRoute allowedRoles={["BROKER", "SUB_BROKER"]} />}>
+                <Route path="/policies/search" element={<PoliciesSearch />} />
+                <Route path="/policies/new" element={<PoliciesNew />} />
+                <Route path="/policies/edit" element={<PoliciesEdit />} />
+                <Route path="/clients/new" element={<ClientsNew />} />
+                <Route path="/clients/search" element={<ClientsSearch />} />
+                <Route path="/clients/edit" element={<ClientsEdit />} />
+                <Route path="/companies" element={<CompanyNew />} />
+                <Route path="/coverages" element={<CoverageNew />} />
+              </Route>
 
+              <Route path="/settings" element={<Settings />} />
+            </Route>
 
-        </Routes>
-      </BrowserRouter >
+            {/* Sin sidebar */}
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<NoEncontrado />} />
 
+          </Routes>
+        </BrowserRouter>
+        <ToastContainer
+          position="bottom-left"
+          autoClose={2000}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover={false}
+          theme="colored"
+          transition={Slide}
+        />
+      </Provider>
     </>
-  )
+  );
 }
 
 export default App

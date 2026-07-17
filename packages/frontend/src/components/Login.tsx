@@ -1,6 +1,9 @@
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
+import api from "../data/api"
+import { toast } from "react-toastify";
+import { loguear } from "../features/user.slice";
 
 
 const Login = () => {
@@ -11,8 +14,8 @@ const Login = () => {
         password: string;
     };
 
-    //const dispatch = useDispatch();
-    //const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { register, handleSubmit, watch, formState: { errors } } = useForm<LoginForm>();;
 
     const username = watch("username");
@@ -21,8 +24,25 @@ const Login = () => {
     const isDisabled = !username || !password;
 
     const onSubmit = (data: LoginForm) => {
-
         console.log(data);
+        api.post("/auth/login", {
+            email: data.username,
+            password: data.password
+        }).then(response => {
+            if (response.data.accessToken) {
+                localStorage.setItem("token", response.data.accessToken);
+                dispatch(loguear(response.data.user));
+                console.log("Navegando...");
+                navigate("/");
+            } else { console.log(response.data.message); }
+
+        }).catch(error => {
+            if (error.response) {
+                toast.error(error.response.data.message);
+            } else {
+                console.error("Error de conexión:", error.message);
+            }
+        });
     }
 
     return (

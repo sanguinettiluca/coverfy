@@ -169,6 +169,21 @@ export async function verifyTwoFactorLogin(preAuthToken: string, codigo: string)
     return generarAuthResponse(user)
 }
 
+export async function listarBrokers() {
+    const brokers = await prisma.user.findMany({
+        where: { role: Role.BROKER},
+        orderBy: { nombre: 'asc'},
+        select: {
+            id: true,
+            nombre: true,
+            role: true,
+            createdAt: true
+        }
+    })
+
+    return brokers
+}
+
 export async function logout(token: string): Promise<void> {
     await prisma.tokenBlacklist.create({
         data: {

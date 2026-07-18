@@ -4,7 +4,8 @@ import {
     listarClientes,
     obtenerClientePorId,
     actualizarCliente,
-    eliminarCliente
+    eliminarCliente,
+    buscarClientePorDocumento
 } from "../services/cliente.service";
 
 // Crear cliente
@@ -104,5 +105,24 @@ export async function eliminarClienteController(req: Request, res: Response): Pr
             return
         }
         res.status(500).json({message: 'Error interno del servidor'})
+    }
+}
+
+export async function buscarClientePorDocumentoController(req:Request<{ documento: string }>, res: Response): Promise<void> {
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken:userId
+
+        const {documento} = req.params
+
+        const cliente = await buscarClientePorDocumento(documento, brokerId)
+
+        res.status(200).json(cliente)
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(404).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: "Error interno" })
     }
 }

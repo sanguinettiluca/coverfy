@@ -119,3 +119,15 @@ export async function eliminarCliente(id: string, brokerId: string) {
 
     return {message: 'Cliente eliminado exitosamente'};
 }
+
+export async function buscarClientePorDocumento(documento:string, brokerId:string){
+    const cliente = await prisma.cliente.findFirst({
+        where: {documento, brokerId}
+    })
+
+    if(!cliente){
+        throw new Error('No se encontro ningun cliente con ese numero de documento')
+    }
+
+    return cliente
+}

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { escanearCedulaController } from "../controllers/ocr.controller";
+import { scanCedula } from "../controllers/gemini.controller";
 import { authenticate, authorizeRoles } from "../middlewares/auth.middleware";
 import { Role } from "../generated/prisma";
 
@@ -18,6 +19,14 @@ router.post(
   authorizeRoles(Role.BROKER, Role.SUB_BROKER),
   upload.single("archivo"),
   escanearCedulaController
+);
+
+router.post(
+  "/test-gemini",
+  authenticate,
+  authorizeRoles(Role.BROKER, Role.SUB_BROKER),
+  upload.single("archivo"),
+  scanCedula
 );
 
 export default router;

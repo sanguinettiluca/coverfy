@@ -8,6 +8,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@google/genai": "^2.13.0",
     "@prisma/client": "latest",
     "@types/bcryptjs": "latest",
     "@types/cors": "latest",

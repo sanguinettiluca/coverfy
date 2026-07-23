@@ -22,7 +22,7 @@ router.post(
 );
 
 router.post(
-  "/test-gemini",
+  "/reconocimiento",
   authenticate,
   authorizeRoles(Role.BROKER, Role.SUB_BROKER),
   upload.single("archivo"),

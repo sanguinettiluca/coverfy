@@ -10,6 +10,7 @@ import polizaRoutes from './routes/poliza.routes'
 import ocrRoutes from './routes/ocr.routes'
 import siniestroRoutes from './routes/siniestro.routes' 
 import reporteRoutes from './routes/reporte.routes'
+import mensajeRapidoRoutes from "./routes/mensajeRapido.routes"
 
 // Cargamos las variables de entorno del archivo .env
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
@@ -36,6 +37,9 @@ app.use('/api/clientes', clientRoutes)
 
 // Rutas de companias
 app.use('/api/companias', companiaRoutes)
+
+// Rutas de WhatsApp
+app.use('/api/mensajes-rapidos', mensajeRapidoRoutes)
 
 // Rutas de coberturas
 app.use('/api/coberturas', coberturaRoutes)

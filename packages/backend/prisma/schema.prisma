@@ -1,7 +1,7 @@
 // IMPORTANTE: Trabajen con la version 6.0.0 de prisma, ya que la 7.0.0 tiene cambios importantes y
 // no es compatible con el codigo actual
 
-// PARA ENTRAR AL PANEL DE PRISMA: npx prisma studio (cd backend)
+// PARA ENTRAR AL PANEL DE PRISMA: npx prisma studio (cd backend primero)
 
 generator client {
   provider = "prisma-client-js"
@@ -48,6 +48,8 @@ model User{
   twoFactorSecret String?
   twoFactorEnabled Boolean @default(false)
   twoFactorBackupCodes String[] @default([])
+
+  mensajesRapidos MensajeRapido[] @relation("MensajesRapidosBroker")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -308,6 +310,17 @@ model Documento{
 
   polizaId String
   poliza Poliza @relation(fields: [polizaId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model MensajeRapido{
+  id String @id @default(uuid())
+  nombre String
+  mensaje String
+
+  brokerId String
+  broker User @relation("MensajesRapidosBroker", fields: [brokerId], references: [id])
 
   createdAt DateTime @default(now())
 }

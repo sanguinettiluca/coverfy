@@ -3,47 +3,47 @@ import QRCode from 'qrcode';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
-const NOMBRE_APP = 'Coverfy'
-const CANTIDAD_BACKUP_CODES = 8
-const TOLERANCIA_SEGUNDOS = 30
+const APP_NAME = 'Coverfy'
+const BACKUP_CODES_COUNT = 8
+const TOLERANCE_SECONDS = 30
 
 
-export async function generarSecret(email: string): Promise<{secret: string, otpauthUrl: string}> {
+export async function generateTotpSecret(email: string): Promise<{secret: string, otpauthUrl: string}> {
     const secret = generateSecret();
-    const otpauthUrl = generateURI( {issuer: NOMBRE_APP, label: email, secret} );
+    const otpauthUrl = generateURI( {issuer: APP_NAME, label: email, secret} );
     return { secret, otpauthUrl };
 }
 
-export async function generarQRCode(otpauthUrl: string): Promise<string> {
+export async function generateQRCode(otpauthUrl: string): Promise<string> {
     return QRCode.toDataURL(otpauthUrl);
 }
 
-export async function verificarCodigo(secret: string, codigo: string): Promise<boolean> {
+export async function verifyCode(secret: string, code: string): Promise<boolean> {
     try{
-        const resultado = await verify({secret, token: codigo, epochTolerance: TOLERANCIA_SEGUNDOS});
-        return resultado.valid;
+        const result = await verify({secret, token: code, epochTolerance: TOLERANCE_SECONDS});
+        return result.valid;
     }catch{
         return false;
     }
 }
 
-export async function generarBackupCodes(): Promise<{ codigosParaMostrar: string[]; codigosHasheados: string[] }> {
-    const codigosParaMostrar: string[] = [];
-    for(let i=0; i < CANTIDAD_BACKUP_CODES; i++){
-        codigosParaMostrar.push(crypto.randomBytes(4).toString('hex').toUpperCase());
+export async function generateBackupCodes(): Promise<{ codesToDisplay: string[]; hashedCodes: string[] }> {
+    const codesToDisplay: string[] = [];
+    for(let i=0; i < BACKUP_CODES_COUNT; i++){
+        codesToDisplay.push(crypto.randomBytes(4).toString('hex').toUpperCase());
     }
 
-    const codigosHasheados = await Promise.all(
-        codigosParaMostrar.map( (codigo) => bcrypt.hash(codigo, 10) )
+    const hashedCodes = await Promise.all(
+        codesToDisplay.map( (code) => bcrypt.hash(code, 10) )
     )
 
-    return { codigosParaMostrar, codigosHasheados };
+    return { codesToDisplay, hashedCodes };
 }
 
-export async function verificarBackupCode(codigo: string, codigosHasheados: string[]): Promise<number> {
-    for(let i=0; i < codigosHasheados.length; i++){
-        const coincide = await bcrypt.compare(codigo, codigosHasheados[i]);
-        if(coincide){
+export async function verifyBackupCode(code: string, hashedCodes: string[]): Promise<number> {
+    for(let i=0; i < hashedCodes.length; i++){
+        const matches = await bcrypt.compare(code, hashedCodes[i]);
+        if(matches){
             return i;
         }
     }

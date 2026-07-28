@@ -5,9 +5,9 @@ export async function setupController(req: Request, res: Response): Promise<void
     try {
         const { userId, email } = req.user!
 
-        const resultado = await twoFactorAuthService.generarSetup(userId, email)
+        const result = await twoFactorAuthService.generateSetup(userId, email)
 
-        res.status(200).json(resultado)
+        res.status(200).json(result)
     } catch (error) {
         if (error instanceof Error) {
             res.status(400).json({ message: error.message })
@@ -20,11 +20,11 @@ export async function setupController(req: Request, res: Response): Promise<void
 export async function confirmController(req: Request, res: Response): Promise<void> {
     try {
         const { userId } = req.user!
-        const { codigo } = req.body
+        const { code } = req.body
 
-        const resultado = await twoFactorAuthService.confirmarSetup(userId, codigo)
+        const result = await twoFactorAuthService.confirmSetup(userId, code)
 
-        res.status(200).json(resultado)
+        res.status(200).json(result)
     } catch (error) {
         if (error instanceof Error) {
             res.status(400).json({ message: error.message })
@@ -37,9 +37,9 @@ export async function confirmController(req: Request, res: Response): Promise<vo
 export async function disableController(req: Request, res: Response): Promise<void> {
     try {
         const { userId } = req.user!
-        const { password, codigo } = req.body
+        const { password, code } = req.body
 
-        await twoFactorAuthService.desactivar2FA(userId, password, codigo)
+        await twoFactorAuthService.disable2FA(userId, password, code)
 
         res.status(200).json({ message: "2FA desactivado correctamente" })
     } catch (error) {

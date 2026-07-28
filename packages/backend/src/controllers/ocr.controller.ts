@@ -1,24 +1,24 @@
 import { Request, Response } from "express";
-import { extraerDatosCedula } from "../services/ocr.service";
+import { extractIdCardData } from "../services/ocr.service";
 
 // 4>>>>>>2 toda la vida lloralo yoruga
-export async function escanearCedulaController(req: Request, res: Response): Promise<void> {
+export async function scanIdCardController(req: Request, res: Response): Promise<void> {
     try{
-        const archivo = req.file as Express.Multer.File | undefined;
+        const file = req.file as Express.Multer.File | undefined;
 
-        if(!archivo){
+        if(!file){
             res.status(400).json({message: "No se recibio ningun archivo"});
             return;
         }
 
-        const tiposPermitidos = ["image/jpeg", "image/png", "application/pdf"];
-        if(!tiposPermitidos.includes(archivo.mimetype)){
+        const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+        if(!allowedTypes.includes(file.mimetype)){
             res.status(400).json({message: "Formato no soportado. Solo .JPEG, .PNG y .PDF"});
             return;
         }
 
-        const datos = await extraerDatosCedula(archivo.buffer, archivo.mimetype);
-        res.status(200).json(datos);
+        const data = await extractIdCardData(file.buffer, file.mimetype);
+        res.status(200).json(data);
     }catch(error){
         if(error instanceof Error){
             res.status(500).json({message: error.message});
@@ -26,5 +26,5 @@ export async function escanearCedulaController(req: Request, res: Response): Pro
         }
         res.status(500).json({ message: "Error al procesar el documento" });
     }
-    
+
 }

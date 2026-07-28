@@ -5,7 +5,7 @@ import { Role } from "../generated/prisma"
 export interface CreateUserDTO {
     email: string
     password: string
-    nombre: string
+    name: string
     role: Role
     brokerId?: string //Solo para usuarios con rol de sub-broker
 }
@@ -30,7 +30,7 @@ export interface AuthResponse {
     user: {
         id: string
         email: string
-        nombre: string
+        name: string
         role: Role
         brokerId?: string | null
     }

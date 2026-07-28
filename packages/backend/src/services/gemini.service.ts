@@ -4,18 +4,18 @@ const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY!
 })
 
-const MODEL_PRINCIPAL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite"
-const MODEL_FALLBACK = process.env.GEMINI_MODEL_FALLBACK || "gemini-flash-latest"
+const PRIMARY_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite"
+const FALLBACK_MODEL = process.env.GEMINI_MODEL_FALLBACK || "gemini-flash-latest"
 
-const PROMPT_CEDULA = `
+const ID_CARD_PROMPT = `
                     Analiza esta imagen de una cédula de identidad uruguaya.
 
                     Extrae únicamente la siguiente información:
 
-                    - documento
-                    - nombres
-                    - apellidos
-                    - fechaNacimiento
+                    - documentNumber
+                    - firstName
+                    - lastName
+                    - dateOfBirth
 
                     IMPORTANTE:
 
@@ -23,63 +23,63 @@ const PROMPT_CEDULA = `
                     - No utilices Markdown.
                     - No agregues explicaciones.
                     - Si un dato no puede leerse, devuelve null.
-                    - Documento debe devolver solo numeros, sin puntos ni guiones
+                    - documentNumber debe devolver solo numeros, sin puntos ni guiones
 
                     Formato:
 
                     {
-                    "documento": "",
-                    "nombres": "",
-                    "apellidos": "",
-                    "fechaNacimiento": "",
+                    "documentNumber": "",
+                    "firstName": "",
+                    "lastName": "",
+                    "dateOfBirth": "",
                     }
                 `.trim()
 
-export interface DatosCedula{
-    documento: string | null
-    nombres: string | null
-    apellidos: string | null
-    fechaNacimiento: string | null
+export interface IdCardData{
+    documentNumber: string | null
+    firstName: string | null
+    lastName: string | null
+    dateOfBirth: string | null
 }
 
-async function generarConFallback(contents: any) {
+async function generateWithFallback(contents: any) {
     try {
-        return await ai.models.generateContent({ model: MODEL_PRINCIPAL, contents })
+        return await ai.models.generateContent({ model: PRIMARY_MODEL, contents })
     } catch (error: any) {
         if (error?.status === 404) {
-            console.warn(`Modelo "${MODEL_PRINCIPAL}" no disponible, reintentando con "${MODEL_FALLBACK}"`)
-            return await ai.models.generateContent({ model: MODEL_FALLBACK, contents })
+            console.warn(`Modelo "${PRIMARY_MODEL}" no disponible, reintentando con "${FALLBACK_MODEL}"`)
+            return await ai.models.generateContent({ model: FALLBACK_MODEL, contents })
         }
         throw error
     }
 }
 
-export async function reconocerCedula(buffer: Buffer, mimeType: string): Promise<DatosCedula>{
-    const response = await generarConFallback([
+export async function recognizeIdCard(buffer: Buffer, mimeType: string): Promise<IdCardData>{
+    const response = await generateWithFallback([
         {
             inlineData: {
                 data: buffer.toString("base64"),
                 mimeType
             }
         },
-        {text: PROMPT_CEDULA}
+        {text: ID_CARD_PROMPT}
     ])
 
-    const textoRespuesta = response.text
+    const responseText = response.text
 
-    if(!textoRespuesta){
+    if(!responseText){
         throw new Error("Imposible reconocer datos")
     }
 
-    const jsonLimpio = textoRespuesta.replace(/```json|```/g, "").trim()
+    const cleanJson = responseText.replace(/```json|```/g, "").trim()
 
-    let datos: DatosCedula
+    let data: IdCardData
 
     try{
-        datos = JSON.parse(jsonLimpio)
+        data = JSON.parse(cleanJson)
     }catch{
         throw new Error("No se pudo interpretar la respuesta")
     }
 
-    return datos 
+    return data
 }

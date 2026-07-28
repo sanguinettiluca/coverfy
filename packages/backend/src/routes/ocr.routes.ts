@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
-import { escanearCedulaController } from "../controllers/ocr.controller";
-import { scanCedula } from "../controllers/gemini.controller";
+import { scanIdCardController } from "../controllers/ocr.controller";
+import { scanIdCard } from "../controllers/gemini.controller";
 import { authenticate, authorizeRoles } from "../middlewares/auth.middleware";
 import { Role } from "../generated/prisma";
 
@@ -17,16 +17,16 @@ router.post(
   "/cedula",
   authenticate,
   authorizeRoles(Role.BROKER, Role.SUB_BROKER),
-  upload.single("archivo"),
-  escanearCedulaController
+  upload.single("file"),
+  scanIdCardController
 );
 
 router.post(
   "/reconocimiento",
   authenticate,
   authorizeRoles(Role.BROKER, Role.SUB_BROKER),
-  upload.single("archivo"),
-  scanCedula
+  upload.single("file"),
+  scanIdCard
 );
 
 export default router;

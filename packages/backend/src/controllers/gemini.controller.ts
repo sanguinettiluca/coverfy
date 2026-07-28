@@ -1,7 +1,7 @@
-import { reconocerCedula } from "../services/gemini.service";
+import { recognizeIdCard } from "../services/gemini.service";
 import { Request, Response } from "express"
 
-export async function scanCedula(req: Request, res: Response): Promise<void> {
+export async function scanIdCard(req: Request, res: Response): Promise<void> {
 
     try{
         if (!req.file) {
@@ -9,12 +9,12 @@ export async function scanCedula(req: Request, res: Response): Promise<void> {
             return
         }
 
-        const datos = await reconocerCedula(
+        const data = await recognizeIdCard(
             req.file?.buffer,
             req.file?.mimetype
         );
 
-        res.status(200).json(datos)
+        res.status(200).json(data)
     }catch(error){
         console.error("ERROR GEMINI:", error)
         res.status(500).json({

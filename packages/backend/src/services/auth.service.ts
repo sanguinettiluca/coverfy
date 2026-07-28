@@ -5,7 +5,7 @@ import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse, PreAuthTokenPayload,
 import { Role } from "../generated/prisma"
 import { decrypt } from "../utils/crypto.util"
 import { validatePassword } from "../validators/password.validator"
-import { verificarCodigo, verificarBackupCode } from "./twoFactor.service"
+import { verifyCode, verifyBackupCode } from "./twoFactor.service"
 
 // Cuantas veces se aplica el algoritmo de hashing a la password
 const SALT_ROUNDS = 10
@@ -49,7 +49,7 @@ export async function createUser(data: CreateUserDTO) {
         data: {
             email: data.email,
             password: hashedPassword,
-            nombre: data.nombre,
+            name: data.name,
             role: data.role,
             brokerId: data.brokerId ?? null
         }
@@ -60,10 +60,10 @@ export async function createUser(data: CreateUserDTO) {
     return userWithoutPassword
 }
 
-function generarAuthResponse(user: {
+function generateAuthResponse(user: {
     id: string
     email: string
-    nombre: string
+    name: string
     role: Role
     brokerId: string | null
 }): AuthResponse{
@@ -85,7 +85,7 @@ function generarAuthResponse(user: {
         user: {
             id: user.id,
             email: user.email,
-            nombre: user.nombre,
+            name: user.name,
             role: user.role,
             brokerId: user.brokerId
         }
@@ -125,10 +125,10 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
         return {twoFactorRequired: true, preAuthToken}
     }
 
-    return generarAuthResponse(user)
+    return generateAuthResponse(user)
 }
 
-export async function verifyTwoFactorLogin(preAuthToken: string, codigo: string): Promise<AuthResponse> {
+export async function verifyTwoFactorLogin(preAuthToken: string, code: string): Promise<AuthResponse> {
     let payload: PreAuthTokenPayload
 
     try{
@@ -150,32 +150,32 @@ export async function verifyTwoFactorLogin(preAuthToken: string, codigo: string)
     }
 
     const secret = decrypt(user.twoFactorSecret)
-    const codigoValido = await verificarCodigo(secret, codigo)
+    const validCode = await verifyCode(secret, code)
 
-    if(!codigoValido){
-        const indice = await verificarBackupCode(codigo, user.twoFactorBackupCodes)
+    if(!validCode){
+        const index = await verifyBackupCode(code, user.twoFactorBackupCodes)
 
-        if(indice == -1){
+        if(index == -1){
             throw new Error('Codigo invalido')
         }
 
-        const codigosRestantes = user.twoFactorBackupCodes.filter((_, i) => i !== indice)
+        const remainingCodes = user.twoFactorBackupCodes.filter((_, i) => i !== index)
         await prisma.user.update({
             where: {id: user.id},
-            data: {twoFactorBackupCodes: codigosRestantes}
+            data: {twoFactorBackupCodes: remainingCodes}
         })
     }
 
-    return generarAuthResponse(user)
+    return generateAuthResponse(user)
 }
 
-export async function listarBrokers() {
+export async function listBrokers() {
     const brokers = await prisma.user.findMany({
         where: { role: Role.BROKER},
-        orderBy: { nombre: 'asc'},
+        orderBy: { name: 'asc'},
         select: {
             id: true,
-            nombre: true,
+            name: true,
             role: true,
             createdAt: true
         }

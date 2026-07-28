@@ -19,33 +19,33 @@ function getKey(): Buffer {
     return key
 }
 
-export function encrypt(texto: string): string {
+export function encrypt(text: string): string {
     const key = getKey()
     const iv = crypto.randomBytes(IV_LENGTH)
     const cipher = crypto.createCipheriv(ALGORITHM, key, iv)
 
-    const cifrado = Buffer.concat([cipher.update(texto, "utf8"), cipher.final()])
+    const encrypted = Buffer.concat([cipher.update(text, "utf8"), cipher.final()])
     const authTag = cipher.getAuthTag()
 
-    return `${iv.toString("hex")}:${authTag.toString("hex")}:${cifrado.toString("hex")}`
+    return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted.toString("hex")}`
 }
 
-export function decrypt(textoCifrado: string): string{
+export function decrypt(encryptedText: string): string{
     const key = getKey()
-    const partes = textoCifrado.split(":")
+    const parts = encryptedText.split(":")
 
-    if(partes.length !== 3){
+    if(parts.length !== 3){
         throw new Error("Formato de dato cifrado invalido")
     }
 
-    const [ivHex, authTagHex, datosHex] = partes
+    const [ivHex, authTagHex, dataHex] = parts
     const iv = Buffer.from(ivHex, "hex")
     const authTag = Buffer.from(authTagHex, "hex")
-    const datos = Buffer.from(datosHex, "hex")
+    const data = Buffer.from(dataHex, "hex")
 
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv)
     decipher.setAuthTag(authTag)
 
-    const descifrado = Buffer.concat([ decipher.update(datos), decipher.final() ])
-    return descifrado.toString("utf8")
+    const decrypted = Buffer.concat([ decipher.update(data), decipher.final() ])
+    return decrypted.toString("utf8")
 }

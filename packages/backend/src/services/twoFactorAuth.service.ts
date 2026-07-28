@@ -1,14 +1,14 @@
 import bcrypt from "bcryptjs";
 import prisma from "../config/prisma";
 import { encrypt, decrypt } from "../utils/crypto.util";
-import { 
-    generarSecret,
-    generarQRCode,
-    verificarCodigo,
-    generarBackupCodes
+import {
+    generateTotpSecret,
+    generateQRCode,
+    verifyCode,
+    generateBackupCodes
 } from "./twoFactor.service";
 
-export async function generarSetup(userId: string, email: string): Promise<{qrCode: string, secret: string}> {
+export async function generateSetup(userId: string, email: string): Promise<{qrCode: string, secret: string}> {
     const user = await prisma.user.findUnique({
         where: {id: userId}
     })
@@ -21,20 +21,20 @@ export async function generarSetup(userId: string, email: string): Promise<{qrCo
         throw new Error('El 2FA ya esta activado en esta cuenta')
     }
 
-    const {secret, otpauthUrl} = await generarSecret(email)
-    const secretCifrado = encrypt(secret)
+    const {secret, otpauthUrl} = await generateTotpSecret(email)
+    const encryptedSecret = encrypt(secret)
 
     await prisma.user.update({
         where: {id: userId},
-        data: {twoFactorSecret: secretCifrado}
+        data: {twoFactorSecret: encryptedSecret}
     })
 
-    const qrCode = await generarQRCode(otpauthUrl)
+    const qrCode = await generateQRCode(otpauthUrl)
 
     return {qrCode, secret}
 }
 
-export async function confirmarSetup(userId:string, codigo: string): Promise<{backupCodes: string[]}> {
+export async function confirmSetup(userId:string, code: string): Promise<{backupCodes: string[]}> {
     const user = await prisma.user.findUnique({
         where: {id: userId}
     })
@@ -48,30 +48,30 @@ export async function confirmarSetup(userId:string, codigo: string): Promise<{ba
     }
 
     const secret = decrypt(user.twoFactorSecret)
-    const codigoValido = await verificarCodigo(secret, codigo)
+    const validCode = await verifyCode(secret, code)
 
-    if(!codigoValido){
+    if(!validCode){
         throw new Error('Codigo invalido')
     }
 
-    const { codigosParaMostrar, codigosHasheados } = await generarBackupCodes()
+    const { codesToDisplay, hashedCodes } = await generateBackupCodes()
 
     await prisma.user.update({
         where: {id: userId},
         data: {
             twoFactorEnabled: true,
-            twoFactorBackupCodes: codigosHasheados
+            twoFactorBackupCodes: hashedCodes
         }
     })
-    
-    return {backupCodes: codigosParaMostrar}
+
+    return {backupCodes: codesToDisplay}
 }
 
-export async function desactivar2FA(userId: string, password: string, codigo: string): Promise<void> {
+export async function disable2FA(userId: string, password: string, code: string): Promise<void> {
     const user = await prisma.user.findUnique({
         where: {id: userId}
     })
-    
+
     if(!user){
         throw new Error('Usuario no encontrado')
     }
@@ -80,14 +80,14 @@ export async function desactivar2FA(userId: string, password: string, codigo: st
         throw new Error('El 2FA no esta activado en esta cuenta')
     }
 
-    const passwordValida = await bcrypt.compare(password, user.password)
-    if(!passwordValida){
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    if(!isPasswordValid){
         throw new Error('Credenciales invalidas')
     }
 
     const secret = decrypt(user.twoFactorSecret)
-    const codigoValido = await verificarCodigo(secret, codigo)
-    if(!codigoValido){
+    const validCode = await verifyCode(secret, code)
+    if(!validCode){
         throw new Error('Codigo invalido')
     }
 

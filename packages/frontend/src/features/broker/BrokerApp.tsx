@@ -3,16 +3,16 @@ import { LogOut, Users, BarChart3, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-import { ClientesList } from "./ClientesList";
-import { ClienteDetalle } from "./ClienteDetalle";
-import { ReportesPage } from "./ReportesPage";
-import { ComisionesPage } from "./ComisionesPage";
+import { ClientsList } from "./ClientsList";
+import { ClientDetail } from "./ClientDetail";
+import { ReportsPage } from "./ReportsPage";
+import { CommissionsPage } from "./CommissionsPage";
 
-type Vista = { tipo: "lista" } | { tipo: "detalle"; clienteId: string } | { tipo: "reportes" } | { tipo: "comisiones" };
+type View = { type: "list" } | { type: "detail"; clientId: string } | { type: "reports" } | { type: "commissions" };
 
 export function BrokerApp() {
   const { logout, user } = useAuth();
-  const [vista, setVista] = useState<Vista>({ tipo: "lista" });
+  const [view, setView] = useState<View>({ type: "list" });
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -25,10 +25,10 @@ export function BrokerApp() {
 
         <nav className="flex-1 px-3 py-4">
           <button
-            onClick={() => setVista({ tipo: "lista" })}
+            onClick={() => setView({ type: "list" })}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              vista.tipo === "lista"
+              view.type === "list"
                 ? "bg-secondary text-secondary-foreground"
                 : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
             )}
@@ -38,10 +38,10 @@ export function BrokerApp() {
           </button>
 
           <button
-            onClick={() => setVista({ tipo: "reportes" })}
+            onClick={() => setView({ type: "reports" })}
             className={cn(
             "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-            vista.tipo === "reportes"
+            view.type === "reports"
             ? "bg-secondary text-secondary-foreground"
             : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
             )}
@@ -51,10 +51,10 @@ export function BrokerApp() {
           </button>
 
           <button
-            onClick={() => setVista({ tipo: "comisiones" })}
+            onClick={() => setView({ type: "commissions" })}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              vista.tipo === "comisiones"
+              view.type === "commissions"
                 ? "bg-secondary text-secondary-foreground"
                 : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
             )}
@@ -80,14 +80,14 @@ export function BrokerApp() {
 
       <main className="flex-1 overflow-y-auto p-8">
         <div className="max-w-4xl mx-auto">
-          {vista.tipo === "reportes" ? (
-            <ReportesPage />
-          ) : vista.tipo === "comisiones" ? (
-            <ComisionesPage />
-          ) : vista.tipo === "lista" ? (
-            <ClientesList onVerCliente={(clienteId) => setVista({ tipo: "detalle", clienteId })} />
+          {view.type === "reports" ? (
+            <ReportsPage />
+          ) : view.type === "commissions" ? (
+            <CommissionsPage />
+          ) : view.type === "list" ? (
+            <ClientsList onViewClient={(clientId) => setView({ type: "detail", clientId })} />
           ) : (
-            <ClienteDetalle clienteId={vista.clienteId} onVolver={() => setVista({ tipo: "lista" })} />
+            <ClientDetail clientId={view.clientId} onBack={() => setView({ type: "list" })} />
           )}
         </div>
       </main>

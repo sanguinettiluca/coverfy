@@ -2,7 +2,7 @@ export type Role = "ADMIN" | "BROKER" | "SUB_BROKER";
 
 export interface User {
     id: string;
-    nombre: string;
+    name: string;
     email: string;
     role: Role;
     brokerId?: string;
@@ -13,12 +13,12 @@ export interface AuthResponse {
     user: User;
 }
 
-export interface Cliente {
+export interface Client {
     id: string;
-    nombres: string;
-    apellidos: string;
-    documento: string;
+    firstName: string;
+    lastName: string;
+    documentNumber: string;
     email: string;
-    celular: string;
-    direccion: string;
+    phone: string;
+    address: string;
 }

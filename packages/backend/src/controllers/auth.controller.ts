@@ -5,10 +5,10 @@ import { Role } from "../generated/prisma"
 // CREAR USUARIO:
 export async function createUserController(req: Request, res: Response): Promise<void> {
     try{
-        const {email, password, nombre, role, brokerId} = req.body
+        const {email, password, name, role, brokerId} = req.body
 
         // Validar los campos obligatorios
-        if(!email || !password || !nombre || !role){
+        if(!email || !password || !name || !role){
             res.status(400).json({message: "Faltan campos obligatorios"})
             return
         }
@@ -19,7 +19,7 @@ export async function createUserController(req: Request, res: Response): Promise
             return
         }
 
-        const user = await authService.createUser({email, password, nombre, role, brokerId})
+        const user = await authService.createUser({email, password, name, role, brokerId})
 
         res.status(201).json({
             message: "Usuario creado exitosamente",
@@ -84,8 +84,8 @@ export async function meController(req: Request, res: Response): Promise<void> {
 
 export async function verifyTwoFactorLoginController(req: Request, res: Response): Promise<void>{
     try{
-        const {preAuthToken, codigo} = req.body
-        const authResponse = await authService.verifyTwoFactorLogin(preAuthToken, codigo)
+        const {preAuthToken, code} = req.body
+        const authResponse = await authService.verifyTwoFactorLogin(preAuthToken, code)
 
         res.status(200).json(authResponse)
     }catch(error){
@@ -97,9 +97,9 @@ export async function verifyTwoFactorLoginController(req: Request, res: Response
     }
 }
 
-export async function listarBrokersController(req:Request, res: Response): Promise<void> {
+export async function listBrokersController(req:Request, res: Response): Promise<void> {
     try{
-        const brokers = await authService.listarBrokers()
+        const brokers = await authService.listBrokers()
         res.status(200).json(brokers)
     }catch(error){
         if(error instanceof Error){

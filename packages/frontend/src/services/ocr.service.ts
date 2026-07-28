@@ -1,17 +1,17 @@
 import api from "./api";
 
-export interface DatosCedula{
-    nombres?: string;
-    apellidos?: string;
-    documento?: string;
-    fechaNacimiento?: string;
+export interface IdCardData{
+    firstName?: string;
+    lastName?: string;
+    documentNumber?: string;
+    dateOfBirth?: string;
 }
 
-export async function escanearCedula(archivo: File): Promise<DatosCedula>{
+export async function scanIdCard(file: File): Promise<IdCardData>{
     const formData = new FormData();
-    formData.append("archivo", archivo);
+    formData.append("file", file);
 
-    const {data} = await api.post<DatosCedula>("/ocr/cedula", formData, {
+    const {data} = await api.post<IdCardData>("/ocr/cedula", formData, {
         headers: {"Content-Type": "multipart/form-data"},
     });
 

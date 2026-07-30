@@ -324,3 +324,50 @@ model QuickMessage{
 
   createdAt DateTime @default(now())
 }
+
+enum AuditAction{
+  REQUEST
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+}
+
+// Registro de auditoria interno: guarda TODOS los movimientos del sistema (requests HTTP
+// y operaciones CRUD sobre cualquier modelo), identificando siempre quien la hizo.
+// Sin @relation hacia User a proposito: no queremos que borrar un usuario borre (Cascade)
+// ni quede bloqueado (Restrict) por su historial de auditoria. actorEmail/actorRole quedan
+// como "foto" del momento del evento, validos aunque el usuario cambie de rol o se borre.
+model AuditLog{
+  id String @id @default(uuid())
+
+  requestId String // agrupa todas las filas generadas por una misma request HTTP
+
+  action AuditAction
+
+  actorId String?
+  actorEmail String?
+  actorRole Role?
+  actingBrokerId String?
+
+  entity String? // nombre del modelo de Prisma afectado (Policy, Client, etc.)
+  entityId String?
+
+  changes Json? // {before, after} redactado, o {where, count} en operaciones batch
+
+  method String?
+  path String?
+  statusCode Int?
+  ip String?
+  durationMs Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@index([requestId])
+  @@index([action])
+}

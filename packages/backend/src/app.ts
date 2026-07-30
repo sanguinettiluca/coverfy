@@ -9,6 +9,8 @@ import ocrRoutes from './routes/ocr.routes'
 import claimRoutes from './routes/claim.routes'
 import reportRoutes from './routes/report.routes'
 import quickMessageRoutes from "./routes/quickMessage.routes"
+import auditLogRoutes from "./routes/auditLog.routes"
+import { auditMiddleware } from "./middlewares/audit.middleware"
 
 const app = express()
 
@@ -17,6 +19,9 @@ app.use(cors())
 
 // Permite parsear el body de las requests como JSON
 app.use(express.json())
+
+// Registro de auditoria: arranca el contexto de la request y loguea cada request HTTP
+app.use(auditMiddleware)
 
 // --- Rutas -----------------------------------------------
 app.get('/health', (req, res) => {
@@ -49,5 +54,8 @@ app.use('/api/siniestros', claimRoutes)
 
 // Rutas de reportes
 app.use('/api/reportes', reportRoutes)
+
+// Rutas de auditoria interna (solo ADMIN)
+app.use('/api/auditoria', auditLogRoutes)
 
 export default app

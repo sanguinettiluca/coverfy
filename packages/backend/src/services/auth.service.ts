@@ -2,13 +2,42 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import prisma from "../config/prisma"
 import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse, PreAuthTokenPayload, LoginResult } from "../domain/user"
-import { Role } from "../generated/prisma"
+import { AuditAction, Role } from "../generated/prisma"
 import { decrypt } from "../utils/crypto.util"
 import { validatePassword } from "../validators/password.validator"
 import { verifyCode, verifyBackupCode } from "./twoFactor.service"
+import { auditContextStorage } from "../context/requestContext"
 
 // Cuantas veces se aplica el algoritmo de hashing a la password
 const SALT_ROUNDS = 10
+
+// El login/logout no siempre generan una escritura Prisma que identifique claramente
+// "quien" hizo el intento (login exitoso no escribe nada; uno fallido tampoco), asi que
+// se registran a mano estos eventos de auditoria.
+async function logAuthEvent(
+    action: AuditAction,
+    actorId: string | null,
+    actorEmail: string,
+    role?: Role,
+    brokerId?: string | null
+): Promise<void> {
+    try {
+        await prisma.auditLog.create({
+            data: {
+                requestId: auditContextStorage.getStore()?.requestId ?? 'sin-request-id',
+                action,
+                actorId,
+                actorEmail,
+                actorRole: role ?? null,
+                actingBrokerId: brokerId ?? null,
+                entity: 'User',
+                entityId: actorId
+            }
+        })
+    } catch (error) {
+        console.error('[audit] error al registrar evento de auth:', error)
+    }
+}
 
 export async function createUser(data: CreateUserDTO) {
     const {valid, errors} = validatePassword(data.password)
@@ -98,6 +127,7 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
     })
 
     if(!user){
+        await logAuthEvent('LOGIN_FAILED', null, data.email)
         throw new Error('Credenciales inválidas')
     }
 
@@ -105,11 +135,13 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
     const isPasswordValid = await bcrypt.compare(data.password, user.password)
 
     if(!isPasswordValid){
+        await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
         throw new Error('Credenciales inválidas')
     }
 
     // Si el usuario tiene el 2FA activado, cortamos aca.
     // Se emite un token temporal de 5 mins para que el fornt end complete el segundo paso
+    // (el LOGIN_SUCCESS real se registra en verifyTwoFactorLogin, cuando se confirma el 2FA)
     if(user.twoFactorEnabled){
         const preAuthPayload: PreAuthTokenPayload = {
             userId: user.id,
@@ -125,6 +157,7 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
         return {twoFactorRequired: true, preAuthToken}
     }
 
+    await logAuthEvent('LOGIN_SUCCESS', user.id, user.email, user.role, user.brokerId)
     return generateAuthResponse(user)
 }
 
@@ -156,6 +189,7 @@ export async function verifyTwoFactorLogin(preAuthToken: string, code: string): 
         const index = await verifyBackupCode(code, user.twoFactorBackupCodes)
 
         if(index == -1){
+            await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
             throw new Error('Codigo invalido')
         }
 
@@ -166,6 +200,7 @@ export async function verifyTwoFactorLogin(preAuthToken: string, code: string): 
         })
     }
 
+    await logAuthEvent('LOGIN_SUCCESS', user.id, user.email, user.role, user.brokerId)
     return generateAuthResponse(user)
 }
 
@@ -190,4 +225,11 @@ export async function logout(token: string): Promise<void> {
             token
         }
     })
+
+    // La ruta de logout pasa por authenticate, asi que el contexto de auditoria ya
+    // tiene el actor cargado (ver auth.middleware.ts)
+    const ctx = auditContextStorage.getStore()
+    if (ctx?.userId && ctx.email) {
+        await logAuthEvent('LOGOUT', ctx.userId, ctx.email, ctx.role, ctx.brokerId)
+    }
 }

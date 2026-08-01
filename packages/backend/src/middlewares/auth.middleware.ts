@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import { JwtPayload } from "../domain/user"
 import { Role } from "../generated/prisma"
 import prisma from "../config/prisma"
+import { auditContextStorage } from "../context/requestContext"
 
 // Este middleware se encarga de verificar el token JWT enviado desde el header Aut
 
@@ -49,6 +50,17 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
         // Carga los datos del usuario autenticado en el request
         req.user = decoded
+
+        // Completa el contexto de auditoria (ver requestContext.ts) con el actor real,
+        // para que la extension de Prisma sepa quien esta haciendo cada escritura
+        const auditCtx = auditContextStorage.getStore()
+        if (auditCtx) {
+            auditCtx.userId = decoded.userId
+            auditCtx.email = decoded.email
+            auditCtx.role = decoded.role
+            auditCtx.brokerId = decoded.brokerId
+        }
+
         next() // Continua al siguiente middleware o controlador
     }catch(error){
         res.status(401).json({ message: 'Token invalido o expirado' })

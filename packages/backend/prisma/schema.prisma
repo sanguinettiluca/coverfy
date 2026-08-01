@@ -1,6 +1,8 @@
 // IMPORTANTE: Trabajen con la version 6.0.0 de prisma, ya que la 7.0.0 tiene cambios importantes y
 // no es compatible con el codigo actual
 
+// PARA ENTRAR AL PANEL DE PRISMA: npx prisma studio (cd backend primero)
+
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -11,7 +13,7 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-// Admin seriamos nosotros, 
+// Admin seriamos nosotros,
 // Broker seria la empresa en si (ej. Aseguros),
 // Sub-Broker son los empleados.
 enum Role{
@@ -21,16 +23,33 @@ enum Role{
 }
 
 model User{
-  idUser String @id @default(uuid())
+  id String @id @default(uuid())
   email String @unique
   password String
-  nombre String
+  name String
   role Role
 
   // Si el usuario es un sub-broker, este campo referencia al broker al que pertenece
   brokerId String?
+  broker User? @relation("BrokerSubBrokers", fields: [brokerId], references: [id])
   subBrokers User[] @relation("BrokerSubBrokers")
-  broker User? @relation("BrokerSubBrokers", fields: [brokerId], references: [idUser])
+
+  companies Company[]
+
+  clients Client[] @relation("BrokerClients")
+
+  // Auditoria: registros creados por el usuario:
+  createdPolicies Policy[] @relation("PolicyCreator")
+  createdClients Client[] @relation("ClientCreator")
+
+  createdClaims Claim[] @relation("ClaimCreator")
+
+  // Autentificacion 2 factores:
+  twoFactorSecret String?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorBackupCodes String[] @default([])
+
+  quickMessages QuickMessage[] @relation("BrokerQuickMessages")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,196 +59,315 @@ model TokenBlacklist {
   id String @id @default(uuid())
   token String
   createdAt DateTime @default(now())
+  expiresAt DateTime?
 }
 
-model Cliente{
-  idCliente String @id @default(uuid())
-  nombres String
-  apellidos String
-  documento String
-  fechaNacimiento DateTime?
-  celular String
-  celularAlternativo String?
+model Client{
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  documentNumber String
+  dateOfBirth DateTime?
+  phone String
+  alternatePhone String?
   email String
-  direccion String
-  notas String?
+  address String
+  notes String?
 
   // Quien lo registro RELACION BROKER-CLIENTE:
-  creadoPorId String
-  creadoPor User @relation("BrokerCreador", fields: [creadoPorId], references: [idUser])
+  createdById String
+  createdBy User @relation("ClientCreator", fields: [createdById], references: [id])
+
+  brokerId String
+  broker User @relation("BrokerClients", fields: [brokerId], references: [id])
 
   // Polizas del cliente:
-  polizas Poliza[]
+  policies Policy[]
 
-  createdAr DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([brokerId, documentNumber])
 }
 
+enum InsuranceType{
+  VEHICLE
+  TRIP
+  RENTAL
+  HOME
+  BUSINESS
+  LIABILITY
+  BOND
+  LIFE
+  OTHER
+}
 
-model Poliza{
-  idPoliza String @id @default(uuid()) // !!en prisma no se pueden usar Int con uuid, asi que se puede usar String y luego parsearlo a Int en el codigo
-  numeroPoliza Int @unique
-  tipo tipoPoliza
-  estado String
-  fechaEmision DateTime
-  fechaInicio DateTime
-  fechaVencimiento DateTime
-  compania String
-  montoTotal Float
-  cuotas Int
-  metodoPago String
+enum PolicyStatus{
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+}
 
-  //Relacion de tablas
+enum PaymentMethod{
+  Debit
+  Credit
+  Transfer
+  Cash
+}
+
+enum ClaimStatus{
+  OPEN
+  CLOSED
+}
+
+model Company{
+  id String @id @default(uuid())
+  name String
+  commissionRate Float @default(0)
+
   brokerId String
-  broker User @relation(fields: [brokerId], references: [idUser])
+  broker User @relation(fields: [brokerId], references: [id])
 
-  clienteId String
-  cliente Cliente @relation(fields: [clienteId], references: [idCliente])
+  policies Policy[]
+  createdAt DateTime @default(now())
 
-  empresaSeguroId String
-  empresaSeguro empresaSeguro @relation(fields: [empresaSeguroId], references: [id])
-
-  
-
-  // Relaciones con las tablas específicas de cada tipo de póliza ("herencia"):
-  vida PolizaVida?
-  vehiculo PolizaVehiculo?
-  hogar PolizaHogar?
-  alquiler PolizaAlquiler?
-  viaje PolizaViaje?
-  comercio PolizaComercio?
-  responsabilidadCivil PolizaResponsabilidadCivil?
-  otros PolizaOtros?
-
+  coverages Coverage[]
 }
 
-enum tipoPoliza{
-  VEHICULO
-  HOGAR
-  VIDA
-  ALQUILER
-  VIAJE
-  COMERCIO
-  RESPONSABILIDAD_CIVIL
-  OTROS
-}
-
-// Tablas específicas para cada tipo de póliza ("herencia"):
-
-model PolizaVida{
-  id String @id @default(uuid()) 
-  beneficiarios String @default("")
-  sumaAsegurada Float @default(0)
-
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
-}
-
-model PolizaVehiculo{
+model Policy{
   id String @id @default(uuid())
-  marca String @default("")
-  modelo String @default("")
-  anio Int?
-  matricula String @default("")
-  padron String @default("")
-  chasis String @default("")
-  motor String @default("")
+  policyNumber String @default("")
+  referenceNumber String @default("")
+  insuranceType InsuranceType
+  status PolicyStatus @default(ACTIVE)
+  startDate DateTime?
+  expirationDate DateTime?
+  totalAmount Float @default(0)
+  installments Int @default(1)
+  paymentMethod PaymentMethod @default(Debit)
 
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+  // Relacion con cliente:
+  // La relacion es del campo clientId que hace referencia al campo id de la tabla Client, y si
+  // se borra el cliente, se borran sus polizas (Cascade):
+  clientId String
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  companyId String
+  company Company @relation(fields: [companyId], references: [id])
+
+  // Cobertura asociada:
+  coverageId String?
+  coverage Coverage? @relation(fields: [coverageId], references: [id])
+
+  // Quien registro la poliza (BROKER o SUB_BROKER):
+  brokerId String
+  broker User @relation("PolicyCreator", fields: [brokerId], references: [id])
+
+  // Siniestros asociados a esta poliza (solo para polizas de vehiculo):
+  claims Claim[]
+
+  // Relacion 1:1 con cada tabla de detalle por tipo de seguro:
+  // Solo una de estas relaciones se llenara dependiendo del tipo de seguro:
+  vehicleDetails VehicleDetails?
+  tripDetails TripDetails?
+  rentalDetails RentalDetails?
+  homeDetails HomeDetails?
+  businessDetails BusinessDetails?
+  liabilityDetails LiabilityDetails?
+  bondDetails BondDetails?
+  lifeDetails LifeDetails?
+  otherDetails OtherDetails?
+
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model PolizaHogar{
+model Coverage{
   id String @id @default(uuid())
-  direccion String @default("")
-  tipoConstruccion String @default("")
-  metrosCuadrados Float?
+  name String
 
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+  // Relacion con empresa de seguros:
+  companyId String
+  company Company @relation(fields: [companyId], references: [id])
+
+  // Relacion con tipo de seguro:
+  insuranceType InsuranceType
+
+  policies Policy[]
 }
 
-model PolizaAlquiler{
-  id String @id @default(uuid()) 
-  direccion String @default("")
-  tipoInmueble String @default("")
-  valorAlquiler Float @default(0)
-
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
-}
-
-model PolizaViaje{
+// Tipos de seguro:
+model VehicleDetails{
   id String @id @default(uuid())
-  destino String @default("")
-  fechaSalida DateTime?
-  fechaRegreso DateTime?
-  pasajeros Int @default(1)
-
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  brand String
+  model String
+  year Int?
+  licensePlate String @default("")
+  registrationNumber String @default("")
+  chassisNumber String @default("")
+  engineNumber String @default("")
 }
 
-model PolizaComercio{
+model TripDetails{
   id String @id @default(uuid())
-  comercio String @default("")
-  razonSocial String @default("")
-  rubro String @default("")
-  direccion String @default("")
-  
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  destination String
+  departureDate DateTime?
+  returnDate DateTime?
+  passengers Int?
 }
 
-model PolizaResponsabilidadCivil{
+model RentalDetails{
   id String @id @default(uuid())
-  actividad String @default("")
-  limiteCobertura Float @default(0)
-
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  address String @default("")
+  propertyType String @default("")
+  rentAmount Float @default(0)
 }
 
-model PolizaOtros{
+model HomeDetails{
   id String @id @default(uuid())
-  descripcion String @default("")
-
-  //Relacion de tablas
-  polizaId String @unique
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  address String @default("")
+  constructionType String @default("")
+  squareMeters Int?
+  propertyValue Float @default(0)
 }
 
-
-model empresaSeguro{
+model BusinessDetails{
   id String @id @default(uuid())
-  nombre String
-  rut String
-  direccion String
-  telefono String
-  email String
-
-  //Relacion de tablas
-  polizaId String
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
-
-  coberturas cobertura[]
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  businessName String @default("")
+  industry String @default("")
+  address String @default("")
 }
 
-model cobertura{
+model LiabilityDetails{
   id String @id @default(uuid())
-  descripcion String
-  monto Float
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  activity String @default("")
+  coverageLimit Float @default(0)
+}
 
-  //Relacion de tablas
-  polizaId String
-  poliza Poliza @relation(fields: [polizaId], references: [idPoliza])
+model BondDetails{
+  id String @id @default(uuid())
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  bondType String @default("")
+  guaranteedAmount Float @default(0)
+  beneficiary String @default("")
+}
 
-  empresaSeguroId String
-  empresaSeguro empresaSeguro @relation(fields: [empresaSeguroId], references: [id])
+model LifeDetails{
+  id String @id @default(uuid())
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  insuredAmount Float @default(0)
+  beneficiary String @default("")
+}
+
+model OtherDetails{
+  id String @id @default(uuid())
+  policyId String @unique
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  description String @default("")
+}
+
+model Claim{
+  id String @id @default(uuid())
+  incidentDate DateTime
+  contactDate DateTime?
+  notes String?
+  status ClaimStatus @default(OPEN)
+
+  // Los siniestros solo se dan en polizas de vehiculo.
+  policyId String
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  // Auditoria: quien registro este siniestro.
+  brokerId String
+  broker User @relation("ClaimCreator", fields: [brokerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Documentos:
+model Document{
+  id String @id @default(uuid())
+  name String
+  type String
+  url String
+
+  policyId String
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model QuickMessage{
+  id String @id @default(uuid())
+  name String
+  message String
+
+  brokerId String
+  broker User @relation("BrokerQuickMessages", fields: [brokerId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum AuditAction{
+  REQUEST
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+}
+
+// Registro de auditoria interno: guarda TODOS los movimientos del sistema (requests HTTP
+// y operaciones CRUD sobre cualquier modelo), identificando siempre quien la hizo.
+// Sin @relation hacia User a proposito: no queremos que borrar un usuario borre (Cascade)
+// ni quede bloqueado (Restrict) por su historial de auditoria. actorEmail/actorRole quedan
+// como "foto" del momento del evento, validos aunque el usuario cambie de rol o se borre.
+model AuditLog{
+  id String @id @default(uuid())
+
+  requestId String // agrupa todas las filas generadas por una misma request HTTP
+
+  action AuditAction
+
+  actorId String?
+  actorEmail String?
+  actorRole Role?
+  actingBrokerId String?
+
+  entity String? // nombre del modelo de Prisma afectado (Policy, Client, etc.)
+  entityId String?
+
+  changes Json? // {before, after} redactado, o {where, count} en operaciones batch
+
+  method String?
+  path String?
+  statusCode Int?
+  ip String?
+  durationMs Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@index([requestId])
+  @@index([action])
 }

@@ -1,30 +1,15 @@
-import express from "express"
-import cors from "cors"
 import dotenv from "dotenv"
-import authRoutes from "./routes/auth.routes"
 import path from "path"
 
-// Cargamos las variables de entorno del archivo .env
+// Cargamos las variables de entorno del archivo .env antes de importar la app
+// (la app crea el PrismaClient y otros singletons al importarse)
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
-const app = express()
+import app from "./app"
+
 const PORT = process.env.PORT || 3000
 
-// Permite requests desde el frontend
-app.use(cors())
-
-// Permite parsear el body de las requests como JSON
-app.use(express.json())
-
-// ─── Rutas ────────────────────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.json({ status: 'Coverfy API is running' })
-})
-
-// Rutas de autenticación (login, crear usuario, perfil)
-app.use('/api/auth', authRoutes)
-
-// ─── Servidor ─────────────────────────────────────────────────
+// --- Servidor -----------------------------------------------
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
 })

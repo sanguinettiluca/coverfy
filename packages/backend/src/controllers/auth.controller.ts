@@ -5,10 +5,10 @@ import { Role } from "../generated/prisma"
 // CREAR USUARIO:
 export async function createUserController(req: Request, res: Response): Promise<void> {
     try{
-        const {email, password, nombre, role, brokerId} = req.body
+        const {email, password, name, role, brokerId} = req.body
 
         // Validar los campos obligatorios
-        if(!email || !password || !nombre || !role){
+        if(!email || !password || !name || !role){
             res.status(400).json({message: "Faltan campos obligatorios"})
             return
         }
@@ -19,7 +19,7 @@ export async function createUserController(req: Request, res: Response): Promise
             return
         }
 
-        const user = await authService.createUser({email, password, nombre, role, brokerId})
+        const user = await authService.createUser({email, password, name, role, brokerId})
 
         res.status(201).json({
             message: "Usuario creado exitosamente",
@@ -29,7 +29,7 @@ export async function createUserController(req: Request, res: Response): Promise
     } catch (error) {
         // Captura errores conocidos del servicio (email duplicado, broker inválido, etc.)
         if (error instanceof Error) {
-            res.status(401).json({ message: error.message })
+            res.status(400).json({ message: error.message })
             return
         }
 
@@ -79,5 +79,33 @@ export async function meController(req: Request, res: Response): Promise<void> {
         res.status(200).json({ user: req.user })
     }catch (error) {
         res.status(500).json({message: "Error interno"})
+    }
+}
+
+export async function verifyTwoFactorLoginController(req: Request, res: Response): Promise<void>{
+    try{
+        const {preAuthToken, code} = req.body
+        const authResponse = await authService.verifyTwoFactorLogin(preAuthToken, code)
+
+        res.status(200).json(authResponse)
+    }catch(error){
+        if(error instanceof Error){
+            res.status(401).json({message: error.message})
+            return
+        }
+        res.status(500).json({message: "Error interno"})
+    }
+}
+
+export async function listBrokersController(req:Request, res: Response): Promise<void> {
+    try{
+        const brokers = await authService.listBrokers()
+        res.status(200).json(brokers)
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: "Error interno"})
     }
 }

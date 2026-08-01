@@ -1,16 +1,16 @@
 export type TipoSeguro =
-    | "VEHICULO"
-    | "VIAJE"
-    | "ALQUILER"
-    | "HOGAR"
-    | "COMERCIO"
-    | "RESPONSABILIDAD_CIVIL"
-    | "FIANZA"
-    | "VIDA"
-    | "OTROS";
+    | "VEHICLE"
+    | "TRIP"
+    | "RENTAL"
+    | "HOME"
+    | "BUSINESS"
+    | "LIABILITY"
+    | "BOND"
+    | "LIFE"
+    | "OTHER";
 
-export type EstadoPoliza = "ACTIVA" | "VENCIDA" | "CANCELADA" | "PENDIENTE";
-export type MetodoPago = "Efectivo" | "Credito" | "Transferencia" | "Debito";
+export type EstadoPoliza = "ACTIVE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
+export type MetodoPago = "Cash" | "Credit" | "Transfer" | "Debit";
 
 export type PolizaEditForm = {
     polizaId?: string;
@@ -43,7 +43,6 @@ export type PolizaEditForm = {
         direccion?: string;
         tipoInmueble?: string;
         valorAlquiler?: number;
-        deposito?: number;
     };
     detalleComercio?: {
         razonSocial?: string;
@@ -75,22 +74,22 @@ export type PolizaEditForm = {
 
 export type PolizaDetalle = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
-    tipoSeguro: TipoSeguro;
-    estado?: EstadoPoliza | null;
-    fechaInicio?: string | null;
-    fechaVencimiento?: string | null;
-    montoTotal?: number | null;
-    cuotas?: number | null;
-    metodoPago?: MetodoPago | null;
-    detalleResponsabilidadCivil?: { actividad: string; limiteCobertura: number } | null;
-    detalleFianza?: { tipoFianza: string; montoGarantizado?: number | null; beneficiario: string } | null;
-    detalleVida?: { sumaAsegurada?: number | null; beneficiario: string } | null;
-    detalleOtros?: { descripcion: string } | null;
-    detalleAlquiler?: { direccion: string; tipoInmueble: string; valorAlquiler: number; deposito: number } | null;
-    detalleComercio?: { razonSocial: string; rubro: string; direccion: string } | null;
-    detalleHogar?: { direccion: string; tipoConstruccion: string; metrosCuadrados?: number | null; valorPropiedad: number } | null;
-    detalleVehiculo?: { marca: string; modelo: string; anio: number; matricula: string; padron: string; chasis: string; motor: string } | null;
-    detalleViaje?: { destino: string; fechaSalida: string; fechaRegreso: string; pasajeros: number } | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
+    insuranceType: TipoSeguro;
+    status?: EstadoPoliza | null;
+    startDate?: string | null;
+    expirationDate?: string | null;
+    totalAmount?: number | null;
+    installments?: number | null;
+    paymentMethod?: MetodoPago | null;
+    liabilityDetails?: { activity: string; coverageLimit: number } | null;
+    bondDetails?: { bondType: string; guaranteedAmount?: number | null; beneficiary: string } | null;
+    lifeDetails?: { insuredAmount?: number | null; beneficiary: string } | null;
+    otherDetails?: { description: string } | null;
+    rentalDetails?: { address: string; propertyType: string; rentAmount: number } | null;
+    businessDetails?: { businessName: string; industry: string; address: string } | null;
+    homeDetails?: { address: string; constructionType: string; squareMeters?: number | null; propertyValue: number } | null;
+    vehicleDetails?: { brand: string; model: string; year: number; licensePlate: string; registrationNumber: string; chassisNumber: string; engineNumber: string } | null;
+    tripDetails?: { destination: string; departureDate: string; returnDate: string; passengers: number } | null;
 };

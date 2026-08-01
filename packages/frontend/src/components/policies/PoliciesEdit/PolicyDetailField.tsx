@@ -9,7 +9,7 @@ type Props = {
 const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
     return (
         <>
-            {tipoSeguro === "RESPONSABILIDAD_CIVIL" && (
+            {tipoSeguro === "LIABILITY" && (
                 <>
                     <label htmlFor="rc_actividad">Actividad</label>
                     <input
@@ -27,7 +27,7 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                 </>
             )}
 
-            {tipoSeguro === "FIANZA" && (
+            {tipoSeguro === "BOND" && (
                 <>
                     <label htmlFor="fianza_tipo">Tipo de Fianza</label>
                     <input id="fianza_tipo" type="text" {...register("detalleFianza.tipoFianza")} />
@@ -44,7 +44,7 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                 </>
             )}
 
-            {tipoSeguro === "VIDA" && (
+            {tipoSeguro === "LIFE" && (
                 <>
                     <label htmlFor="vida_suma">Suma Asegurada</label>
                     <input
@@ -58,14 +58,14 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                 </>
             )}
 
-            {tipoSeguro === "OTROS" && (
+            {tipoSeguro === "OTHER" && (
                 <>
                     <label htmlFor="otros_desc">Descripción</label>
                     <input id="otros_desc" type="text" {...register("detalleOtros.descripcion")} />
                 </>
             )}
 
-            {tipoSeguro === "ALQUILER" && (
+            {tipoSeguro === "RENTAL" && (
                 <>
                     <label htmlFor="alq_direccion">Dirección</label>
                     <input id="alq_direccion" type="text" {...register("detalleAlquiler.direccion")} />
@@ -79,17 +79,10 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                         type="number"
                         {...register("detalleAlquiler.valorAlquiler", { valueAsNumber: true })}
                     />
-
-                    <label htmlFor="alq_deposito">Depósito</label>
-                    <input
-                        id="alq_deposito"
-                        type="number"
-                        {...register("detalleAlquiler.deposito", { valueAsNumber: true })}
-                    />
                 </>
             )}
 
-            {tipoSeguro === "COMERCIO" && (
+            {tipoSeguro === "BUSINESS" && (
                 <>
                     <label htmlFor="com_razon">Razón Social</label>
                     <input id="com_razon" type="text" {...register("detalleComercio.razonSocial")} />
@@ -102,7 +95,7 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                 </>
             )}
 
-            {tipoSeguro === "HOGAR" && (
+            {tipoSeguro === "HOME" && (
                 <>
                     <label htmlFor="hogar_direccion">Dirección</label>
                     <input id="hogar_direccion" type="text" {...register("detalleHogar.direccion")} />
@@ -126,7 +119,7 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                 </>
             )}
 
-            {tipoSeguro === "VEHICULO" && (
+            {tipoSeguro === "VEHICLE" && (
                 <>
                     <label htmlFor="veh_marca">Marca</label>
                     <input id="veh_marca" type="text" {...register("detalleVehiculo.marca")} />
@@ -155,7 +148,7 @@ const PolicyDetailFields = ({ tipoSeguro, register }: Props) => {
                 </>
             )}
 
-            {tipoSeguro === "VIAJE" && (
+            {tipoSeguro === "TRIP" && (
                 <>
                     <label htmlFor="viaje_destino">Destino</label>
                     <input id="viaje_destino" type="text" {...register("detalleViaje.destino")} />

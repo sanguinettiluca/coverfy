@@ -1,27 +1,28 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-type Poliza = {
+type Policy = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
-    tipoSeguro: string;
-    estado?: string | null;
-    fechaInicio?: string | null;
-    fechaVencimiento?: string | null;
-    montoTotal?: number | null;
-    cuotas?: number | null;
-    metodoPago?: string | null;
-    clienteId: string;
-    companiaId: string;
-    coberturaId?: string | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
+    insuranceType: string;
+    status?: string | null;
+    startDate?: string | null;
+    expirationDate?: string | null;
+    totalAmount?: number | null;
+    installments?: number | null;
+    paymentMethod?: string | null;
+    clientId: string;
+    companyId: string;
+    coverageId?: string | null;
     brokerId: string;
     createdAt: string;
     updatedAt: string;
 };
 
+
 type PolizaAccordionProps = {
-    poliza: Poliza;
+    poliza: Policy;
 };
 
 const formatFecha = (fecha?: string | null) =>
@@ -59,14 +60,14 @@ const PolizaAccordion = ({ poliza }: PolizaAccordionProps) => {
                 onClick={() => setAbierto((prev) => !prev)}
             >
                 <div className="poliza-accordion-title">
-                    <span className="poliza-accordion-numero">{poliza.numeroPoliza}</span>
-                    <span className="poliza-accordion-tipo">{poliza.tipoSeguro}</span>
+                    <span className="poliza-accordion-numero">{poliza.policyNumber}</span>
+                    <span className="poliza-accordion-tipo">{poliza.insuranceType}</span>
                 </div>
 
                 <div className="poliza-accordion-right">
-                    {poliza.estado && (
-                        <span className={`poliza-accordion-estado ${getEstadoClass(poliza.estado)}`}>
-                            {poliza.estado}
+                    {poliza.status && (
+                        <span className={`poliza-accordion-estado ${getEstadoClass(poliza.status)}`}>
+                            {poliza.status}
                         </span>
                     )}
                     <ChevronDown
@@ -85,34 +86,34 @@ const PolizaAccordion = ({ poliza }: PolizaAccordionProps) => {
 
                     <div className="poliza-accordion-field">
                         <span className="poliza-accordion-label">Número de Referencia</span>
-                        <span className={`poliza-accordion-value ${!poliza.numeroReferencia ? "poliza-accordion-value--muted" : ""}`}>
-                            {formatTexto(poliza.numeroReferencia)}
+                        <span className={`poliza-accordion-value ${!poliza.referenceNumber ? "poliza-accordion-value--muted" : ""}`}>
+                            {formatTexto(poliza.referenceNumber)}
                         </span>
                     </div>
 
                     <div className="poliza-accordion-field">
                         <span className="poliza-accordion-label">Método de Pago</span>
-                        <span className="poliza-accordion-value">{poliza.metodoPago ?? "-"}</span>
+                        <span className="poliza-accordion-value">{poliza.paymentMethod ?? "-"}</span>
                     </div>
 
                     <div className="poliza-accordion-field">
                         <span className="poliza-accordion-label">Fecha de Inicio</span>
-                        <span className="poliza-accordion-value">{formatFecha(poliza.fechaInicio)}</span>
+                        <span className="poliza-accordion-value">{formatFecha(poliza.startDate)}</span>
                     </div>
 
                     <div className="poliza-accordion-field">
                         <span className="poliza-accordion-label">Fecha de Vencimiento</span>
-                        <span className="poliza-accordion-value">{formatFecha(poliza.fechaVencimiento)}</span>
+                        <span className="poliza-accordion-value">{formatFecha(poliza.expirationDate)}</span>
                     </div>
 
                     <div className="poliza-accordion-field">
                         <span className="poliza-accordion-label">Monto Total</span>
-                        <span className="poliza-accordion-value">{formatMonto(poliza.montoTotal)}</span>
+                        <span className="poliza-accordion-value">{formatMonto(poliza.totalAmount)}</span>
                     </div>
 
                     <div className="poliza-accordion-field">
                         <span className="poliza-accordion-label">Cuotas</span>
-                        <span className="poliza-accordion-value">{poliza.cuotas ?? "-"}</span>
+                        <span className="poliza-accordion-value">{poliza.installments ?? "-"}</span>
                     </div>
 
                 </div>

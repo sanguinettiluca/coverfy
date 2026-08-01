@@ -5,64 +5,64 @@ import SearchPolicyButton from "./SearchPoliciyButton";
 import PolicyResult from "./PolicyResult";
 import api from "../../data/api";
 
-type TipoSeguro =
-    | "VEHICULO"
-    | "VIAJE"
-    | "ALQUILER"
-    | "HOGAR"
-    | "COMERCIO"
-    | "RESPONSABILIDAD_CIVIL"
-    | "FIANZA"
-    | "VIDA"
-    | "OTROS";
+type InsuranceType =
+    | "VEHICLE"
+    | "TRIP"
+    | "RENTAL"
+    | "HOME"
+    | "BUSINESS"
+    | "LIABILITY"
+    | "BOND"
+    | "LIFE"
+    | "OTHER";
 
-type EstadoPoliza = "ACTIVA" | "VENCIDA" | "CANCELADA" | "PENDIENTE" | "SUSPENDIDA";
-type MetodoPago = "Efectivo" | "Credito" | "Transferencia" | "Debito";
+type PolicyStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
+type PaymentMethod = "Cash" | "Credit" | "Transfer" | "Debit";
 
 type BuscarPolizaForm = {
     numeroReferencia: string;
 };
 
-type Cobertura = {
+type Coverage = {
     id: string;
-    nombre: string;
-    companiaId: string;
-    tipoSeguro: TipoSeguro;
+    name: string;
+    companyId: string;
+    insuranceType: InsuranceType;
 };
 
-type Compania = {
+type Company = {
     id: string;
-    nombre: string;
-    porcentajeComision: number;
+    name: string;
+    commissionRate: number;
     brokerId: string;
     createdAt: string;
-    coberturas: Cobertura[];
+    coverages: Coverage[];
 };
 
-type PolizaDetalle = {
+type Policy = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
-    tipoSeguro: TipoSeguro;
-    estado?: EstadoPoliza | null;
-    fechaInicio?: string | null;
-    fechaVencimiento?: string | null;
-    montoTotal?: number | null;
-    cuotas?: number | null;
-    metodoPago?: MetodoPago | null;
-    companiaId: string;
-    coberturaId?: string | null;
-    broker?: { id: string; nombre: string; role: string } | null;
-    cliente?: { id: string; nombres: string; apellidos: string } | null;
-    detalleResponsabilidadCivil?: { actividad: string; limiteCobertura: number } | null;
-    detalleFianza?: { tipoFianza: string; montoGarantizado?: number | null; beneficiario: string } | null;
-    detalleVida?: { sumaAsegurada?: number | null; beneficiario: string } | null;
-    detalleOtros?: { descripcion: string } | null;
-    detalleAlquiler?: { direccion: string; tipoInmueble: string; valorAlquiler: number; deposito: number } | null;
-    detalleComercio?: { razonSocial: string; rubro: string; direccion: string } | null;
-    detalleHogar?: { direccion: string; tipoConstruccion: string; metrosCuadrados?: number | null; valorPropiedad: number } | null;
-    detalleVehiculo?: { marca: string; modelo: string; anio: number; matricula: string; padron: string; chasis: string; motor: string } | null;
-    detalleViaje?: { destino: string; fechaSalida: string; fechaRegreso: string; pasajeros: number } | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
+    insuranceType: InsuranceType;
+    status?: PolicyStatus | null;
+    startDate?: string | null;
+    expirationDate?: string | null;
+    totalAmount?: number | null;
+    installments?: number | null;
+    paymentMethod?: PaymentMethod | null;
+    companyId: string;
+    coverageId?: string | null;
+    broker?: { id: string; name: string; role: string } | null;
+    client?: { id: string; firstName: string; lastName: string } | null;
+    liabilityDetails?: { activity: string; coverageLimit: number } | null;
+    bondDetails?: { bondType: string; guaranteedAmount?: number | null; beneficiary: string } | null;
+    lifeDetails?: { insuredAmount?: number | null; beneficiary: string } | null;
+    otherDetails?: { description: string } | null;
+    rentalDetails?: { address: string; propertyType: string; rentAmount: number } | null;
+    businessDetails?: { businessName: string; industry: string; address: string } | null;
+    homeDetails?: { address: string; constructionType: string; squareMeters?: number | null; propertyValue: number } | null;
+    vehicleDetails?: { brand: string; model: string; year: number; licensePlate: string; registrationNumber: string; chassisNumber: string; engineNumber: string } | null;
+    tripDetails?: { destination: string; departureDate: string; returnDate: string; passengers: number } | null;
 };
 
 const PoliciesSearch = () => {
@@ -70,8 +70,8 @@ const PoliciesSearch = () => {
 
     const numeroReferencia = watch("numeroReferencia");
 
-    const [poliza, setPoliza] = useState<PolizaDetalle | null>(null);
-    const [compania, setCompania] = useState<Compania | null>(null);
+    const [poliza, setPoliza] = useState<Policy | null>(null);
+    const [compania, setCompania] = useState<Company | null>(null);
     const [buscado, setBuscado] = useState(false);
     const [cargandoDetalle, setCargandoDetalle] = useState(false);
 
@@ -79,12 +79,12 @@ const PoliciesSearch = () => {
         setCargandoDetalle(true);
         try {
             const detalle = await api.get(`/polizas/${polizaId}`);
-            const polizaData: PolizaDetalle = detalle.data;
+            const polizaData: Policy = detalle.data;
             setPoliza(polizaData);
 
-            if (polizaData.companiaId) {
+            if (polizaData.companyId) {
                 try {
-                    const companiaResponse = await api.get(`/companias/${polizaData.companiaId}`);
+                    const companiaResponse = await api.get(`/companias/${polizaData.companyId}`);
                     setCompania(companiaResponse.data);
                 } catch {
                     setCompania(null);

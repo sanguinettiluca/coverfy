@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 type Broker = {
     id: string;
-    nombre: string;
+    name: string;
 };
 
 type BrokerSelectProps = {
@@ -18,9 +18,9 @@ const BrokerSelect = ({ id, value, onChange }: BrokerSelectProps) => {
     const [cargando, setCargando] = useState(true);
 
     useEffect(() => {
-        api.get("/users", { params: { role: "BROKER" } })
+        api.get("/auth/brokers")
             .then((response) => {
-                setBrokers(response.data.users);
+                setBrokers(response.data);
             })
             .catch(() => {
                 toast.error("No se pudo cargar la lista de brokers");
@@ -40,7 +40,7 @@ const BrokerSelect = ({ id, value, onChange }: BrokerSelectProps) => {
             </option>
             {brokers.map((broker) => (
                 <option key={broker.id} value={broker.id}>
-                    {broker.nombre}
+                    {broker.name}
                 </option>
             ))}
         </select>

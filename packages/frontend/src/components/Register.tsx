@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 import api from "../data/api"
 import { toast } from "react-toastify";
 import BrokerSelect from "./BrokerSelect";
 
-type Role = "ADMIN " | "BROKER" | "SUB_BROKER";
+type Role = "ADMIN" | "BROKER" | "SUB_BROKER";
 
 type RegisterForm = {
     name: string;
@@ -13,10 +13,11 @@ type RegisterForm = {
     confirm_password: string;
     role: Role;
     broker_id?: string;
+    
 };
 
 const Register = () => {
-    const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<RegisterForm>();
+    const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<RegisterForm>();
 
     const role = watch("role");
     const isSubBroker = role === "SUB_BROKER";
@@ -27,14 +28,7 @@ const Register = () => {
     const confirmPassword = watch("confirm_password");
     const brokerId = watch("broker_id");
 
-    const isDisabled =
-        !name ||
-        !email ||
-        !password ||
-        !confirmPassword ||
-        password !== confirmPassword ||
-        !role ||
-        (isSubBroker && !brokerId);
+
 
     const onSubmit = (data: RegisterForm) => {
         console.log(data);
@@ -42,7 +36,7 @@ const Register = () => {
         console.log(typeof data.role);
 
         api.post("/auth/users", {
-            nombre: data.name,
+            name: data.name,
             email: data.email,
             password: data.password,
             role: data.role,
@@ -50,6 +44,7 @@ const Register = () => {
         })
             .then(response => {
                 toast.success(response.data.message);
+                <Navigate to="/register"  />
                 reset();
             })
             .catch(error => {
@@ -143,18 +138,18 @@ const Register = () => {
 
                     {isSubBroker && (
                         <>
-                            <label htmlFor="broker_id">Broker ID</label>
-                            <input
-                                id="broker_id"
-                                type="text"
-                                placeholder="Broker ID asociado"
-                                {...register("broker_id", { required: isSubBroker })}
+                            <label htmlFor="broker_id">Broker</label>
+                            <input type="hidden" {...register("broker_id", { required: isSubBroker })} />
+                            <BrokerSelect
+                                id="broker_id_select"
+                                value={brokerId}
+                                onChange={(value) => setValue("broker_id", value, { shouldValidate: true })}
                             />
                             {errors.broker_id && <span className="error">Este campo es requerido</span>}
                         </>
                     )}
 
-                    <button type="submit" className="btn" disabled={isDisabled}>
+                    <button type="submit" className="btn" >
                         Crear Cuenta
                     </button>
                 </form>

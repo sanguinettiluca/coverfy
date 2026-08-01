@@ -44,16 +44,16 @@ const ClientsEdit = () => {
 
     const onSubmit = (data: UpdateClienteForm) => {
         api.put(`/clientes/${data.clienteId}`, {
-            nombres: data.nombres,
-            apellidos: data.apellidos,
-            documento: data.documento,
-            fechaNacimiento: data.fechaNacimiento ? new Date(data.fechaNacimiento).toISOString()
+            firstName: data.nombres,
+            lastName: data.apellidos,
+            documentNumber: data.documento,
+            dateOfBirth: data.fechaNacimiento ? new Date(data.fechaNacimiento).toISOString()
                 : undefined,
-            celular: data.celular,
-            celularAlternativo: data.celularAlternativo || undefined,
+            phone: data.celular,
+            alternatePhone: data.celularAlternativo || undefined,
             email: data.email,
-            direccion: data.direccion,
-            notas: data.notas || undefined
+            address: data.direccion,
+            notes: data.notas || undefined
         })
             .then(() => {
                 toast.success("Cliente actualizado correctamente");
@@ -105,15 +105,15 @@ const ClientsEdit = () => {
                             onEncontrado={(cliente) => {
                                 reset({
                                     clienteId: cliente.id,
-                                    nombres: cliente.nombres,
-                                    apellidos: cliente.apellidos,
-                                    documento: cliente.documento,
-                                    fechaNacimiento: cliente.fechaNacimiento?.slice(0, 10),
-                                    celular: cliente.celular,
-                                    celularAlternativo: cliente.celularAlternativo,
+                                    nombres: cliente.firstName,
+                                    apellidos: cliente.lastName,
+                                    documento: cliente.documentNumber,
+                                    fechaNacimiento: cliente.dateOfBirth?.slice(0, 10),
+                                    celular: cliente.phone,
+                                    celularAlternativo: cliente.alternatePhone,
                                     email: cliente.email,
-                                    direccion: cliente.direccion,
-                                    notas: cliente.notas,
+                                    direccion: cliente.address,
+                                    notas: cliente.notes,
                                 });
                             }}
                             onNoEncontrado={limpiarFormulario}

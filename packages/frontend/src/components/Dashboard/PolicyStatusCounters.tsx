@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react";
-import api from "../../data/api"; // ajustá el path real
+import api from "../../data/api";
 
-type EstadoPoliza = "ACTIVA" | "VENCIDA" | "CANCELADA" | "SUSPENDIDA";
+type PolicyStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
 
-type Poliza = {
+type Policy = {
     id: string;
-    estado?: EstadoPoliza | null;
+    status?: PolicyStatus | null;
 };
 
 const PolicyStatusCounters = () => {
-    const [conteo, setConteo] = useState<Record<string, number>>({});
+    const [count, setCount] = useState<Record<string, number>>({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        api.get("/polizas", { params: { porPagina: 1000, pagina: 1 } })
+        api.get("/polizas", { params: { perPage: 999999, page: 1 } })
             .then((response) => {
-                const polizas: Poliza[] = response.data.polizas ?? [];
-                const nuevoConteo: Record<string, number> = {};
-                polizas.forEach((p) => {
-                    const estado = p.estado ?? "SIN_ESTADO";
-                    nuevoConteo[estado] = (nuevoConteo[estado] ?? 0) + 1;
+                const policies: Policy[] = response.data.policies ?? [];
+                const newCount: Record<string, number> = {};
+                policies.forEach((p) => {
+                    const status = p.status ?? "SIN_ESTADO";
+                    newCount[status] = (newCount[status] ?? 0) + 1;
                 });
-                setConteo(nuevoConteo);
+                setCount(newCount);
             })
-            .catch(() => setConteo({}))
+            .catch(() => setCount({}))
             .finally(() => setLoading(false));
     }, []);
 
@@ -41,25 +41,25 @@ const PolicyStatusCounters = () => {
         <div className="dashboard-stats-grid">
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-value dashboard-stat-value--activa">
-                    {conteo.ACTIVA ?? 0}
+                    {count.ACTIVE ?? 0}
                 </span>
                 <span className="dashboard-stat-label">Activas</span>
             </div>
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-value dashboard-stat-value--vencida">
-                    {conteo.VENCIDA ?? 0}
+                    {count.EXPIRED ?? 0}
                 </span>
                 <span className="dashboard-stat-label">Vencidas</span>
             </div>
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-value dashboard-stat-value--pendiente">
-                    {conteo.CANCELADA ?? 0}
+                    {count.CANCELLED ?? 0}
                 </span>
                 <span className="dashboard-stat-label">Canceladas</span>
             </div>
             <div className="dashboard-stat-card">
                 <span className="dashboard-stat-value dashboard-stat-value--suspendida">
-                    {conteo.SUSPENDIDA ?? 0}
+                    {count.SUSPENDED ?? 0}
                 </span>
                 <span className="dashboard-stat-label">Suspendidas</span>
             </div>

@@ -1,23 +1,8 @@
 import { useForm } from "react-hook-form";
 import api from "../../data/api";
 import { toast } from "react-toastify";
-import CompanySelect from "./CompanySelect"; 
-type TipoSeguro =
-    | "VEHICULO"
-    | "VIAJE"
-    | "ALQUILER"
-    | "HOGAR"
-    | "COMERCIO"
-    | "RESPONSABILIDAD_CIVIL"
-    | "FIANZA"
-    | "VIDA"
-    | "OTROS";
-
-type CoverageForm = {
-    nombre: string;
-    tipoSeguro: TipoSeguro | "";
-    companiaId: string;
-};
+import CompanySelect from "./CompanySelect";
+import type { CoverageForm } from "../coverages/CoverageTypes";
 
 const CoverageNew = () => {
     const {
@@ -29,9 +14,9 @@ const CoverageNew = () => {
 
     const onSubmit = (data: CoverageForm) => {
         api.post("/coberturas", {
-            nombre: data.nombre,
-            tipoSeguro: data.tipoSeguro,
-            companiaId: data.companiaId
+            name: data.name,
+            insuranceType: data.insuranceType,
+            companyId: data.companyId
         })
             .then(response => {
                 toast.success(response.data.message);
@@ -59,35 +44,35 @@ const CoverageNew = () => {
                     onSubmit={handleSubmit(onSubmit)}
                 >
 
-                    <label htmlFor="nombre">Nombre</label>
+                    <label htmlFor="name">Nombre</label>
                     <input
-                        id="nombre"
+                        id="name"
                         type="text"
-                        {...register("nombre", { required: true })}
+                        {...register("name", { required: true })}
                     />
-                    {errors.nombre && (
+                    {errors.name && (
                         <span className="error">
                             Este campo es requerido
                         </span>
                     )}
 
-                    <label htmlFor="tipoSeguro">Tipo de Seguro</label>
+                    <label htmlFor="insuranceType">Tipo de Seguro</label>
                     <select
-                        id="tipoSeguro"
-                        {...register("tipoSeguro", { required: true })}
+                        id="insuranceType"
+                        {...register("insuranceType", { required: true })}
                     >
                         <option value="">Seleccione un tipo de seguro...</option>
-                        <option value="VEHICULO">Vehículo</option>
-                        <option value="VIAJE">Viaje</option>
-                        <option value="ALQUILER">Alquiler</option>
-                        <option value="HOGAR">Hogar</option>
-                        <option value="COMERCIO">Comercio</option>
-                        <option value="RESPONSABILIDAD_CIVIL">Responsabilidad Civil</option>
-                        <option value="FIANZA">Fianza</option>
-                        <option value="VIDA">Vida</option>
-                        <option value="OTROS">Otros</option>
+                        <option value="VEHICLE">Vehículo</option>
+                        <option value="TRIP">Viaje</option>
+                        <option value="RENTAL">Alquiler</option>
+                        <option value="HOME">Hogar</option>
+                        <option value="BUSINESS">Comercio</option>
+                        <option value="LIABILITY">Responsabilidad Civil</option>
+                        <option value="BOND">Fianza</option>
+                        <option value="LIFE">Vida</option>
+                        <option value="OTHER">Otros</option>
                     </select>
-                    {errors.tipoSeguro && (
+                    {errors.insuranceType && (
                         <span className="error">
                             Este campo es requerido
                         </span>

@@ -66,9 +66,9 @@ const Dashboard = () => {
             <PolicyStatusCounters />
 
             <div className="dashboard-widgets-grid">
-                <UpcomingPolicies />
                 <RecentClients />
                 <RecentPolicies />
+                <UpcomingPolicies />
                 <PartnerCompanies />
             </div>
 

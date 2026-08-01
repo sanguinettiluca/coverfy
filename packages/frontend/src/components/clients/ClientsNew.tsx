@@ -1,6 +1,9 @@
 import { useForm } from "react-hook-form";
 import api from "../../data/api"
 import { toast } from "react-toastify";
+import { Upload, FileCheck } from "lucide-react";
+import { useState } from "react";
+import PhoneInput from "./PhoneInput"
 
 type ClienteForm = {
     nombres: string;
@@ -15,21 +18,67 @@ type ClienteForm = {
 };
 
 const ClientsNew = () => {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<ClienteForm>();
+    const { register, handleSubmit, reset, setValue, control, formState: { errors } } = useForm<ClienteForm>();
+
+    const [nombreArchivo, setNombreArchivo] = useState<string | null>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setNombreArchivo(file.name);
+            escanearCedula(file);
+        }
+    };
+    const escanearCedula = async (file: File) => {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            console.log(formData.get("archivo"));
+            const { data } = await api.post("ocr/reconocimiento", formData);
+
+            if (data.firstName) {
+                setValue("nombres", data.firstName);
+            }
+
+            if (data.lastName) {
+                setValue("apellidos", data.lastName);
+            }
+
+            if (data.documentNumber) {
+                setValue("documento", data.documentNumber);
+            }
+
+            if (data.dateOfBirth) {
+                // Convierte DD/MM/YYYY a YYYY-MM-DD
+                const [dia, mes, anio] = data.dateOfBirth.split("/");
+                setValue("fechaNacimiento", `${anio}-${mes}-${dia}`);
+            }
+
+            toast.success("Datos extraídos correctamente");
+
+        } catch (error: any) {
+            if (error.response) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Error al escanear la cédula");
+            }
+        }
+    };
 
     const onSubmit = (data: ClienteForm) => {
         console.log(data);
         api.post("/clientes", {
-            nombres: data.nombres,
-            apellidos: data.apellidos,
-            documento: data.documento,
-            fechaNacimiento: data.fechaNacimiento ? new Date(data.fechaNacimiento).toISOString()
+            firstName: data.nombres,
+            lastName: data.apellidos,
+            documentNumber: data.documento,
+            dateOfBirth: data.fechaNacimiento ? new Date(data.fechaNacimiento).toISOString()
                 : undefined,
-            celular: data.celular,
-            celularAlternativo: data.celularAlternativo || undefined,
+            phone: data.celular,
+            alternatePhone: data.celularAlternativo || undefined,
             email: data.email,
-            direccion: data.direccion,
-            notas: data.notas || undefined
+            address: data.direccion,
+            notes: data.notas || undefined
 
         }).then(response => {
             toast.success(response.data.message);
@@ -77,6 +126,27 @@ const ClientsNew = () => {
                     />
                     {errors.documento && <span className="error">Este campo es requerido</span>}
 
+                    <label htmlFor="cedula">Escanear cédula</label>
+
+                    <div className="file-upload">
+                        <input
+                            id="cedula"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            className="file-upload-input"
+                            onChange={handleFileChange}
+                        />
+                        <label htmlFor="cedula" className="file-upload-label">
+                            {nombreArchivo ? <FileCheck size={16} /> : <Upload size={16} />}
+                            {nombreArchivo ? "Cambiar archivo" : "Subir foto o PDF de la cédula"}
+                        </label>
+                        {nombreArchivo && (
+                            <span className="file-upload-filename file-upload-filename--active">
+                                {nombreArchivo}
+                            </span>
+                        )}
+                    </div>
+
                     <label htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
                     <input
                         id="fechaNacimiento"
@@ -85,20 +155,19 @@ const ClientsNew = () => {
                         {...register("fechaNacimiento")}
                     />
 
-                    <label htmlFor="celular">Celular</label>
-                    <input
-                        id="celular"
-                        type="tel"
-                        {...register("celular", { required: true })}
+                    <PhoneInput
+                        control={control}
+                        errors={errors}
+                        name="celular"
+                        label="Celular"
+                        required
                     />
-                    {errors.celular && <span className="error">Este campo es requerido</span>}
 
-                    <label htmlFor="celularAlternativo">Celular Alternativo</label>
-                    <input
-                        id="celularAlternativo"
-                        type="tel"
-                        placeholder="Opcional"
-                        {...register("celularAlternativo")}
+                    <PhoneInput
+                        control={control}
+                        errors={errors}
+                        name="celularAlternativo"
+                        label="Celular Alternativo"
                     />
 
                     <label htmlFor="email">Email</label>

@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import api from "../../data/api";
 
-type Poliza = {
+type Policy = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
-    tipoSeguro: string;
-    fechaVencimiento?: string | null;
-    estado?: string | null;
-    cliente?: { nombres: string; apellidos: string } | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
+    insuranceType: string;
+    expirationDate?: string | null;
+    status?: string | null;
+    client?: { firstName: string; lastName: string } | null;
 };
 
-const DIAS_URGENTE = 15;
-const DIAS_PRONTO = 30;
+const urgent = 15;
+const soon = 30;
 
 const diasHasta = (fecha: string) => {
     const hoy = new Date();
@@ -23,25 +23,22 @@ const diasHasta = (fecha: string) => {
 };
 
 const getBadgeClass = (dias: number) => {
-    if (dias <= DIAS_URGENTE) return "dashboard-widget-item-badge--urgent";
-    if (dias <= DIAS_PRONTO) return "dashboard-widget-item-badge--soon";
+    if (dias <= urgent) return "dashboard-widget-item-badge--urgent";
+    if (dias <= soon) return "dashboard-widget-item-badge--soon";
     return "dashboard-widget-item-badge--ok";
 };
 
 const UpcomingPoliciesCard = () => {
-    const [polizas, setPolizas] = useState<Poliza[]>([]);
+    const [polizas, setPolizas] = useState<Policy[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // NOTA: listarPolizas no soporta orderBy fechaVencimiento ni filtro por rango de fechas.
-        // Traemos un lote grande y ordenamos/filtramos en el cliente.
-        // Lo ideal sería un endpoint GET /polizas/vencimientos en el backend.
-        api.get("/polizas", { params: { porPagina: 1000, pagina: 1, estado: "ACTIVA" } })
+        api.get("/polizas", { params: { perPage: 999999, page: 1, status: "ACTIVE" } })
             .then((response) => {
-                const todas: Poliza[] = response.data.polizas ?? [];
+                const todas: Policy[] = response.data.policies ?? [];
                 const conVencimiento = todas
-                    .filter((p) => p.fechaVencimiento)
-                    .map((p) => ({ ...p, dias: diasHasta(p.fechaVencimiento!) }))
+                    .filter((p) => p.expirationDate)
+                    .map((p) => ({ ...p, dias: diasHasta(p.expirationDate!) }))
                     .filter((p) => p.dias >= 0)
                     .sort((a, b) => a.dias - b.dias)
                     .slice(0, 8);
@@ -64,18 +61,18 @@ const UpcomingPoliciesCard = () => {
             {!loading && polizas.length > 0 && (
                 <div className="dashboard-widget-list">
                     {polizas.map((poliza) => {
-                        const dias = diasHasta(poliza.fechaVencimiento!);
+                        const dias = diasHasta(poliza.expirationDate!);
                         return (
                             <div className="dashboard-widget-item" key={poliza.id}>
                                 <div className="dashboard-widget-item-main">
                                     <span className="dashboard-widget-item-title">
-                                        {poliza.numeroPoliza}
-                                        {poliza.numeroReferencia ? ` · Ref. ${poliza.numeroReferencia}` : ""}
+                                        {poliza.policyNumber}
+                                        {poliza.referenceNumber ? ` · Ref. ${poliza.referenceNumber}` : ""}
                                     </span>
                                     <span className="dashboard-widget-item-sub">
-                                        {poliza.cliente
-                                            ? `${poliza.cliente.nombres} ${poliza.cliente.apellidos}`
-                                            : poliza.tipoSeguro}
+                                        {poliza.client
+                                            ? `${poliza.client.firstName} ${poliza.client.lastName}`
+                                            : poliza.insuranceType}
                                     </span>
                                 </div>
                                 <span className={`dashboard-widget-item-badge ${getBadgeClass(dias)}`}>

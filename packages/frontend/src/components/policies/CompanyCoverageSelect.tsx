@@ -1,39 +1,39 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 import type { UseFormRegister, UseFormWatch, UseFormSetValue, FieldErrors } from "react-hook-form";
-import api from "../../data/api"; 
+import api from "../../data/api";
 
-type TipoSeguro =
-    | "VEHICULO"
-    | "VIAJE"
-    | "ALQUILER"
-    | "HOGAR"
-    | "COMERCIO"
-    | "RESPONSABILIDAD_CIVIL"
-    | "FIANZA"
-    | "VIDA"
-    | "OTROS";
+type InsuranceType =
+    | "VEHICLE"
+    | "TRIP"
+    | "RENTAL"
+    | "HOME"
+    | "BUSINESS"
+    | "LIABILITY"
+    | "BOND"
+    | "LIFE"
+    | "OTHER";
 
-type Cobertura = {
+type Coverage = {
     id: string;
-    nombre: string;
-    companiaId: string;
-    tipoSeguro: TipoSeguro;
+    name: string;
+    companyId: string;
+    insuranceType: InsuranceType;
 };
 
-type Compania = {
+type Company = {
     id: string;
-    nombre: string;
-    porcentajeComision: number;
+    name: string;
+    commissionRate: number;
     brokerId: string;
     createdAt: string;
-    coberturas: Cobertura[];
+    coverages: Coverage[];
 };
 
 type PolizaFormFields = {
     companiaId: string;
     coberturaId?: string;
-    tipoSeguro: TipoSeguro | "";
+    tipoSeguro: InsuranceType | "";
 };
 
 type Props<T extends PolizaFormFields> = {
@@ -49,7 +49,7 @@ const CompanyCoverageSelect = <T extends PolizaFormFields>({
     setValue,
     errors,
 }: Props<T>) => {
-    const [companias, setCompanias] = useState<Compania[]>([]);
+    const [companias, setCompanias] = useState<Company[]>([]);
     const [cargando, setCargando] = useState(true);
 
     const companiaId = watch("companiaId" as any);
@@ -68,8 +68,8 @@ const CompanyCoverageSelect = <T extends PolizaFormFields>({
 
     const companiaSeleccionada = companias.find((c) => c.id === companiaId);
 
-    const coberturasDisponibles = (companiaSeleccionada?.coberturas ?? []).filter(
-        (cobertura) => !tipoSeguro || cobertura.tipoSeguro === tipoSeguro
+    const coberturasDisponibles = (companiaSeleccionada?.coverages ?? []).filter(
+        (cobertura) => !tipoSeguro || cobertura.insuranceType === tipoSeguro
     );
 
     const handleCompaniaChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -91,7 +91,7 @@ const CompanyCoverageSelect = <T extends PolizaFormFields>({
                 </option>
                 {companias.map((compania) => (
                     <option key={compania.id} value={compania.id}>
-                        {compania.nombre}
+                        {compania.name}
                     </option>
                 ))}
             </select>
@@ -112,7 +112,7 @@ const CompanyCoverageSelect = <T extends PolizaFormFields>({
                 </option>
                 {coberturasDisponibles.map((cobertura) => (
                     <option key={cobertura.id} value={cobertura.id}>
-                        {cobertura.nombre}
+                        {cobertura.name}
                     </option>
                 ))}
             </select>

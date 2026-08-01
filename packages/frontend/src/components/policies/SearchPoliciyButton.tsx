@@ -4,8 +4,8 @@ import { toast } from "react-toastify";
 
 type PolizaResumen = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
 };
 
 type Props = {
@@ -24,14 +24,14 @@ const SearchPolicyButton = ({ numeroReferencia, onEncontrado, onNoEncontrado }: 
         try {
             const response = await api.get("/polizas", {
                 params: {
-                    busqueda: numeroReferencia
+                    search: numeroReferencia
                 }
             });
 
-            const polizas: PolizaResumen[] = response.data.polizas;
+            const polizas: PolizaResumen[] = response.data.policies;
 
             const poliza = polizas.find(
-                (p) => p.numeroReferencia === numeroReferencia
+                (p) => p.referenceNumber === numeroReferencia
             );
 
             if (!poliza) {

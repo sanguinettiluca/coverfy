@@ -1,13 +1,13 @@
 export type TipoSeguro =
-    | "VEHICULO"
-    | "VIAJE"
-    | "ALQUILER"
-    | "HOGAR"
-    | "COMERCIO"
-    | "RESPONSABILIDAD_CIVIL"
-    | "FIANZA"
-    | "VIDA"
-    | "OTROS";
+    | "VEHICLE"
+    | "TRIP"
+    | "RENTAL"
+    | "HOME"
+    | "BUSINESS"
+    | "LIABILITY"
+    | "BOND"
+    | "LIFE"
+    | "OTHER";
 
 export type EstadoPoliza = "ACTIVA" | "VENCIDA" | "CANCELADA" | "SUSPENDIDA";
 export type MetodoPago = "Efectico" | "Credito" | "Transferencia" | "Debito";

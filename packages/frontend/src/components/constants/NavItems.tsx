@@ -1,7 +1,8 @@
 import {
     LayoutDashboard, FileText, BarChart2, List,
     Bell, Search, Settings, UserPlus,
-    FileSearchIcon, FilePlusIcon, FilePenLine, BookUser, UserSearch, UserPen, FileUser, Building2, FileCog
+    FileSearchIcon, FilePlusIcon, FilePenLine, BookUser, UserSearch, UserPen, FileUser, Building2, FileCog,
+    Calculator
 } from "lucide-react";
 
 export type NavChild = {
@@ -43,7 +44,8 @@ export const NAV_ITEMS: NavItem[] = [
     },
     { label: "Alta Compañia", to: "/companies", icon: <Building2 size={18} />, roles: ["BROKER", "SUB_BROKER"] },
     { label: "Alta Cobertura", to: "/coverages", icon: <FileCog size={18} />, roles: ["BROKER", "SUB_BROKER"] },
-    { label: "Reportes", to: "/reports", icon: <BarChart2 size={18} /> },
+    { label: "Calculadora de comisiones", to: "/comissions", icon: <Calculator size={18} />, roles: ["BROKER", "SUB_BROKER"] },
+    { label: "Gráficas", to: "/charts", icon: <BarChart2 size={18} />, roles: ["BROKER", "SUB_BROKER"] },
     { label: "Listas", to: "/lists", icon: <List size={18} /> },
     { label: "Alertas", to: "/alerts", icon: <Bell size={18} /> },
     { label: "Busqueda", to: "/search", icon: <Search size={18} /> },

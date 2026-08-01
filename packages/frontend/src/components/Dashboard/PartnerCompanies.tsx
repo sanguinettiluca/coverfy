@@ -1,32 +1,32 @@
 import { useEffect, useState } from "react";
 import api from "../../data/api"; 
 
-type Cobertura = {
+type Coverage = {
     id: string;
-    nombre: string;
-    companiaId: string;
-    tipoSeguro: string;
+    name: string;
+    companyId: string;
+    insuranceType: string;
 };
 
-type Compania = {
+type Company = {
     id: string;
-    nombre: string;
-    porcentajeComision: number;
+    name: string;
+    commissionRate: number;
     brokerId: string;
     createdAt: string;
-    coberturas: Cobertura[];
+    coverages: Coverage[];
 };
 
 const PartnerCompaniesCard = () => {
-    const [companias, setCompanias] = useState<Compania[]>([]);
+    const [companies, setCompanies] = useState<Company[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         api.get("/companias")
             .then((response) => {
-                setCompanias(response.data ?? []);
+                setCompanies(response.data ?? []);
             })
-            .catch(() => setCompanias([]))
+            .catch(() => setCompanies([]))
             .finally(() => setLoading(false));
     }, []);
 
@@ -36,23 +36,23 @@ const PartnerCompaniesCard = () => {
 
             {loading && <p className="dashboard-widget-loading">Cargando...</p>}
 
-            {!loading && companias.length === 0 && (
+            {!loading && companies.length === 0 && (
                 <p className="dashboard-widget-empty">Todavía no hay compañías registradas</p>
             )}
 
-            {!loading && companias.length > 0 && (
+            {!loading && companies.length > 0 && (
                 <div className="dashboard-widget-list">
-                    {companias.map((compania) => (
-                        <div className="dashboard-widget-item" key={compania.id}>
+                    {companies.map((companies) => (
+                        <div className="dashboard-widget-item" key={companies.id}>
                             <div className="dashboard-widget-item-main">
-                                <span className="dashboard-widget-item-title">{compania.nombre}</span>
+                                <span className="dashboard-widget-item-title">{companies.name}</span>
                                 <span className="dashboard-widget-item-sub">
-                                    {compania.coberturas.length}{" "}
-                                    {compania.coberturas.length === 1 ? "cobertura" : "coberturas"}
+                                    {companies.coverages.length}{" "}
+                                    {companies.coverages.length === 1 ? "cobertura" : "coberturas"}
                                 </span>
                             </div>
                             <span className="dashboard-widget-item-badge dashboard-widget-item-badge--ok">
-                                {compania.porcentajeComision}%
+                                {companies.commissionRate}%
                             </span>
                         </div>
                     ))}

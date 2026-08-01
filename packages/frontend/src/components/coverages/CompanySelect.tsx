@@ -1,58 +1,54 @@
 import { useEffect, useState } from "react";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import api from "../../data/api"; // ajustá el path real
+import api from "../../data/api";
+import type { CoverageForm } from "../coverages/CoverageTypes";
 
-type Compania = {
+type Company = {
     id: string;
-    nombre: string;
-    porcentajeComision: number;
+    name: string;
+    commissionRate: number;
     brokerId: string;
     createdAt: string;
 };
 
-type CompaniaFormFields = {
-    companiaId: string;
-    [key: string]: any;
-};
-
 type Props = {
-    register: UseFormRegister<CompaniaFormFields>;
-    errors: FieldErrors<CompaniaFormFields>;
+    register: UseFormRegister<CoverageForm>;
+    errors: FieldErrors<CoverageForm>;
 };
 
 const CompanySelect = ({ register, errors }: Props) => {
-    const [companias, setCompanias] = useState<Compania[]>([]);
-    const [cargando, setCargando] = useState(true);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         api.get("/companias")
             .then((response) => {
-                setCompanias(response.data);
+                setCompanies(response.data);
             })
             .catch(() => {
-                setCompanias([]);
+                setCompanies([]);
             })
-            .finally(() => setCargando(false));
+            .finally(() => setIsLoading(false));
     }, []);
 
     return (
         <>
-            <label htmlFor="companiaId">Compañía</label>
+            <label htmlFor="companyId">Compañía</label>
             <select
-                id="companiaId"
-                {...register("companiaId", { required: true })}
-                disabled={cargando}
+                id="companyId"
+                {...register("companyId", { required: true })}
+                disabled={isLoading}
             >
                 <option value="">
-                    {cargando ? "Cargando compañías..." : "Elije una compañía..."}
+                    {isLoading ? "Cargando compañías..." : "Elije una compañía..."}
                 </option>
-                {companias.map((compania) => (
-                    <option key={compania.id} value={compania.id}>
-                        {compania.nombre}
+                {companies.map((company) => (
+                    <option key={company.id} value={company.id}>
+                        {company.name}
                     </option>
                 ))}
             </select>
-            {errors.companiaId && <span className="error">Este campo es requerido</span>}
+            {errors.companyId && <span className="error">Este campo es requerido</span>}
         </>
     );
 };

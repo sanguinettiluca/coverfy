@@ -11,52 +11,52 @@ type BuscarClienteForm = {
 
 type Cliente = {
     id: string;
-    nombres: string;
-    apellidos: string;
-    documento: string;
-    fechaNacimiento?: string;
-    celular: string;
-    celularAlternativo?: string;
+    firstName: string;
+    lastName: string;
+    documentNumber: string;
+    birthDate?: string;
+    phone: string;
+    alternativePhone?: string;
     email: string;
-    direccion: string;
-    notas?: string;
+    address: string;
+    notes?: string;
 };
 
-type Poliza = {
+type Policy = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
-    tipoSeguro: string;
-    estado?: string | null;
-    fechaInicio?: string | null;
-    fechaVencimiento?: string | null;
-    montoTotal?: number | null;
-    cuotas?: number | null;
-    metodoPago?: string | null;
-    clienteId: string;
-    companiaId: string;
-    coberturaId?: string | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
+    insuranceType: string;
+    status?: string | null;
+    startDate?: string | null;
+    expirationDate?: string | null;
+    totalAmount?: number | null;
+    installments?: number | null;
+    paymentMethod?: string | null;
+    clientId: string;
+    companyId: string;
+    coverageId?: string | null;
     brokerId: string;
     createdAt: string;
     updatedAt: string;
 };
 
-type ClienteCompleto = {
+type ClientComplete = {
     id: string;
-    nombres: string;
-    apellidos: string;
-    documento: string;
-    fechaNacimiento?: string | null;
-    celular: string;
-    celularAlternativo?: string | null;
+    firstName: string;
+    lastName: string;
+    documentNumber: string;
+    dateOfBirth?: string | null;
+    phone: string;
+    alternativePhone?: string | null;
     email: string;
-    direccion: string;
-    notas?: string | null;
-    creadoPorId: string;
+    address: string;
+    notes?: string | null;
+    createdById: string;
     brokerId: string;
     createdAt: string;
-    creadoPor?: { id: string; nombre: string; role: string };
-    polizas: Poliza[];
+    createdBy?: { id: string; name: string; role: string };
+    policies: Policy[];
 };
 
 const ClientsSearch = () => {
@@ -65,18 +65,18 @@ const ClientsSearch = () => {
     const navigate = useNavigate();
     const documento = watch("documento");
 
-    const [cliente, setCliente] = useState<ClienteCompleto | null>(null);
+    const [client, setClient] = useState<ClientComplete | null>(null);
     const [buscado, setBuscado] = useState(false);
     const [cargandoDetalle, setCargandoDetalle] = useState(false);
 
-    const handleEncontrado = async (clienteEncontrado: Cliente) => {
+    const handleEncontrado = async (clientFound: Cliente) => {
         setCargandoDetalle(true);
         try {
-            const detalle = await api.get(`/clientes/${clienteEncontrado.id}`);
-            setCliente(detalle.data);
+            const detalle = await api.get(`/clientes/${clientFound.id}`);
+            setClient(detalle.data);
             setBuscado(true);
         } catch {
-            setCliente(null);
+            setClient(null);
             setBuscado(true);
         } finally {
             setCargandoDetalle(false);
@@ -88,7 +88,7 @@ const ClientsSearch = () => {
             documento: ""
         });
 
-        setCliente(null);
+        setClient(null);
         setBuscado(false);
         setCargandoDetalle(false);
 
@@ -117,7 +117,7 @@ const ClientsSearch = () => {
                                 documento={documento ?? ""}
                                 onEncontrado={handleEncontrado}
                                 onNoEncontrado={() => {
-                                    setCliente(null);
+                                    setClient(null);
                                     setBuscado(true);
                                 }}
                             />
@@ -133,19 +133,19 @@ const ClientsSearch = () => {
                     </p>
                 </div>
 
-                {(cargandoDetalle || (buscado && (cliente || !cargandoDetalle))) && (
+                {(cargandoDetalle || (buscado && (client || !cargandoDetalle))) && (
                     <div className="result-card">
                         {cargandoDetalle && <p className="login-sub">Cargando datos del cliente...</p>}
 
-                        {!cargandoDetalle && buscado && !cliente && (
+                        {!cargandoDetalle && buscado && !client && (
                             <p className="login-sub">No se encontró ningún cliente con ese documento</p>
                         )}
 
-                        {!cargandoDetalle && cliente && (
+                        {!cargandoDetalle && client && (
                             <ClientResult
-                                cliente={cliente}
+                                cliente={client}
                                 onEliminado={() => {
-                                    setCliente(null);
+                                    setClient(null);
                                     setBuscado(false);
                                 }}
                             />

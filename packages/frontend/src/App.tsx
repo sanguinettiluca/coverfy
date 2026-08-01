@@ -18,6 +18,8 @@ import Dashboard from "./components/Dashboard/Dashboard.tsx"
 import CompanyNew from "./components/Companies/CompanyNew.tsx"
 import CoverageNew from "./components/coverages/CoverageNew.tsx"
 import ProtectedRoute from './components/constants/ProtecterRoute'
+import ComissionsPage from './components/comissions/ComissionsPage.tsx'
+import ChartsPage from './components/charts/ChartsPage.tsx'
 
 import './App.css'
 
@@ -47,6 +49,8 @@ function App() {
                 <Route path="/clients/edit" element={<ClientsEdit />} />
                 <Route path="/companies" element={<CompanyNew />} />
                 <Route path="/coverages" element={<CoverageNew />} />
+                <Route path="/comissions" element={<ComissionsPage />} />
+                <Route path="/charts" element={<ChartsPage />} />
               </Route>
 
               <Route path="/settings" element={<Settings />} />

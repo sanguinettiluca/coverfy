@@ -11,14 +11,15 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  config.headers["Content-Type"] = "application/json";
-  
-  if(config.skipAuth) {
-    return config;
-  }
+    if (!(config.data instanceof FormData)) {
+        config.headers["Content-Type"] = "application/json";
+    }
 
-  config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
-  return config;
+    if (!config.skipAuth) {
+        config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+    }
+
+    return config;
 });
 
 export default api;

@@ -3,8 +3,8 @@ import api from "../../data/api";
 import { toast } from "react-toastify";
 
 type CompanyForm = {
-    nombre: string;
-    porcentajeComision?: number;
+    name: string;
+    commissionRate?: number;
 };
 
 const CompanyNew = () => {
@@ -17,8 +17,8 @@ const CompanyNew = () => {
 
     const onSubmit = (data: CompanyForm) => {
         api.post("/companias", {
-            nombre: data.nombre,
-            porcentajeComision: data.porcentajeComision ?? undefined
+            name: data.name,
+            commissionRate: data.commissionRate ?? undefined
         })
             .then(response => {
                 toast.success(response.data.message);
@@ -50,23 +50,23 @@ const CompanyNew = () => {
                     <input
                         id="nombre"
                         type="text"
-                        {...register("nombre", { required: true })}
+                        {...register("name", { required: true })}
                     />
-                    {errors.nombre && (
+                    {errors.name && (
                         <span className="error">
                             Este campo es requerido
                         </span>
                     )}
 
-                    <label htmlFor="porcentajeComision">
+                    <label htmlFor="comissionRate">
                         Porcentaje de Comisión
                     </label>
                     <input
-                        id="porcentajeComision"
+                        id="comissionRate"
                         type="number"
                         step="0.01"
                         placeholder="Opcional"
-                        {...register("porcentajeComision", {
+                        {...register("commissionRate", {
                             valueAsNumber: true,
                             min: {
                                 value: 0,
@@ -78,9 +78,9 @@ const CompanyNew = () => {
                             }
                         })}
                     />
-                    {errors.porcentajeComision && (
+                    {errors.commissionRate && (
                         <span className="error">
-                            {errors.porcentajeComision.message}
+                            {errors.commissionRate.message}
                         </span>
                     )}
 

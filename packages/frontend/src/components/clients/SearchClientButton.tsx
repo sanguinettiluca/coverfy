@@ -4,21 +4,21 @@ import { toast } from "react-toastify";
 
 type Props = {
     documento: string;
-    onEncontrado: (cliente: Cliente) => void;
+    onEncontrado: (cliente: Client) => void;
     onNoEncontrado: () => void;
 };
 
-type Cliente = {
+type Client = {
     id: string;
-    nombres: string;
-    apellidos: string;
-    documento: string;
-    fechaNacimiento?: string;
-    celular: string;
-    celularAlternativo?: string;
+    firstName: string;
+    lastName: string;
+    documentNumber: string;
+    dateOfBirth?: string;
+    phone: string;
+    alternatePhone?: string;
     email: string;
-    direccion: string;
-    notas?: string;
+    address: string;
+    notes?: string;
 };
 
 const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado }: Props) => {
@@ -36,11 +36,11 @@ const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado }: Props) 
                 }
             });
 
-            const clientes: Cliente[] = response.data.clientes;
+            const clientes: Client[] = response.data.clients;
 
             
             const cliente = clientes.find(
-                c => c.documento.trim() === documento.trim()
+                c => c.documentNumber.trim() === documento.trim()
             );
             if (!cliente) {
                 

@@ -7,7 +7,16 @@ import NewPolicyDetailFields from "./NewPolicyDetailFields";
 import type { PolizaForm } from "./policiesNew.type";
 
 const PoliciesNew = () => {
-    const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<PolizaForm>();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        setValue,
+        formState: { errors }
+    } = useForm<PolizaForm>({
+        shouldUnregister: true,
+    });
 
     const tipoSeguro = watch("tipoSeguro");
     const numeroPoliza = watch("numeroPoliza");
@@ -23,47 +32,138 @@ const PoliciesNew = () => {
         !tipoSeguro || !numeroPoliza || !clienteId || !companiaId || fechasInvalidas;
 
     const onSubmit = (data: PolizaForm) => {
-        console.log(data.estado);
-
-        api.post("/polizas", {
-            tipoSeguro: data.tipoSeguro,
-            numeroPoliza: data.numeroPoliza,
-            numeroReferencia: data.numeroReferencia || undefined,
-            estado: data.estado ? data.estado.toUpperCase() : undefined,
-            fechaInicio: data.fechaInicio
+        const basePayload = {
+            insuranceType: data.tipoSeguro,
+            policyNumber: data.numeroPoliza,
+            referenceNumber: data.numeroReferencia || undefined,
+            status: data.estado ? data.estado.toUpperCase() : undefined,
+            startDate: data.fechaInicio
                 ? new Date(data.fechaInicio).toISOString()
                 : undefined,
-            fechaVencimiento: data.fechaVencimiento
+            expirationDate: data.fechaVencimiento
                 ? new Date(data.fechaVencimiento).toISOString()
                 : undefined,
-            montoTotal: data.montoTotal || undefined,
-            cuotas: data.cuotas || undefined,
-            metodoPago: data.metodoPago || undefined,
-            clienteId: data.clienteId,
-            companiaId: data.companiaId,
-            coberturaId: data.coberturaId || undefined,
+            totalAmount: data.montoTotal || undefined,
+            installments: data.cuotas || undefined,
+            paymentMethod: data.metodoPago || undefined,
+            clientId: data.clienteId,
+            companyId: data.companiaId,
+            coverageId: data.coberturaId || undefined,
+        };
 
-            detalleResponsabilidadCivil: data.detalleResponsabilidadCivil,
-            detalleFianza: data.detalleFianza,
-            detalleVida: data.detalleVida,
-            detalleOtros: data.detalleOtros,
-            detalleAlquiler: data.detalleAlquiler,
-            detalleComercio: data.detalleComercio,
-            detalleHogar: data.detalleHogar,
-            detalleVehiculo: data.detalleVehiculo,
-            detalleViaje: data.detalleViaje
-                ? {
-                    destino: data.detalleViaje.destino,
-                    fechaSalida: data.detalleViaje.fechaSalida
-                        ? new Date(data.detalleViaje.fechaSalida).toISOString()
-                        : undefined,
-                    fechaRegreso: data.detalleViaje.fechaRegreso
-                        ? new Date(data.detalleViaje.fechaRegreso).toISOString()
-                        : undefined,
-                    pasajeros: data.detalleViaje.pasajeros,
-                }
-                : undefined,
-        })
+        let payload: Record<string, unknown>;
+
+        switch (data.tipoSeguro) {
+            case "LIABILITY":
+                payload = {
+                    ...basePayload,
+                    liabilityDetails: {
+                        activity: data.detalleResponsabilidadCivil?.actividad,
+                        coverageLimit: data.detalleResponsabilidadCivil?.limiteCobertura,
+                    },
+                };
+                break;
+
+            case "BOND":
+                payload = {
+                    ...basePayload,
+                    bondDetails: {
+                        bondType: data.detalleFianza?.tipoFianza,
+                        guaranteedAmount: data.detalleFianza?.montoGarantizado,
+                        beneficiary: data.detalleFianza?.beneficiario,
+                    },
+                };
+                break;
+
+            case "LIFE":
+                payload = {
+                    ...basePayload,
+                    lifeDetails: {
+                        insuredAmount: data.detalleVida?.sumaAsegurada,
+                        beneficiary: data.detalleVida?.beneficiario,
+                    },
+                };
+                break;
+
+            case "OTHER":
+                payload = {
+                    ...basePayload,
+                    otherDetails: {
+                        description: data.detalleOtros?.descripcion,
+                    },
+                };
+                break;
+
+            case "RENTAL":
+                payload = {
+                    ...basePayload,
+                    rentalDetails: {
+                        address: data.detalleAlquiler?.direccion,
+                        propertyType: data.detalleAlquiler?.tipoInmueble,
+                        rentAmount: data.detalleAlquiler?.valorAlquiler,
+                    },
+                };
+                break;
+
+            case "BUSINESS":
+                payload = {
+                    ...basePayload,
+                    businessDetails: {
+                        businessName: data.detalleComercio?.razonSocial,
+                        industry: data.detalleComercio?.rubro,
+                        address: data.detalleComercio?.direccion,
+                    },
+                };
+                break;
+
+            case "HOME":
+                payload = {
+                    ...basePayload,
+                    homeDetails: {
+                        address: data.detalleHogar?.direccion,
+                        constructionType: data.detalleHogar?.tipoConstruccion,
+                        squareMeters: data.detalleHogar?.metrosCuadrados,
+                        propertyValue: data.detalleHogar?.valorPropiedad,
+                    },
+                };
+                break;
+
+            case "VEHICLE":
+                payload = {
+                    ...basePayload,
+                    vehicleDetails: {
+                        brand: data.detalleVehiculo?.marca,
+                        model: data.detalleVehiculo?.modelo,
+                        year: data.detalleVehiculo?.anio,
+                        licensePlate: data.detalleVehiculo?.matricula,
+                        registrationNumber: data.detalleVehiculo?.padron,
+                        chassisNumber: data.detalleVehiculo?.chasis,
+                        engineNumber: data.detalleVehiculo?.motor,
+                    },
+                };
+                break;
+
+            case "TRIP":
+                payload = {
+                    ...basePayload,
+                    tripDetails: {
+                        destination: data.detalleViaje?.destino,
+                        departureDate: data.detalleViaje?.fechaSalida
+                            ? new Date(data.detalleViaje.fechaSalida).toISOString()
+                            : undefined,
+                        returnDate: data.detalleViaje?.fechaRegreso
+                            ? new Date(data.detalleViaje.fechaRegreso).toISOString()
+                            : undefined,
+                        passengers: data.detalleViaje?.pasajeros,
+                    },
+                };
+                break;
+
+            default:
+                payload = basePayload;
+        }
+
+        api.post("/polizas", payload)
             .then(response => {
                 toast.success(response.data.message);
                 reset();
@@ -92,15 +192,15 @@ const PoliciesNew = () => {
                         {...register("tipoSeguro", { required: true })}
                     >
                         <option value="">Elije un tipo de seguro...</option>
-                        <option value="VEHICULO">Vehículo</option>
-                        <option value="VIAJE">Viaje</option>
-                        <option value="ALQUILER">Alquiler</option>
-                        <option value="HOGAR">Hogar</option>
-                        <option value="COMERCIO">Comercio</option>
-                        <option value="RESPONSABILIDAD_CIVIL">Responsabilidad Civil</option>
-                        <option value="FIANZA">Fianza</option>
-                        <option value="VIDA">Vida</option>
-                        <option value="OTROS">Otros</option>
+                        <option value="VEHICLE">Vehículo</option>
+                        <option value="TRIP">Viaje</option>
+                        <option value="RENTAL">Alquiler</option>
+                        <option value="HOME">Hogar</option>
+                        <option value="BUSINESS">Comercio</option>
+                        <option value="LIABILITY">Responsabilidad Civil</option>
+                        <option value="BOND">Fianza</option>
+                        <option value="LIFE">Vida</option>
+                        <option value="OTHER">Otros</option>
                     </select>
                     {errors.tipoSeguro && <span className="error">Este campo es requerido</span>}
 
@@ -122,7 +222,7 @@ const PoliciesNew = () => {
 
                     <label htmlFor="estado">Estado</label>
                     <select id="estado" {...register("estado")}>
-                        <option value="ACTIVA">Activa</option>
+                        <option value="ACTIVE">Activa</option>
                     </select>
 
                     <label htmlFor="fechaInicio">Fecha de Inicio</label>
@@ -183,12 +283,11 @@ const PoliciesNew = () => {
                     <label htmlFor="metodoPago">Método de Pago</label>
                     <select id="metodoPago" {...register("metodoPago")}>
                         <option value="">Elije un método de pago...</option>
-                        <option value="Efectivo">Efectivo</option>
-                        <option value="Credito">Tarjeta de crédito</option>
-                        <option value="Transferencia">Transferencia</option>
-                        <option value="Debito">Débito automático</option>
+                        <option value="Cash">Efectivo</option>
+                        <option value="Credit">Tarjeta de crédito</option>
+                        <option value="Transfer">Transferencia</option>
+                        <option value="Debit">Débito automático</option>
                     </select>
-
                     <input type="hidden" {...register("clienteId", { required: true })} />
                     <ClientPicker setValue={setValue as any} errors={errors} />
 

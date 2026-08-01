@@ -1,65 +1,67 @@
 import { FileText } from "lucide-react";
 import DeletePolicyButton from "./DeletePolicyButton";
+import PolicyPDFButton from "./PolicyPdf";
 
-type TipoSeguro =
-    | "VEHICULO"
-    | "VIAJE"
-    | "ALQUILER"
-    | "HOGAR"
-    | "COMERCIO"
-    | "RESPONSABILIDAD_CIVIL"
-    | "FIANZA"
-    | "VIDA"
-    | "OTROS";
 
-type EstadoPoliza = "ACTIVA" | "VENCIDA" | "CANCELADA" | "PENDIENTE" | "SUSPENDIDA";
-type MetodoPago = "Efectivo" | "Credito" | "Transferencia" | "Debito";
+type InsuranceType =
+    | "VEHICLE"
+    | "TRIP"
+    | "RENTAL"
+    | "HOME"
+    | "BUSINESS"
+    | "LIABILITY"
+    | "BOND"
+    | "LIFE"
+    | "OTHER";
 
-type Cobertura = {
+type PolicyStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
+type PaymentMethod = "Cash" | "Credit" | "Transfer" | "Debit";
+
+type Coverage = {
     id: string;
-    nombre: string;
-    companiaId: string;
-    tipoSeguro: TipoSeguro;
+    name: string;
+    companyId: string;
+    insuranceType: InsuranceType;
 };
 
-type Compania = {
+type Company = {
     id: string;
-    nombre: string;
-    porcentajeComision: number;
+    name: string;
+    commissionRate: number;
     brokerId: string;
     createdAt: string;
-    coberturas: Cobertura[];
+    coverages: Coverage[];
 };
 
-type PolizaDetalle = {
+type Policy = {
     id: string;
-    numeroPoliza: string;
-    numeroReferencia?: string | null;
-    tipoSeguro: TipoSeguro;
-    estado?: EstadoPoliza | null;
-    fechaInicio?: string | null;
-    fechaVencimiento?: string | null;
-    montoTotal?: number | null;
-    cuotas?: number | null;
-    metodoPago?: MetodoPago | null;
-    companiaId: string;
-    coberturaId?: string | null;
-    broker?: { id: string; nombre: string; role: string } | null;
-    cliente?: { id: string; nombres: string; apellidos: string } | null;
-    detalleResponsabilidadCivil?: { actividad: string; limiteCobertura: number } | null;
-    detalleFianza?: { tipoFianza: string; montoGarantizado?: number | null; beneficiario: string } | null;
-    detalleVida?: { sumaAsegurada?: number | null; beneficiario: string } | null;
-    detalleOtros?: { descripcion: string } | null;
-    detalleAlquiler?: { direccion: string; tipoInmueble: string; valorAlquiler: number; deposito: number } | null;
-    detalleComercio?: { razonSocial: string; rubro: string; direccion: string } | null;
-    detalleHogar?: { direccion: string; tipoConstruccion: string; metrosCuadrados?: number | null; valorPropiedad: number } | null;
-    detalleVehiculo?: { marca: string; modelo: string; anio: number; matricula: string; padron: string; chasis: string; motor: string } | null;
-    detalleViaje?: { destino: string; fechaSalida: string; fechaRegreso: string; pasajeros: number } | null;
+    policyNumber: string;
+    referenceNumber?: string | null;
+    insuranceType: InsuranceType;
+    status?: PolicyStatus | null;
+    startDate?: string | null;
+    expirationDate?: string | null;
+    totalAmount?: number | null;
+    installments?: number | null;
+    paymentMethod?: PaymentMethod | null;
+    companyId: string;
+    coverageId?: string | null;
+    broker?: { id: string; name: string; role: string } | null;
+    client?: { id: string; firstName: string; lastName: string } | null;
+    liabilityDetails?: { activity: string; coverageLimit: number } | null;
+    bondDetails?: { bondType: string; guaranteedAmount?: number | null; beneficiary: string } | null;
+    lifeDetails?: { insuredAmount?: number | null; beneficiary: string } | null;
+    otherDetails?: { description: string } | null;
+    rentalDetails?: { address: string; propertyType: string; rentAmount: number } | null;
+    businessDetails?: { businessName: string; industry: string; address: string } | null;
+    homeDetails?: { address: string; constructionType: string; squareMeters?: number | null; propertyValue: number } | null;
+    vehicleDetails?: { brand: string; model: string; year: number; licensePlate: string; registrationNumber: string; chassisNumber: string; engineNumber: string } | null;
+    tripDetails?: { destination: string; departureDate: string; returnDate: string; passengers: number } | null;
 };
 
 type PolicyResultProps = {
-    poliza: PolizaDetalle;
-    compania: Compania | null;
+    poliza: Policy;
+    compania: Company | null;
     onEliminada: () => void;
 };
 
@@ -74,22 +76,20 @@ const formatTexto = (valor?: string | null) =>
 
 const getEstadoClass = (estado?: string | null) => {
     switch (estado?.trim().toUpperCase()) {
-        case "ACTIVA":
+        case "ACTIVE":
             return "policy-result-badge--activa";
-        case "VENCIDA":
-        case "CANCELADA":
+        case "EXPIRED":
+        case "CANCELLED":
             return "policy-result-badge--vencida";
-        case "SUSPENDIDA":
+        case "SUSPENDED":
             return "policy-result-badge--suspendida";
-        case "PENDIENTE":
-            return "policy-result-badge--pendiente";
         default:
             return "";
     }
 };
 
 const PolicyResult = ({ poliza, compania, onEliminada }: PolicyResultProps) => {
-    const cobertura = compania?.coberturas.find((c) => c.id === poliza.coberturaId);
+    const cobertura = compania?.coverages.find((c) => c.id === poliza.coverageId);
 
     return (
         <div>
@@ -100,15 +100,15 @@ const PolicyResult = ({ poliza, compania, onEliminada }: PolicyResultProps) => {
                         <FileText size={20} />
                     </div>
                     <div>
-                        <div className="policy-result-numero">{poliza.numeroPoliza}</div>
-                        <div className="policy-result-tipo">{poliza.tipoSeguro}</div>
+                        <div className="policy-result-numero">{poliza.policyNumber}</div>
+                        <div className="policy-result-tipo">{poliza.insuranceType}</div>
                     </div>
                 </div>
 
-                {poliza.estado && (
+                {poliza.status && (
                     <div className="policy-result-badges">
-                        <span className={`policy-result-badge ${getEstadoClass(poliza.estado)}`}>
-                            {poliza.estado}
+                        <span className={`policy-result-badge ${getEstadoClass(poliza.status)}`}>
+                            {poliza.status}
                         </span>
                     </div>
                 )}
@@ -117,263 +117,261 @@ const PolicyResult = ({ poliza, compania, onEliminada }: PolicyResultProps) => {
             <div style={{ marginBottom: "1.5rem" }}>
                 <DeletePolicyButton
                     polizaId={poliza.id}
-                    numeroPoliza={poliza.numeroPoliza}
+                    numeroPoliza={poliza.policyNumber}
                     onEliminada={onEliminada}
                 />
             </div>
+
+            <PolicyPDFButton poliza={poliza} compania={compania} />
 
             <div className="client-result-grid">
 
                 <div className="client-result-field">
                     <span className="client-result-label">Número de Referencia</span>
-                    <span className={`client-result-value ${!poliza.numeroReferencia ? "client-result-value--muted" : ""}`}>
-                        {formatTexto(poliza.numeroReferencia)}
+                    <span className={`client-result-value ${!poliza.referenceNumber ? "client-result-value--muted" : ""}`}>
+                        {formatTexto(poliza.referenceNumber)}
                     </span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Método de Pago</span>
-                    <span className="client-result-value">{poliza.metodoPago ?? "-"}</span>
+                    <span className="client-result-value">{poliza.paymentMethod ?? "-"}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Fecha de Inicio</span>
-                    <span className="client-result-value">{formatFecha(poliza.fechaInicio)}</span>
+                    <span className="client-result-value">{formatFecha(poliza.startDate)}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Fecha de Vencimiento</span>
-                    <span className="client-result-value">{formatFecha(poliza.fechaVencimiento)}</span>
+                    <span className="client-result-value">{formatFecha(poliza.expirationDate)}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Monto Total</span>
-                    <span className="client-result-value">{formatMonto(poliza.montoTotal)}</span>
+                    <span className="client-result-value">{formatMonto(poliza.totalAmount)}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Cuotas</span>
-                    <span className="client-result-value">{poliza.cuotas ?? "-"}</span>
+                    <span className="client-result-value">{poliza.installments ?? "-"}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Cliente</span>
                     <span className="client-result-value">
-                        {poliza.cliente ? `${poliza.cliente.nombres} ${poliza.cliente.apellidos}` : "-"}
+                        {poliza.client ? `${poliza.client.firstName} ${poliza.client.lastName}` : "-"}
                     </span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Broker</span>
-                    <span className="client-result-value">{poliza.broker?.nombre ?? "-"}</span>
+                    <span className="client-result-value">{poliza.broker?.name ?? "-"}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Compañía</span>
-                    <span className="client-result-value">{compania?.nombre ?? "-"}</span>
+                    <span className="client-result-value">{compania?.name ?? "-"}</span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Comisión</span>
                     <span className="client-result-value">
-                        {compania?.porcentajeComision != null ? `${compania.porcentajeComision}%` : "-"}
+                        {compania?.commissionRate != null ? `${compania.commissionRate}%` : "-"}
                     </span>
                 </div>
 
                 <div className="client-result-field">
                     <span className="client-result-label">Cobertura</span>
-                    <span className="client-result-value">{cobertura?.nombre ?? "-"}</span>
+                    <span className="client-result-value">{cobertura?.name ?? "-"}</span>
                 </div>
 
             </div>
 
-            {poliza.detalleResponsabilidadCivil && (
+            {poliza.liabilityDetails && (
                 <>
                     <div className="policy-result-section-title">Responsabilidad Civil</div>
                     <div className="client-result-grid">
                         <div className="client-result-field">
                             <span className="client-result-label">Actividad</span>
-                            <span className="client-result-value">{poliza.detalleResponsabilidadCivil.actividad}</span>
+                            <span className="client-result-value">{poliza.liabilityDetails.activity}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Límite de Cobertura</span>
-                            <span className="client-result-value">{formatMonto(poliza.detalleResponsabilidadCivil.limiteCobertura)}</span>
+                            <span className="client-result-value">{formatMonto(poliza.liabilityDetails.coverageLimit)}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleFianza && (
+            {poliza.bondDetails && (
                 <>
                     <div className="policy-result-section-title">Fianza</div>
                     <div className="client-result-grid">
                         <div className="client-result-field">
                             <span className="client-result-label">Tipo de Fianza</span>
-                            <span className="client-result-value">{poliza.detalleFianza.tipoFianza}</span>
+                            <span className="client-result-value">{poliza.bondDetails.bondType}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Monto Garantizado</span>
-                            <span className="client-result-value">{formatMonto(poliza.detalleFianza.montoGarantizado)}</span>
+                            <span className="client-result-value">{formatMonto(poliza.bondDetails.guaranteedAmount)}</span>
                         </div>
                         <div className="client-result-field client-result-field--full">
                             <span className="client-result-label">Beneficiario</span>
-                            <span className="client-result-value">{poliza.detalleFianza.beneficiario}</span>
+                            <span className="client-result-value">{poliza.bondDetails.beneficiary}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleVida && (
+            {poliza.lifeDetails && (
                 <>
                     <div className="policy-result-section-title">Vida</div>
                     <div className="client-result-grid">
                         <div className="client-result-field">
                             <span className="client-result-label">Suma Asegurada</span>
-                            <span className="client-result-value">{formatMonto(poliza.detalleVida.sumaAsegurada)}</span>
+                            <span className="client-result-value">{formatMonto(poliza.lifeDetails.insuredAmount)}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Beneficiario</span>
-                            <span className="client-result-value">{poliza.detalleVida.beneficiario}</span>
+                            <span className="client-result-value">{poliza.lifeDetails.beneficiary}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleOtros && (
+            {poliza.otherDetails && (
                 <>
                     <div className="policy-result-section-title">Otros</div>
                     <div className="client-result-grid">
                         <div className="client-result-field client-result-field--full">
                             <span className="client-result-label">Descripción</span>
-                            <span className="client-result-value">{poliza.detalleOtros.descripcion}</span>
+                            <span className="client-result-value">{poliza.otherDetails.description}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleAlquiler && (
+            {poliza.rentalDetails && (
                 <>
                     <div className="policy-result-section-title">Alquiler</div>
                     <div className="client-result-grid">
                         <div className="client-result-field client-result-field--full">
                             <span className="client-result-label">Dirección</span>
-                            <span className="client-result-value">{poliza.detalleAlquiler.direccion}</span>
+                            <span className="client-result-value">{poliza.rentalDetails.address}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Tipo de Inmueble</span>
-                            <span className="client-result-value">{poliza.detalleAlquiler.tipoInmueble}</span>
+                            <span className="client-result-value">{poliza.rentalDetails.propertyType}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Valor de Alquiler</span>
-                            <span className="client-result-value">{formatMonto(poliza.detalleAlquiler.valorAlquiler)}</span>
-                        </div>
-                        <div className="client-result-field">
-                            <span className="client-result-label">Depósito</span>
-                            <span className="client-result-value">{formatMonto(poliza.detalleAlquiler.deposito)}</span>
+                            <span className="client-result-value">{formatMonto(poliza.rentalDetails.rentAmount)}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleComercio && (
+            {poliza.businessDetails && (
                 <>
                     <div className="policy-result-section-title">Comercio</div>
                     <div className="client-result-grid">
                         <div className="client-result-field">
                             <span className="client-result-label">Razón Social</span>
-                            <span className="client-result-value">{poliza.detalleComercio.razonSocial}</span>
+                            <span className="client-result-value">{poliza.businessDetails.businessName}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Rubro</span>
-                            <span className="client-result-value">{poliza.detalleComercio.rubro}</span>
+                            <span className="client-result-value">{poliza.businessDetails.industry}</span>
                         </div>
                         <div className="client-result-field client-result-field--full">
                             <span className="client-result-label">Dirección</span>
-                            <span className="client-result-value">{poliza.detalleComercio.direccion}</span>
+                            <span className="client-result-value">{poliza.businessDetails.address}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleHogar && (
+            {poliza.homeDetails && (
                 <>
                     <div className="policy-result-section-title">Hogar</div>
                     <div className="client-result-grid">
                         <div className="client-result-field client-result-field--full">
                             <span className="client-result-label">Dirección</span>
-                            <span className="client-result-value">{poliza.detalleHogar.direccion}</span>
+                            <span className="client-result-value">{poliza.homeDetails.address}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Tipo de Construcción</span>
-                            <span className="client-result-value">{poliza.detalleHogar.tipoConstruccion}</span>
+                            <span className="client-result-value">{poliza.homeDetails.constructionType}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Metros Cuadrados</span>
-                            <span className="client-result-value">{poliza.detalleHogar.metrosCuadrados ?? "-"}</span>
+                            <span className="client-result-value">{poliza.homeDetails.squareMeters ?? "-"}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Valor de la Propiedad</span>
-                            <span className="client-result-value">{formatMonto(poliza.detalleHogar.valorPropiedad)}</span>
+                            <span className="client-result-value">{formatMonto(poliza.homeDetails.propertyValue)}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleVehiculo && (
+            {poliza.vehicleDetails && (
                 <>
                     <div className="policy-result-section-title">Vehículo</div>
                     <div className="client-result-grid">
                         <div className="client-result-field">
                             <span className="client-result-label">Marca</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.marca}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.brand}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Modelo</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.modelo}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.model}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Año</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.anio}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.year}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Matrícula</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.matricula}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.licensePlate}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Padrón</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.padron}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.registrationNumber}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Chasis</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.chasis}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.chassisNumber}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Motor</span>
-                            <span className="client-result-value">{poliza.detalleVehiculo.motor}</span>
+                            <span className="client-result-value">{poliza.vehicleDetails.engineNumber}</span>
                         </div>
                     </div>
                 </>
             )}
 
-            {poliza.detalleViaje && (
+            {poliza.tripDetails && (
                 <>
                     <div className="policy-result-section-title">Viaje</div>
                     <div className="client-result-grid">
                         <div className="client-result-field">
                             <span className="client-result-label">Destino</span>
-                            <span className="client-result-value">{poliza.detalleViaje.destino}</span>
+                            <span className="client-result-value">{poliza.tripDetails.destination}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Fecha de Salida</span>
-                            <span className="client-result-value">{formatFecha(poliza.detalleViaje.fechaSalida)}</span>
+                            <span className="client-result-value">{formatFecha(poliza.tripDetails.departureDate)}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Fecha de Regreso</span>
-                            <span className="client-result-value">{formatFecha(poliza.detalleViaje.fechaRegreso)}</span>
+                            <span className="client-result-value">{formatFecha(poliza.tripDetails.returnDate)}</span>
                         </div>
                         <div className="client-result-field">
                             <span className="client-result-label">Pasajeros</span>
-                            <span className="client-result-value">{poliza.detalleViaje.pasajeros}</span>
+                            <span className="client-result-value">{poliza.tripDetails.passengers}</span>
                         </div>
                     </div>
                 </>

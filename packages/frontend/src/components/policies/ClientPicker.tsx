@@ -1,18 +1,18 @@
 import { useState } from "react";
 import type { FieldErrors } from "react-hook-form";
-import SearchClientButton from "../clients/SearchClientButton"; // ajustá el path real
+import SearchClientButton from "../clients/SearchClientButton";
 
 type Cliente = {
     id: string;
-    nombres: string;
-    apellidos: string;
-    documento: string;
-    fechaNacimiento?: string;
-    celular: string;
-    celularAlternativo?: string;
+    firstName: string;
+    lastName: string;
+    documentNumber: string;
+    dateOfBirth?: string;
+    phone: string;
+    alternatePhone?: string;
     email: string;
-    direccion: string;
-    notas?: string;
+    address: string;
+    notes?: string;
 };
 
 type Props = {
@@ -57,7 +57,7 @@ const ClientPicker = ({ setValue, errors }: Props) => {
 
             {clienteEncontrado && (
                 <p className="login-sub" style={{ marginTop: "-4px", marginBottom: 0 }}>
-                    Cliente: {clienteEncontrado.nombres} {clienteEncontrado.apellidos}
+                    Cliente: {clienteEncontrado.firstName} {clienteEncontrado.lastName}
                 </p>
             )}
 

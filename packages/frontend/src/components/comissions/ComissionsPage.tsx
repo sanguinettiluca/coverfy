@@ -41,7 +41,7 @@ const CommissionsPage = () => {
     const [cargandoPolizas, setCargandoPolizas] = useState(false);
 
     useEffect(() => {
-        api.get("/companies")
+        api.get("/companias")
             .then((response) => setCompanias(response.data ?? []))
             .catch(() => setCompanias([]))
             .finally(() => setCargandoCompanias(false));

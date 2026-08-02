@@ -1,4 +1,9 @@
-/* === THEME VARIABLES === */
+/* ============================================================
+   THEME VARIABLES
+   Paleta central: todo el archivo consume estas variables para
+   soportar modo oscuro (:root) y modo claro ([data-theme="light"])
+   sin duplicar reglas. Cambiar acá = cambiar en toda la app.
+   ============================================================ */
 :root {
     --color-bg: #0d1117;
     --color-bg-alt: #161b22;
@@ -49,7 +54,11 @@
     --color-toggle-thumb: #ffffff;
 }
 
-/* === RESET === */
+/* ============================================================
+   RESET
+   Normaliza box-sizing, tipografía base y comportamiento de
+   inputs/botones/links antes de cualquier estilo específico.
+   ============================================================ */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -79,6 +88,12 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+  /* Alinea ícono + texto de forma consistente en todos los botones
+     custom (2FA, WhatsApp, modales, etc), sin importar el navegador */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
 }
 
 a {
@@ -86,7 +101,12 @@ a {
   text-decoration: none;
 }
 
-/* === PAGE === */
+/* ============================================================
+   PAGE / LOGIN CARD
+   Layout genérico de pantalla centrada (login, 2FA, error pages).
+   .login-card se reutiliza fuera del login real (ej: registro,
+   pantalla de código 2FA) por eso el nombre es genérico.
+   ============================================================ */
 .page {
   min-height: 100vh;
   display: flex;
@@ -228,8 +248,12 @@ a {
     color: var(--color-text);
 }
 
-/* === ASIDE === */
-
+/* ============================================================
+   ASIDE / SIDEBAR
+   Barra lateral fija de navegación + su estado activo/hover,
+   variante expandible con submenú (.sidebar-link--expandable)
+   y layout general de la app logueada (.layout, .main-content).
+   ============================================================ */
 .sidebar {
     width: 220px;
     min-height: 100vh;
@@ -336,7 +360,7 @@ a {
 
 .sidebar-logout:hover {
     color: var(--color-danger);
-    background: var(--color-danger-soft);
+    background: rgba(248, 81, 73, 0.08);
 }
 
 .layout {
@@ -350,7 +374,6 @@ a {
     padding: 2rem;
     background: var(--color-bg);
 }
-
 
 .sidebar-link--expandable {
     justify-content: flex-start;
@@ -397,6 +420,11 @@ a {
     padding-left: 36px;
 }
 
+/* ============================================================
+   NOTAS TEXTAREA
+   Estilo puntual para el textarea de "notas" en formularios de
+   cliente/póliza, separado del resto de inputs por su tamaño.
+   ============================================================ */
 .notas-textarea {
     resize: vertical;
     min-height: 80px;
@@ -412,7 +440,12 @@ a {
     box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
-/* === POLIZA ACCORDION === */
+/* ============================================================
+   POLIZA ACCORDION
+   Tarjeta expandible usada en el detalle de cliente para listar
+   sus pólizas. Los .poliza-accordion-estado--* colorean según
+   el estado real de la póliza (activa/vencida/etc).
+   ============================================================ */
 .poliza-accordion {
     background: var(--color-bg);
     border: 0.5px solid var(--color-border);
@@ -547,6 +580,12 @@ a {
     }
 }
 
+/* ============================================================
+   SEARCH LAYOUT
+   Layout de dos columnas para las pantallas de búsqueda
+   (form a la izquierda, resultado a la derecha en .result-card).
+   Colapsa a una columna en mobile (<800px).
+   ============================================================ */
 .search-layout {
     display: flex;
     gap: 1.5rem;
@@ -574,7 +613,11 @@ a {
     }
 }
 
-/* === CLIENT RESULT === */
+/* ============================================================
+   CLIENT RESULT
+   Tarjeta de detalle de cliente: header con avatar de iniciales,
+   grilla de datos, y sección de pólizas asociadas.
+   ============================================================ */
 .client-result-header {
     display: flex;
     align-items: center;
@@ -687,7 +730,12 @@ a {
     }
 }
 
-/* === POLICY RESULT === */
+/* ============================================================
+   POLICY RESULT
+   Tarjeta de detalle de póliza (resultado de búsqueda): header
+   con ícono + badge de estado, y grillas de campos según el
+   tipo de seguro (reutiliza .client-result-grid/-field).
+   ============================================================ */
 .policy-result-header {
     display: flex;
     align-items: center;
@@ -774,7 +822,11 @@ a {
     margin-top: 0;
 }
 
-/* === SETTINGS === */
+/* ============================================================
+   SETTINGS
+   Página de configuración: filas con toggle (.settings-toggle)
+   agrupadas en secciones (.settings-section).
+   ============================================================ */
 .settings-page {
     max-width: 640px;
     margin: 0 auto;
@@ -879,7 +931,11 @@ a {
     cursor: not-allowed;
 }
 
-/* === DASHBOARD === */
+/* ============================================================
+   DASHBOARD
+   Grilla de accesos directos (tarjetas de colores por categoría)
+   que arma la pantalla principal post-login.
+   ============================================================ */
 .dashboard-page {
     max-width: 960px;
     margin: 0 auto;
@@ -992,7 +1048,12 @@ a {
     }
 }
 
-/* === DASHBOARD WIDGETS === */
+/* ============================================================
+   DASHBOARD WIDGETS
+   Widgets del dashboard: contadores de pólizas por estado,
+   listas de "próximos vencimientos"/"últimas pólizas", con
+   badges de urgencia (urgent/soon/ok).
+   ============================================================ */
 .dashboard-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1123,7 +1184,11 @@ a {
     text-align: center;
 }
 
-/* === CONFIRM MODAL === */
+/* ============================================================
+   CONFIRM MODAL
+   Modal genérico de confirmación (usado para eliminar registros,
+   y reutilizado como base visual para otros modales como 2FA).
+   ============================================================ */
 .confirm-modal-overlay {
     position: fixed;
     inset: 0;
@@ -1195,7 +1260,11 @@ a {
     cursor: not-allowed;
 }
 
-/* === DELETE POLICY BUTTON === */
+/* ============================================================
+   DELETE POLICY BUTTON
+   Botón de acción destructiva (eliminar póliza) con estilo
+   diferenciado en rojo suave.
+   ============================================================ */
 .delete-policy-btn {
     display: inline-flex;
     align-items: center;
@@ -1218,8 +1287,11 @@ a {
     cursor: not-allowed;
 }
 
-
-/* === FILE UPLOAD === */
+/* ============================================================
+   FILE UPLOAD
+   Input de archivo estilizado (oculta el <input type="file">
+   nativo y muestra un label clickeable con drag&drop visual).
+   ============================================================ */
 .file-upload {
     display: flex;
     flex-direction: column;
@@ -1276,7 +1348,11 @@ a {
     color: var(--color-success);
 }
 
-/* === COMMISSIONS === */
+/* ============================================================
+   COMMISSIONS
+   Página de cálculo de comisiones: selector de compañía,
+   tarjetas de resumen y tabla de pólizas con su comisión.
+   ============================================================ */
 .commissions-page {
     max-width: 900px;
     margin: 0 auto;
@@ -1440,8 +1516,11 @@ a {
     color: var(--color-text);
 }
 
-/* === WHATSAPP MESSAGE MODAL === */
-
+/* ============================================================
+   WHATSAPP MESSAGE MODAL
+   Modal para redactar y enviar un mensaje de WhatsApp a un
+   cliente desde su ficha (botón verde de marca WhatsApp).
+   ============================================================ */
 .whatsapp-modal-overlay {
     position: fixed;
     inset: 0;
@@ -1527,7 +1606,12 @@ a {
     color: white;
 }
 
-/* === CHARTS === */
+/* ============================================================
+   CHARTS
+   Página de gráficas con selector de pestañas (.charts-tab) y
+   una tarjeta contenedora (.charts-card) que renderiza el
+   gráfico de Chart.js seleccionado.
+   ============================================================ */
 .charts-page {
     max-width: 900px;
     margin: 0 auto;
@@ -1604,4 +1688,182 @@ a {
     height: 360px;
     font-size: 13px;
     color: var(--color-text-faint);
+}
+
+/* ============================================================
+   2FA (Autenticación en dos pasos)
+   Botón de estado (activar/desactivar), modal de configuración
+   con QR + código de confirmación, y grilla de códigos de
+   respaldo que se muestran una única vez al activar.
+   ============================================================ */
+.twofa-status-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    border-radius: 8px;
+    padding: 7px 12px;
+    transition: opacity 0.15s;
+}
+
+.twofa-status-btn:hover {
+    opacity: 0.85;
+}
+
+.twofa-status-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.twofa-status-btn--enabled {
+    color: var(--color-danger);
+    background: var(--color-danger-soft);
+}
+
+.twofa-setup-modal {
+    max-width: 420px;
+}
+
+.twofa-qr-wrapper {
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.twofa-qr-image {
+    width: 200px;
+    height: 200px;
+}
+
+.twofa-secret-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 1rem;
+}
+
+.twofa-secret-code {
+    flex: 1;
+    font-size: 13px;
+    color: var(--color-text);
+    word-break: break-all;
+}
+
+.twofa-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    background: var(--color-border-soft);
+    border-radius: 6px;
+    padding: 6px 10px;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.twofa-copy-btn:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.twofa-copy-btn--wide {
+    flex: 1;
+    font-size: 13px;
+}
+
+.twofa-code-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.twofa-code-input,
+.twofa-password-input {
+    width: 100%;
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 16px;
+    letter-spacing: 4px;
+    text-align: center;
+    color: var(--color-text);
+    outline: none;
+    margin-bottom: 1rem;
+}
+
+.twofa-password-input {
+    letter-spacing: normal;
+    font-size: 14px;
+    text-align: left;
+}
+
+.twofa-code-input:focus,
+.twofa-password-input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.twofa-backup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 1rem 0;
+}
+
+.twofa-backup-code {
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--color-text);
+}
+
+.twofa-backup-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.twofa-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.confirm-modal-btn--primary {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.confirm-modal-btn--primary:hover {
+    background: var(--color-accent-hover);
+}
+
+.link-button {
+    color: var(--color-link);
+    font-size: 13px;
+}
+
+.link-button:hover {
+    text-decoration: underline;
 }

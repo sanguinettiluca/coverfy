@@ -1,5 +1,6 @@
 import { useTheme } from "../hooks/useTheme"
 import { useState } from "react";
+import TwoFactorSection from "./twofactor/TwoFactorSection";
 
 const Settings = () => {
     const { isDark, toggleTheme } = useTheme();
@@ -47,6 +48,11 @@ const Settings = () => {
                         aria-label="Alternar vista compacta"
                     />
                 </div>
+            </div>
+
+            <div className="settings-section">
+                <div className="settings-section-title">Seguridad</div>
+                <TwoFactorSection />
             </div>
 
             <div className="settings-section">

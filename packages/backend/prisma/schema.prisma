@@ -127,6 +127,7 @@ model Company{
   id String @id @default(uuid())
   name String
   commissionRate Float @default(0)
+  url String?
 
   brokerId String
   broker User @relation(fields: [brokerId], references: [id])

@@ -109,3 +109,17 @@ export async function listBrokersController(req:Request, res: Response): Promise
         res.status(500).json({ message: "Error interno"})
     }
 }
+
+export async function listSubBrokersController(req:Request, res: Response): Promise<void> {
+    try{
+        const {userId} = req.user!
+        const subBrokers = await authService.listSubBrokers(userId)
+        res.status(200).json(subBrokers)
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: "Error interno"})
+    }
+}

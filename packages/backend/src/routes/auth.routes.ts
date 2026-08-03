@@ -2,6 +2,7 @@ import { Router } from "express"
 import {
     createUserController,
     listBrokersController,
+    listSubBrokersController,
     loginController,
     logoutController,
     meController,
@@ -28,6 +29,7 @@ router.get('/me', authenticate, meController)
 // Solo los admins pueden crear nuevos usuarios (brokers o sub-brokers)
 router.post('/users', authenticate, authorizeRoles(Role.ADMIN), createUserController)
 router.get('/brokers', authenticate,authorizeRoles(Role.ADMIN), listBrokersController)
+router.get('/sub-brokers', authenticate, authorizeRoles(Role.BROKER), listSubBrokersController)
 
 router.post('/logout', authenticate, logoutController)
 

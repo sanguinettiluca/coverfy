@@ -246,6 +246,21 @@ export async function listBrokers() {
     return brokers
 }
 
+export async function listSubBrokers(brokerId: string) {
+    const subBrokers = await prisma.user.findMany({
+        where: { role: Role.SUB_BROKER, brokerId },
+        orderBy: { name: 'asc'},
+        select: {
+            id: true,
+            name: true,
+            role: true,
+            createdAt: true
+        }
+    })
+
+    return subBrokers
+}
+
 export async function logout(token: string): Promise<void> {
     await prisma.tokenBlacklist.create({
         data: {

@@ -2,10 +2,12 @@ import Joi from "joi";
 
 export const createCompanySchema = Joi.object({
     name: Joi.string().trim().min(2).max(50).required(),
-    commissionRate: Joi.number().min(0).max(100).optional()
+    commissionRate: Joi.number().min(0).max(100).optional(),
+    website: Joi.string().trim().uri({ scheme: ['http', 'https'] }).optional().allow('')
 })
 
 export const updateCompanySchema = Joi.object({
     name: Joi.string().trim().min(2).max(50),
-    commissionRate: Joi.number().min(0).max(100)
+    commissionRate: Joi.number().min(0).max(100),
+    website: Joi.string().trim().uri({ scheme: ['http', 'https'] }).allow('')
 }).min(1)

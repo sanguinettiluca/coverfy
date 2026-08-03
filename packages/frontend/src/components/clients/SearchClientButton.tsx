@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Search } from "lucide-react";
 import api from "../../data/api";
 import { toast } from "react-toastify";
@@ -6,6 +7,7 @@ type Props = {
     documento: string;
     onEncontrado: (cliente: Client) => void;
     onNoEncontrado: () => void;
+    autoTrigger?: number; 
 };
 
 type Client = {
@@ -21,10 +23,10 @@ type Client = {
     notes?: string;
 };
 
-const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado }: Props) => {
+const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado, autoTrigger }: Props) => {
 
     const handleBuscar = async () => {
-        
+
         if (!documento) {
             toast.error("Ingrese un documento");
             return;
@@ -38,12 +40,12 @@ const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado }: Props) 
 
             const clientes: Client[] = response.data.clients;
 
-            
+
             const cliente = clientes.find(
                 c => c.documentNumber.trim() === documento.trim()
             );
             if (!cliente) {
-                
+
                 toast.error("Cliente no encontrado");
                 onNoEncontrado();
                 return;
@@ -57,6 +59,12 @@ const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado }: Props) 
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        if (autoTrigger !== undefined && autoTrigger > 0) {
+            handleBuscar();
+        }
+    }, [autoTrigger]);
 
     return (
         <button type="button" className="sidebar-icon" onClick={handleBuscar}>

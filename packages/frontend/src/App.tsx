@@ -20,7 +20,7 @@ import CoverageNew from "./components/coverages/CoverageNew.tsx"
 import ProtectedRoute from './components/constants/ProtecterRoute'
 import ComissionsPage from './components/comissions/ComissionsPage.tsx'
 import ChartsPage from './components/charts/ChartsPage.tsx'
-
+import UnifiedSearch from './components/search/UnifiedSearch.tsx'
 import './App.css'
 
 function App() {
@@ -51,6 +51,7 @@ function App() {
                 <Route path="/coverages" element={<CoverageNew />} />
                 <Route path="/comissions" element={<ComissionsPage />} />
                 <Route path="/charts" element={<ChartsPage />} />
+                <Route path="/search" element={<UnifiedSearch />} />
               </Route>
 
               <Route path="/settings" element={<Settings />} />

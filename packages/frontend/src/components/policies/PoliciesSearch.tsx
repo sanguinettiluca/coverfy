@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import SearchPolicyButton from "./SearchPoliciyButton";
 import PolicyResult from "./PolicyResult";
 import api from "../../data/api";
@@ -66,14 +66,27 @@ type Policy = {
 };
 
 const PoliciesSearch = () => {
-    const { register, watch, formState: { errors } } = useForm<BuscarPolizaForm>();
+    const { register, watch, setValue, formState: { errors } } = useForm<BuscarPolizaForm>();
 
+    const [searchParams] = useSearchParams();
     const numeroReferencia = watch("numeroReferencia");
 
     const [poliza, setPoliza] = useState<Policy | null>(null);
     const [compania, setCompania] = useState<Company | null>(null);
     const [buscado, setBuscado] = useState(false);
     const [cargandoDetalle, setCargandoDetalle] = useState(false);
+    const [autoTrigger, setAutoTrigger] = useState(0);
+
+    // Si llegamos con ?referencia=X en la URL, precargamos el campo y
+    // disparamos la búsqueda automáticamente una sola vez al montar.
+    useEffect(() => {
+        const referenciaUrl = searchParams.get("referencia");
+        if (referenciaUrl) {
+            setValue("numeroReferencia", referenciaUrl);
+            setAutoTrigger((prev) => prev + 1);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleEncontrado = async (polizaId: string) => {
         setCargandoDetalle(true);
@@ -128,6 +141,7 @@ const PoliciesSearch = () => {
                                     setCompania(null);
                                     setBuscado(true);
                                 }}
+                                autoTrigger={autoTrigger}
                             />
                         </div>
                         {errors.numeroReferencia && <span className="error">Este campo es requerido</span>}

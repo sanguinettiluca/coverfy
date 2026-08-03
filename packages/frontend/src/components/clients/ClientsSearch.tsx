@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import SearchClientButton from "./SearchClientButton";
 import ClientResult from "./ClientResult";
 import api from "../../data/api";
@@ -60,14 +60,27 @@ type ClientComplete = {
 };
 
 const ClientsSearch = () => {
-    const { register, watch, reset, formState: { errors } } = useForm<BuscarClienteForm>();
+    const { register, watch, reset, setValue, formState: { errors } } = useForm<BuscarClienteForm>();
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const documento = watch("documento");
 
     const [client, setClient] = useState<ClientComplete | null>(null);
     const [buscado, setBuscado] = useState(false);
     const [cargandoDetalle, setCargandoDetalle] = useState(false);
+    const [autoTrigger, setAutoTrigger] = useState(0);
+
+    // Si llegamos con ?documento=X en la URL, precargamos el campo y
+    // disparamos la búsqueda automáticamente una sola vez al montar.
+    useEffect(() => {
+        const documentoUrl = searchParams.get("documento");
+        if (documentoUrl) {
+            setValue("documento", documentoUrl);
+            setAutoTrigger((prev) => prev + 1);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleEncontrado = async (clientFound: Cliente) => {
         setCargandoDetalle(true);
@@ -120,6 +133,7 @@ const ClientsSearch = () => {
                                     setClient(null);
                                     setBuscado(true);
                                 }}
+                                autoTrigger={autoTrigger}
                             />
                         </div>
                         {errors.documento && <span className="error">Este campo es requerido</span>}

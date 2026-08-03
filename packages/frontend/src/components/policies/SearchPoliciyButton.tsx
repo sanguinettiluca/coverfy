@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Search } from "lucide-react";
 import api from "../../data/api";
 import { toast } from "react-toastify";
@@ -12,9 +13,10 @@ type Props = {
     numeroReferencia: string;
     onEncontrado: (polizaId: string) => void;
     onNoEncontrado: () => void;
+    autoTrigger?: number; // cuando cambia, dispara la búsqueda automáticamente
 };
 
-const SearchPolicyButton = ({ numeroReferencia, onEncontrado, onNoEncontrado }: Props) => {
+const SearchPolicyButton = ({ numeroReferencia, onEncontrado, onNoEncontrado, autoTrigger }: Props) => {
 
     const handleBuscar = async () => {
         if (!numeroReferencia) {
@@ -47,6 +49,13 @@ const SearchPolicyButton = ({ numeroReferencia, onEncontrado, onNoEncontrado }: 
             toast.error("Error al buscar póliza");
         }
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        if (autoTrigger !== undefined && autoTrigger > 0) {
+            handleBuscar();
+        }
+    }, [autoTrigger]);
 
     return (
         <button type="button" className="sidebar-icon" onClick={handleBuscar}>

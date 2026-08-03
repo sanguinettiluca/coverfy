@@ -11,6 +11,9 @@ import { auditContextStorage } from "../context/requestContext"
 // Cuantas veces se aplica el algoritmo de hashing a la password
 const SALT_ROUNDS = 10
 
+const MAX_LOGIN_ATTEMPTS = 3
+const LOCKOUT_DURATION = 5 * 60 * 1000 // 5 minutos
+
 // El login/logout no siempre generan una escritura Prisma que identifique claramente
 // "quien" hizo el intento (login exitoso no escribe nada; uno fallido tampoco), asi que
 // se registran a mano estos eventos de auditoria.
@@ -131,12 +134,36 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
         throw new Error('Credenciales inválidas')
     }
 
+    // Si la cuenta esta bloqueada y el bloqueo todavia no vencio, cortamos antes de comparar la contraseña
+    if(user.lockedUntil && user.lockedUntil > new Date()){
+        await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
+        throw new Error('Cuenta bloqueada temporalmente. Intente nuevamente más tarde.')
+    }
+
     // Compara la password ingresada con el hash almacenado en la base de datos
     const isPasswordValid = await bcrypt.compare(data.password, user.password)
 
     if(!isPasswordValid){
+        const attempts = user.failedLoginAttempts + 1
+        const shouldLock = attempts >= MAX_LOGIN_ATTEMPTS
+
+        await prisma.user.update({
+            where: {id: user.id},
+            data: {
+                failedLoginAttempts: shouldLock ? 0 : attempts,
+                lockedUntil: shouldLock ? new Date(Date.now() + LOCKOUT_DURATION) : null
+            }
+        })
+
         await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
         throw new Error('Credenciales inválidas')
+    }
+
+    if(user.failedLoginAttempts > 0 || user.lockedUntil){
+        await prisma.user.update({
+            where: {id: user.id},
+            data: {failedLoginAttempts: 0, lockedUntil: null}
+        })
     }
 
     // Si el usuario tiene el 2FA activado, cortamos aca.

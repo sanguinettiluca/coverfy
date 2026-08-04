@@ -123,3 +123,37 @@ export async function listSubBrokersController(req:Request, res: Response): Prom
         res.status(500).json({ message: "Error interno"})
     }
 }
+
+export async function deactivateUserController(req: Request, res: Response): Promise<void> {
+    try{
+        const id = req.params.id as string
+        const user = await authService.deactivateUser(id)
+        res.status(200).json({
+            message: 'Usuario desactivado exitosamente',
+            user
+        })
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: "Error interno"})
+    }
+}
+
+export async function reactivateUserController(req: Request, res: Response): Promise<void> {
+    try{
+        const id = req.params.id as string
+        const user = await authService.reactivateUser(id)
+        res.status(200).json({
+            message: 'Usuario reactivado exitosamente',
+            user
+        })
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: "Error interno"})
+    }
+}

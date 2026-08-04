@@ -3,7 +3,8 @@ import {
     createCoverage,
     listCoverages,
     updateCoverage,
-    deleteCoverage
+    deleteCoverage,
+    reactivateCoverage
 } from '../services/coverage.service'
 import { InsuranceType } from "../generated/prisma";
 
@@ -79,6 +80,26 @@ export async function deleteCoverageController(req: Request, res: Response): Pro
 
         const result = await deleteCoverage(id, brokerId)
         res.status(200).json(result)
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({message: error.message})
+            return
+        }
+        res.status(500).json({message: 'Error interno del servidor'})
+    }
+}
+
+export async function reactivateCoverageController(req: Request, res: Response): Promise<void>{
+    try{
+        const { userId, role, brokerId: brokerIdToken } = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+
+        const coverage = await reactivateCoverage(id, brokerId)
+        res.status(200).json({
+            message: 'Cobertura reactivada',
+            coverage
+        })
     }catch(error){
         if(error instanceof Error){
             res.status(400).json({message: error.message})

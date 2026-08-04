@@ -15,7 +15,8 @@ export async function createCoverage(data: CreateCoverageDTO, brokerId: string){
         where: {
             name: data.name,
             insuranceType: data.insuranceType,
-            companyId: data.companyId
+            companyId: data.companyId,
+            isActive: true
         }
     })
 
@@ -87,9 +88,28 @@ export async function deleteCoverage(id: string, brokerId: string) {
         throw new Error('Cobertura no encontrada')
     }
 
-    await prisma.coverage.delete({
-        where: { id }
+    const updatedCoverage = await prisma.coverage.update({
+        where: { id },
+        data: { isActive: false }
+    })
+    return updatedCoverage
+}
+
+export async function reactivateCoverage(id: string, brokerId: string) {
+    const coverage = await prisma.coverage.findFirst({
+        where: {
+            id,
+            company: { brokerId }
+        }
     })
 
-    return { message: 'Cobertura eliminada correctamente' }
+    if (!coverage) {
+        throw new Error('Cobertura no encontrada')
+    }
+
+    const updatedCoverage = await prisma.coverage.update({
+        where: { id },
+        data: { isActive: true }
+    })
+    return updatedCoverage
 }

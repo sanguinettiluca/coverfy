@@ -143,6 +143,11 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
         throw new Error('Credenciales inválidas')
     }
 
+    if(!user.isActive){
+        await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
+        throw new Error('Cuenta inactiva. Contacte a un administrador.')
+    }
+
     // Si la cuenta esta bloqueada y el bloqueo todavia no vencio, cortamos antes de comparar la contraseña
     if(user.lockedUntil && user.lockedUntil > new Date()){
         await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
@@ -283,4 +288,40 @@ export async function logout(token: string): Promise<void> {
     if (ctx?.userId && ctx.email) {
         await logAuthEvent('LOGOUT', ctx.userId, ctx.email, ctx.role, ctx.brokerId)
     }
+}
+
+export async function deactivateUser(id:string){
+    const user = await prisma.user.findUnique({
+        where: {id}
+    })
+
+    if(!user){
+        throw new Error("Usuario no encontrado")
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: {id},
+        data: {isActive: false}
+    })
+
+    const {password, ...userWithoutPassword} = updatedUser
+    return userWithoutPassword
+}
+
+export async function reactivateUser(id:string){
+    const user = await prisma.user.findUnique({
+        where: {id}
+    })
+
+    if(!user){
+        throw new Error("Usuario no encontrado")
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: {id},
+        data: {isActive: true}
+    })
+
+    const {password, ...userWithoutPassword} = updatedUser
+    return updatedUser
 }

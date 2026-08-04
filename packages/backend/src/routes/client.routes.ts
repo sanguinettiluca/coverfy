@@ -5,7 +5,8 @@ import {
     getClientByIdController,
     updateClientController,
     deleteClientController,
-    findClientByDocumentController
+    findClientByDocumentController,
+    reactivateClientController
 } from "../controllers/client.controller";
 import {authenticate, authorizeRoles} from "../middlewares/auth.middleware";
 import { Role } from "../generated/prisma"
@@ -23,5 +24,6 @@ router.get('/documento/:documentNumber', authenticate, authorizeRoles(...allowed
 router.post('/', authenticate, authorizeRoles(...allowedRoles), validate(createClientSchema), createClientController);
 router.put('/:id', authenticate, authorizeRoles(...allowedRoles), validate(updateClientSchema), updateClientController);
 router.delete('/:id', authenticate, authorizeRoles(...allowedRoles), deleteClientController);
+router.patch('/:id/reactivate', authenticate, authorizeRoles(...allowedRoles), reactivateClientController);
 
 export default router;

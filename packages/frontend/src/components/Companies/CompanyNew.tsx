@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 type CompanyForm = {
     name: string;
     commissionRate?: number;
+    url?: string;
 };
 
 const CompanyNew = () => {
@@ -18,7 +19,8 @@ const CompanyNew = () => {
     const onSubmit = (data: CompanyForm) => {
         api.post("/companias", {
             name: data.name,
-            commissionRate: data.commissionRate ?? undefined
+            commissionRate: data.commissionRate ?? undefined,
+            url: data.url || undefined
         })
             .then(response => {
                 toast.success(response.data.message);
@@ -81,6 +83,26 @@ const CompanyNew = () => {
                     {errors.commissionRate && (
                         <span className="error">
                             {errors.commissionRate.message}
+                        </span>
+                    )}
+
+                    <label htmlFor="url">
+                        Sitio web
+                    </label>
+                    <input
+                        id="url"
+                        type="url"
+                        placeholder="https://www.aseguradora.com"
+                        {...register("url", {
+                            pattern: {
+                                value: /^https?:\/\/.+/i,
+                                message: "Debe ser una URL válida, comenzando con http:// o https://"
+                            }
+                        })}
+                    />
+                    {errors.url && (
+                        <span className="error">
+                            {errors.url.message}
                         </span>
                     )}
 

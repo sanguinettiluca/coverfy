@@ -1,11 +1,11 @@
 export interface CreateCompanyDTO {
     name: string;
     commissionRate?: number;
-    website?: string;
+    url?: string;
 }
 
 export interface UpdateCompanyDTO {
     name?: string;
     commissionRate?: number;
-    website?: string;
+    url?: string;
 }

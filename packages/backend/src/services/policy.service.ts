@@ -32,7 +32,7 @@ function buildDetailsCreate(data: CreatePolicyDTO): Record<string, unknown> | un
     return { [detailsKey]: { create: detailsFields } };
 }
 
-export async function createPolicy(data: CreatePolicyDTO, brokerId: string){
+export async function createPolicy(data: CreatePolicyDTO, brokerId: string, createdByUserId: string){
     const client = await prisma.client.findFirst({
         where: {id: data.clientId, brokerId}
     });
@@ -69,7 +69,7 @@ export async function createPolicy(data: CreatePolicyDTO, brokerId: string){
             client: { connect: { id: clientId } },
             company: { connect: { id: companyId } },
             ...(coverageId ? { coverage: { connect: { id: coverageId } } } : {}),
-            broker: { connect: { id: brokerId } },
+            broker: { connect: { id: createdByUserId } },
             ...details
         },
         include: {

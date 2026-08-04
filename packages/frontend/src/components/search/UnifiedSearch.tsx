@@ -29,6 +29,7 @@ const UnifiedSearch = () => {
     const [referencia, setReferencia] = useState("");
     const [estadoPoliza, setEstadoPoliza] = useState<PolicyStatusFilter>("");
     const [nombreCliente, setNombreCliente] = useState("");
+    const [subBrokerId, setSubBrokerId] = useState("");
     const [policySort, setPolicySort] = useState<PolicySortField>("createdAt");
     const [policyOrder, setPolicyOrder] = useState<SortOrder>("desc");
 
@@ -103,6 +104,9 @@ const UnifiedSearch = () => {
                 p.client ? normalizar(`${p.client.firstName} ${p.client.lastName}`).includes(q) : false
             );
         }
+        if (subBrokerId) {
+            resultado = resultado.filter((p) => p.broker?.id === subBrokerId);
+        }
 
         const dir = policyOrder === "asc" ? 1 : -1;
         resultado = [...resultado].sort((a, b) => {
@@ -121,7 +125,7 @@ const UnifiedSearch = () => {
         });
 
         return resultado;
-    }, [polizasRaw, numeroPoliza, referencia, estadoPoliza, nombreCliente, policySort, policyOrder]);
+    }, [polizasRaw, numeroPoliza, referencia, estadoPoliza, nombreCliente, subBrokerId, policySort, policyOrder]);
 
     return (
         <div className="commissions-page">
@@ -150,12 +154,14 @@ const UnifiedSearch = () => {
                     referencia={referencia}
                     estado={estadoPoliza}
                     nombreCliente={nombreCliente}
+                    subBrokerId={subBrokerId}
                     sortField={policySort}
                     sortOrder={policyOrder}
                     onNumeroPolizaChange={setNumeroPoliza}
                     onReferenciaChange={setReferencia}
                     onEstadoChange={setEstadoPoliza}
                     onNombreClienteChange={setNombreCliente}
+                    onSubBrokerIdChange={setSubBrokerId}
                     onSortFieldChange={setPolicySort}
                     onSortOrderChange={setPolicyOrder}
                 />

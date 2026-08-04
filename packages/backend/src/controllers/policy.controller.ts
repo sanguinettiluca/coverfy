@@ -12,17 +12,20 @@ import { PolicyStatus } from "../generated/prisma";
 export async function createPolicyController(req: Request, res: Response): Promise<void>{
     try{
         const {userId, role, brokerId: brokerIdToken} = req.user!
-        //console.log("BODY RECIBIDO DESPUES DE VALIDATE:", JSON.stringify(req.body, null, 2))
-        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const carteraId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
 
-        const policy = await createPolicy(req.body, brokerId);
-        res.status(201).json({message: "Poliza creada exitosamente", policy});
+        const policy = await createPolicy(req.body, carteraId, userId)
+
+        res.status(201).json({
+            message: 'Poliza creada exitosamente',
+            policy
+        })
     }catch(error){
         if(error instanceof Error){
-            res.status(400).json({message: error.message});
-            return;
+            res.status(400).json({ message: error.message })
+            return
         }
-        res.status(500).json({message: "Error interno del servidor"})
+        res.status(500).json({ message: 'Error interno del servidor' })
     }
 }
 

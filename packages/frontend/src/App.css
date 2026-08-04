@@ -1917,3 +1917,13 @@ a {
     margin-bottom: 1rem;
     gap: 12px;
 }
+
+.dashboard-widget-item-link {
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.dashboard-widget-item-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+}

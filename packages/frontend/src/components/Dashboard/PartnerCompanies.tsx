@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../../data/api"; 
+import api from "../../data/api";
 
 type Coverage = {
     id: string;
@@ -12,6 +12,7 @@ type Company = {
     id: string;
     name: string;
     commissionRate: number;
+    url?: string | null;
     brokerId: string;
     createdAt: string;
     coverages: Coverage[];
@@ -42,17 +43,23 @@ const PartnerCompaniesCard = () => {
 
             {!loading && companies.length > 0 && (
                 <div className="dashboard-widget-list">
-                    {companies.map((companies) => (
-                        <div className="dashboard-widget-item" key={companies.id}>
+                    {companies.map((company) => (
+                        <div className="dashboard-widget-item" key={company.id}>
                             <div className="dashboard-widget-item-main">
-                                <span className="dashboard-widget-item-title">{companies.name}</span>
+                                {company.url ? (
+                                    <a href={company.url} target="_blank" rel="noopener noreferrer" className="dashboard-widget-item-title dashboard-widget-item-link">
+                                        {company.name}
+                                    </a>
+                                ) : (
+                                    <span className="dashboard-widget-item-title">{company.name}</span>
+                                )}
                                 <span className="dashboard-widget-item-sub">
-                                    {companies.coverages.length}{" "}
-                                    {companies.coverages.length === 1 ? "cobertura" : "coberturas"}
+                                    {company.coverages.length}{" "}
+                                    {company.coverages.length === 1 ? "cobertura" : "coberturas"}
                                 </span>
                             </div>
                             <span className="dashboard-widget-item-badge dashboard-widget-item-badge--ok">
-                                {companies.commissionRate}%
+                                {company.commissionRate}%
                             </span>
                         </div>
                     ))}

@@ -12,7 +12,7 @@ export async function createCompany(data: CreateCompanyDTO, brokerId: string) {
     }
 
     const company = await prisma.company.create({
-        data: {name: data.name, commissionRate: data.commissionRate ?? 0, brokerId}
+        data: {name: data.name, commissionRate: data.commissionRate ?? 0, url: data.url || undefined, brokerId}
     })
 
     return company;

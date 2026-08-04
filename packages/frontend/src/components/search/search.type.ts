@@ -24,6 +24,7 @@ export type Policy = {
     expirationDate?: string | null;
     totalAmount?: number | null;
     client?: PolicyClient | null;
+    broker?: { id: string; name: string } | null;
     createdAt: string;
 };
 
@@ -54,3 +55,8 @@ export const ESTADO_LABEL: Record<string, string> = {
 };
 
 export type PolicyStatusFilter = "" | "ACTIVE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
+
+export type SubBroker = {
+    id: string;
+    name: string;
+};

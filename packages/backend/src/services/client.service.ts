@@ -114,7 +114,7 @@ export async function deleteClient(id: string, brokerId: string) {
     if(!client){
         throw new Error('Cliente no encontrado')
     }
-    // el cliente y todas sus polizas se desactivan juntos
+    // el cliente y todas sus polizas se desactivan juntos, las polizas pasan a tener como status CANCELLED
     await prisma.$transaction([
         prisma.client.update({
             where: {id},
@@ -122,7 +122,7 @@ export async function deleteClient(id: string, brokerId: string) {
         }),
         prisma.policy.updateMany({
             where: {clientId: id},
-            data: {isActive: false}
+            data: {isActive: false, status: 'CANCELLED'}
         })
     ])
 

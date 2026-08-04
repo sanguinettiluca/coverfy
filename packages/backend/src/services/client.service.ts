@@ -8,7 +8,7 @@ export async function createClient(
     createdById: string
 ){
     const existingClient = await prisma.client.findFirst({
-        where: {documentNumber: data.documentNumber, brokerId}
+        where: {documentNumber: data.documentNumber, brokerId, isActive: true}
     })
 
     if(existingClient){
@@ -114,10 +114,36 @@ export async function deleteClient(id: string, brokerId: string) {
     if(!client){
         throw new Error('Cliente no encontrado')
     }
-
-    await prisma.client.delete({ where: {id} })
+    // el cliente y todas sus polizas se desactivan juntos
+    await prisma.$transaction([
+        prisma.client.update({
+            where: {id},
+            data: {isActive: false}
+        }),
+        prisma.policy.updateMany({
+            where: {clientId: id},
+            data: {isActive: false}
+        })
+    ])
 
     return {message: 'Cliente eliminado exitosamente'};
+}
+
+export async function reactivateClient(id: string, brokerId: string){
+    const client = await prisma.client.findFirst({
+        where: {id, brokerId}
+    })
+
+    if(!client){
+        throw new Error('Cliente no encontrado')
+    }
+
+    const reactivatedClient = await prisma.client.update({
+        where: {id},
+        data: {isActive: true}
+    })
+
+    return reactivatedClient;
 }
 
 export async function findClientByDocument(documentNumber: string, brokerId: string){

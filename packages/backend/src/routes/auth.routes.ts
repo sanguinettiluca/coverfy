@@ -6,7 +6,9 @@ import {
     loginController,
     logoutController,
     meController,
-    verifyTwoFactorLoginController
+    verifyTwoFactorLoginController,
+    deactivateUserController,
+    reactivateUserController
 } from "../controllers/auth.controller"
 import { authenticate, authorizeRoles } from "../middlewares/auth.middleware"
 import { Role } from "../generated/prisma"
@@ -30,6 +32,8 @@ router.get('/me', authenticate, meController)
 router.post('/users', authenticate, authorizeRoles(Role.ADMIN), createUserController)
 router.get('/brokers', authenticate,authorizeRoles(Role.ADMIN), listBrokersController)
 router.get('/sub-brokers', authenticate, authorizeRoles(Role.BROKER), listSubBrokersController)
+router.patch('/users/:id/deactivate', authenticate, authorizeRoles(Role.ADMIN), deactivateUserController)
+router.patch('/users/:id/reactivate', authenticate, authorizeRoles(Role.ADMIN), reactivateUserController)
 
 router.post('/logout', authenticate, logoutController)
 

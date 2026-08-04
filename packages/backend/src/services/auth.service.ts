@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import prisma from "../config/prisma"
+import crypto from "crypto"
 import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse, PreAuthTokenPayload, LoginResult } from "../domain/user"
 import { AuditAction, Role } from "../generated/prisma"
 import { decrypt } from "../utils/crypto.util"
@@ -92,18 +93,26 @@ export async function createUser(data: CreateUserDTO) {
     return userWithoutPassword
 }
 
-function generateAuthResponse(user: {
+async function generateAuthResponse(user: {
     id: string
     email: string
     name: string
     role: Role
     brokerId: string | null
-}): AuthResponse{
+}): Promise<AuthResponse>{
+    const sessionId = crypto.randomUUID() // Genera un ID de sesión único para poder invalidar el token si es necesario
+
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {currentSessionId: sessionId}
+    })
+
     const payload: JwtPayload = {
         userId: user.id,
         email: user.email,
         role: user.role,
-        brokerId: user.brokerId
+        brokerId: user.brokerId,
+        sessionId
     }
 
     const accessToken = jwt.sign(
@@ -132,6 +141,11 @@ export async function login(data: LoginDTO): Promise<LoginResult> {
     if(!user){
         await logAuthEvent('LOGIN_FAILED', null, data.email)
         throw new Error('Credenciales inválidas')
+    }
+
+    if(!user.isActive){
+        await logAuthEvent('LOGIN_FAILED', user.id, user.email, user.role, user.brokerId)
+        throw new Error('Cuenta inactiva. Contacte a un administrador.')
     }
 
     // Si la cuenta esta bloqueada y el bloqueo todavia no vencio, cortamos antes de comparar la contraseña
@@ -274,4 +288,40 @@ export async function logout(token: string): Promise<void> {
     if (ctx?.userId && ctx.email) {
         await logAuthEvent('LOGOUT', ctx.userId, ctx.email, ctx.role, ctx.brokerId)
     }
+}
+
+export async function deactivateUser(id:string){
+    const user = await prisma.user.findUnique({
+        where: {id}
+    })
+
+    if(!user){
+        throw new Error("Usuario no encontrado")
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: {id},
+        data: {isActive: false}
+    })
+
+    const {password, ...userWithoutPassword} = updatedUser
+    return userWithoutPassword
+}
+
+export async function reactivateUser(id:string){
+    const user = await prisma.user.findUnique({
+        where: {id}
+    })
+
+    if(!user){
+        throw new Error("Usuario no encontrado")
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: {id},
+        data: {isActive: true}
+    })
+
+    const {password, ...userWithoutPassword} = updatedUser
+    return updatedUser
 }

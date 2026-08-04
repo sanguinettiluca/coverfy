@@ -48,6 +48,16 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         // Decodifica el token usando la clave definida en el .env (process.env.JWT_SECRET)
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload
 
+        const currentUser = await prisma.user.findUnique({
+            where: { id: decoded.userId },
+            select: { currentSessionId: true }
+        })
+
+        if(!currentUser || currentUser.currentSessionId !== decoded.sessionId){
+            res.status(401).json({ message: 'Tu sesión se cerró porque iniciaste sesión en otro dispositivo' })
+            return
+        }
+
         // Carga los datos del usuario autenticado en el request
         req.user = decoded
 

@@ -4,7 +4,8 @@ import{
     listPoliciesController,
     updatePolicyController,
     deletePolicyController,
-    getPolicyByIdController
+    getPolicyByIdController,
+    reactivatePolicyController
 } from '../controllers/policy.controller'
 import { authenticate, authorizeRoles } from "../middlewares/auth.middleware";
 import { Role } from "../generated/prisma";
@@ -19,5 +20,6 @@ router.get('/:id', authenticate, authorizeRoles(...allowedRoles), getPolicyByIdC
 router.post('/', authenticate, authorizeRoles(...allowedRoles), validate(createPolicySchema), createPolicyController)
 router.put('/:id', authenticate, authorizeRoles(...allowedRoles), validate(updatePolicySchema), updatePolicyController)
 router.delete('/:id', authenticate, authorizeRoles(...allowedRoles), deletePolicyController)
+router.patch('/:id/reactivate', authenticate, authorizeRoles(...allowedRoles), reactivatePolicyController)
 
 export default router

@@ -41,7 +41,7 @@ export async function createPolicy(data: CreatePolicyDTO, brokerId: string, crea
     }
 
     const existingPolicy = await prisma.policy.findFirst({
-        where: {policyNumber: data.policyNumber, clientId: data.clientId}
+        where: {policyNumber: data.policyNumber, clientId: data.clientId, isActive: true}
     });
     if(existingPolicy){
         throw new Error("Ya existe una poliza con ese numero para este cliente");
@@ -257,8 +257,27 @@ export async function deletePolicy(id: string, brokerId: string){
         throw new Error("Poliza no encontrada");
     }
 
-    await prisma.policy.delete({where: {id}});
-    return {message: "Poliza eliminada exitosamente"};
+    const updatedPolicy = await prisma.policy.update({
+        where: {id},
+        data: {isActive: false}
+    })
+    return {message: "Poliza dada de baja exitosamente", policy: updatedPolicy}
+}
+
+export async function reactivatePolicy(id: string, brokerId: string){
+    const policy = await prisma.policy.findFirst({
+        where: {id, brokerId}
+    })
+
+    if(!policy){
+        throw new Error("Poliza no encontrada");
+    }
+
+    const reactivatedPolicy = await prisma.policy.update({
+        where: {id},
+        data: {isActive: true}
+    })
+    return reactivatedPolicy
 }
 
 export async function getPolicyById(id: string, brokerId: string){

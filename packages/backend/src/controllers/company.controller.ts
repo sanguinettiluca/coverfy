@@ -4,7 +4,8 @@ import {
     listCompanies,
     getCompanyById,
     updateCompany,
-    deleteCompany
+    deleteCompany,
+    reactivateCompany
 } from '../services/company.service'
 
 export async function createCompanyController(req: Request, res: Response): Promise<void>{
@@ -89,6 +90,26 @@ export async function deleteCompanyController(req: Request, res: Response): Prom
     }catch(error){
         if(error instanceof Error){
             res.status(400).json({message: error.message})
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}
+
+export async function reactivateCompanyController(req: Request, res: Response): Promise<void>{
+    try{
+        const { userId, role, brokerId: brokerIdToken } = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+
+        const company = await reactivateCompany(id, brokerId)
+        res.status(200).json({
+            message: 'Compañía reactivada correctamente',
+            company
+        })
+    }catch(error){
+        if(error instanceof Error){
+            res.status(400).json({ message: error.message })
             return
         }
         res.status(500).json({ message: 'Error interno del servidor' })

@@ -1,4 +1,3 @@
-import e from "express"
 import { Role } from "../generated/prisma"
 
 // DTO (Data Transfer Object) para la creación de un nuevo usuario
@@ -23,6 +22,7 @@ export interface JwtPayload {
     email: string
     role: Role
     brokerId?: string | null // El broker al que pertenece (null si es admin o broker)
+    sessionId: string // ID de la sesión para poder invalidarla si es necesario
 }
 
 export interface AuthResponse {

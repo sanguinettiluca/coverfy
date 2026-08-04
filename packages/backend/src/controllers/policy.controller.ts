@@ -4,7 +4,8 @@ import {
     listPolicies,
     updatePolicy,
     deletePolicy,
-    getPolicyById
+    getPolicyById,
+    reactivatePolicy
 } from '../services/policy.service'
 import { CreatePolicyDTO, UpdatePolicyDTO } from "../domain/policy";
 import { PolicyStatus } from "../generated/prisma";
@@ -99,6 +100,25 @@ export async function getPolicyByIdController(req: Request, res: Response): Prom
         res.status(200).json(policy)
     }
     catch(error){
+        if(error instanceof Error){
+            res.status(404).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
+    }
+}
+
+export async function reactivatePolicyController(req: Request, res: Response): Promise<void>{
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken : userId
+        const policy = await reactivatePolicy(id, brokerId)
+        res.status(200).json({
+            message: "Poliza reactivada exitosamente",
+            policy
+        })
+    }catch(error){
         if(error instanceof Error){
             res.status(404).json({ message: error.message })
             return

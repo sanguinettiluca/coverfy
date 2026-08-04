@@ -1,4 +1,4 @@
-// IMPORTANTE: Trabajen con la version 6.0.0 de prisma, ya que la 7.0.0 tiene cambios importantes y
+// IMPORTANTE: Trabajen con la version 6 de prisma, ya que la 7.0.0 tiene cambios importantes y
 // no es compatible con el codigo actual
 
 // PARA ENTRAR AL PANEL DE PRISMA: npx prisma studio (cd backend primero)
@@ -51,6 +51,10 @@ model User{
 
   failedLoginAttempts Int @default(0)
   lockedUntil DateTime?
+  isActive Boolean @default(true)
+
+  // Sesion unica
+  currentSessionId String?
 
   quickMessages QuickMessage[] @relation("BrokerQuickMessages")
 
@@ -87,6 +91,7 @@ model Client{
   // Polizas del cliente:
   policies Policy[]
 
+  isActive Boolean @default(true)
   createdAt DateTime @default(now())
 
   @@index([brokerId, documentNumber])
@@ -132,6 +137,7 @@ model Company{
   brokerId String
   broker User @relation(fields: [brokerId], references: [id])
 
+  isActive Boolean @default(true)
   policies Policy[]
   createdAt DateTime @default(now())
 
@@ -184,6 +190,7 @@ model Policy{
 
   documents Document[]
 
+  isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -191,6 +198,8 @@ model Policy{
 model Coverage{
   id String @id @default(uuid())
   name String
+
+  isActive Boolean @default(true)
 
   // Relacion con empresa de seguros:
   companyId String

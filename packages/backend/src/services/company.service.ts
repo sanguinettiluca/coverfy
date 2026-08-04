@@ -4,7 +4,7 @@ import { CreateCompanyDTO, UpdateCompanyDTO } from "../domain/company";
 export async function createCompany(data: CreateCompanyDTO, brokerId: string) {
     // Verificar si no existe una compañía con el mismo nombre para el mismo broker
     const existingCompany = await prisma.company.findFirst({
-        where: { name: data.name, brokerId }
+        where: { name: data.name, brokerId, isActive: true }
     })
 
     if (existingCompany) {
@@ -75,9 +75,33 @@ export async function deleteCompany(id: string, brokerId: string){
         throw new Error("Compañía no encontrada.");
     }
 
-    await prisma.company.delete({
-        where: {id}
-    })
+    await prisma.$transaction([
+        prisma.company.update({
+            where: {id},
+            data: {isActive: false}
+        }),
+        prisma.coverage.updateMany({
+            where: {companyId: id},
+            data: {isActive: false}
+        })
+    ])
 
     return { message: "Compañía eliminada exitosamente." };
+}
+
+export async function reactivateCompany(id: string, brokerId: string){
+    const company = await prisma.company.findFirst({
+        where: {id, brokerId}
+    })
+
+    if(!company){
+        throw new Error("Compañía no encontrada.");
+    }
+
+    const reactivatedCompany = await prisma.company.update({
+        where: {id},
+        data: {isActive: true}
+    })
+
+    return reactivatedCompany;
 }

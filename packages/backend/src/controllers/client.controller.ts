@@ -5,7 +5,8 @@ import {
     getClientById,
     updateClient,
     deleteClient,
-    findClientByDocument
+    findClientByDocument,
+    reactivateClient
 } from "../services/client.service";
 
 // Crear cliente
@@ -124,5 +125,25 @@ export async function findClientByDocumentController(req:Request<{ documentNumbe
             return
         }
         res.status(500).json({ message: "Error interno" })
+    }
+}
+
+export async function reactivateClientController(req: Request, res: Response): Promise<void> {
+    try{
+        const {userId, role, brokerId: brokerIdToken} = req.user!
+        const id = req.params.id as string
+        const brokerId = role === 'SUB_BROKER' && brokerIdToken ? brokerIdToken:userId
+        const client = await reactivateClient(id, brokerId)
+
+        res.status(200).json({
+            message: 'Cliente reactivado exitosamente',
+            client
+        })
+    }catch(error){
+        if (error instanceof Error) {
+            res.status(400).json({ message: error.message })
+            return
+        }
+        res.status(500).json({ message: 'Error interno del servidor' })
     }
 }

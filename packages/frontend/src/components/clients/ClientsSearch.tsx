@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams, Link } from "react-router";
 import SearchClientButton from "./SearchClientButton";
 import ClientResult from "./ClientResult";
 import api from "../../data/api";
@@ -140,10 +140,8 @@ const ClientsSearch = () => {
 
                     </div>
 
-                    <p className="small">
-                        <button type="button" onClick={handleVolver} className="small">
-                            Volver
-                        </button>
+                     <p className="small">
+                        <Link to="/">Volver al Dashboard</Link>
                     </p>
                 </div>
 

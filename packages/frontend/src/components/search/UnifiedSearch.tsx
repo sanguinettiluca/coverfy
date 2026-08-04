@@ -6,12 +6,51 @@ import PolicySearchFilters from "./PolicySearchFilters";
 import ClientsResultsTable from "./ClientesResultsTable";
 import PoliciesResultsTable from "./PoliciesResultsTable";
 import SearchResultsPdfButton from "./SearchResultsPdf";
-import type { Client, Policy, SearchMode, ClientSortField, PolicySortField, SortOrder, PolicyStatusFilter } from "./search.type";
+import type {
+    Client,
+    Policy,
+    SearchMode,
+    ClientSortField,
+    PolicySortField,
+    SortOrder,
+    PolicyStatusFilter,
+    InsuranceTypeFilter,
+} from "./search.type";
 
 const normalizar = (v: string) => v.trim().toLowerCase();
 
+const STORAGE_KEY = "unified-search-state";
+
+type PersistedState = {
+    mode: SearchMode;
+    documento: string;
+    nombre: string;
+    clientSort: ClientSortField;
+    clientOrder: SortOrder;
+    numeroPoliza: string;
+    referencia: string;
+    estadoPoliza: PolicyStatusFilter;
+    tipoPoliza: InsuranceTypeFilter;
+    matricula: string;
+    nombreCliente: string;
+    subBrokerId: string;
+    policySort: PolicySortField;
+    policyOrder: SortOrder;
+};
+
+const loadPersistedState = (): Partial<PersistedState> => {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch {
+        return {};
+    }
+};
+
 const UnifiedSearch = () => {
-    const [mode, setMode] = useState<SearchMode>("clients");
+    const persisted = loadPersistedState();
+
+    const [mode, setMode] = useState<SearchMode>(persisted.mode ?? "clients");
 
     // --- Datos crudos traídos del backend ---
     const [clientesRaw, setClientesRaw] = useState<Client[]>([]);
@@ -19,19 +58,37 @@ const UnifiedSearch = () => {
     const [cargando, setCargando] = useState(false);
 
     // --- Filtros clientes ---
-    const [documento, setDocumento] = useState("");
-    const [nombre, setNombre] = useState("");
-    const [clientSort, setClientSort] = useState<ClientSortField>("name");
-    const [clientOrder, setClientOrder] = useState<SortOrder>("asc");
+    const [documento, setDocumento] = useState(persisted.documento ?? "");
+    const [nombre, setNombre] = useState(persisted.nombre ?? "");
+    const [clientSort, setClientSort] = useState<ClientSortField>(persisted.clientSort ?? "name");
+    const [clientOrder, setClientOrder] = useState<SortOrder>(persisted.clientOrder ?? "asc");
 
     // --- Filtros pólizas ---
-    const [numeroPoliza, setNumeroPoliza] = useState("");
-    const [referencia, setReferencia] = useState("");
-    const [estadoPoliza, setEstadoPoliza] = useState<PolicyStatusFilter>("");
-    const [nombreCliente, setNombreCliente] = useState("");
-    const [subBrokerId, setSubBrokerId] = useState("");
-    const [policySort, setPolicySort] = useState<PolicySortField>("createdAt");
-    const [policyOrder, setPolicyOrder] = useState<SortOrder>("desc");
+    const [numeroPoliza, setNumeroPoliza] = useState(persisted.numeroPoliza ?? "");
+    const [referencia, setReferencia] = useState(persisted.referencia ?? "");
+    const [estadoPoliza, setEstadoPoliza] = useState<PolicyStatusFilter>(persisted.estadoPoliza ?? "");
+    const [tipoPoliza, setTipoPoliza] = useState<InsuranceTypeFilter>(persisted.tipoPoliza ?? "");
+    const [matricula, setMatricula] = useState(persisted.matricula ?? "");
+    const [nombreCliente, setNombreCliente] = useState(persisted.nombreCliente ?? "");
+    const [subBrokerId, setSubBrokerId] = useState(persisted.subBrokerId ?? "");
+    const [policySort, setPolicySort] = useState<PolicySortField>(persisted.policySort ?? "createdAt");
+    const [policyOrder, setPolicyOrder] = useState<SortOrder>(persisted.policyOrder ?? "desc");
+
+    // Persiste automáticamente los filtros/orden/modo cada vez que cambian.
+    // No se guarda la lista de resultados: al volver a entrar, el efecto de
+    // abajo vuelve a pedirla al backend usando los filtros ya restaurados.
+    useEffect(() => {
+        const state: PersistedState = {
+            mode, documento, nombre, clientSort, clientOrder,
+            numeroPoliza, referencia, estadoPoliza, tipoPoliza, matricula,
+            nombreCliente, subBrokerId, policySort, policyOrder,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }, [
+        mode, documento, nombre, clientSort, clientOrder,
+        numeroPoliza, referencia, estadoPoliza, tipoPoliza, matricula,
+        nombreCliente, subBrokerId, policySort, policyOrder,
+    ]);
 
     // Trae un lote grande al cambiar de modo. El filtrado fino se hace
     // en el cliente (ver comentario sobre limitaciones de /polizas más abajo).
@@ -98,6 +155,15 @@ const UnifiedSearch = () => {
         if (estadoPoliza) {
             resultado = resultado.filter((p) => p.status === estadoPoliza);
         }
+        if (tipoPoliza) {
+            resultado = resultado.filter((p) => p.insuranceType === tipoPoliza);
+        }
+        if (matricula) {
+            const q = normalizar(matricula);
+            resultado = resultado.filter((p) =>
+                (p.vehicleDetails?.licensePlate ?? "").toLowerCase().includes(q)
+            );
+        }
         if (nombreCliente) {
             const q = normalizar(nombreCliente);
             resultado = resultado.filter((p) =>
@@ -125,7 +191,7 @@ const UnifiedSearch = () => {
         });
 
         return resultado;
-    }, [polizasRaw, numeroPoliza, referencia, estadoPoliza, nombreCliente, subBrokerId, policySort, policyOrder]);
+    }, [polizasRaw, numeroPoliza, referencia, estadoPoliza, tipoPoliza, matricula, nombreCliente, subBrokerId, policySort, policyOrder]);
 
     return (
         <div className="commissions-page">
@@ -153,6 +219,8 @@ const UnifiedSearch = () => {
                     numeroPoliza={numeroPoliza}
                     referencia={referencia}
                     estado={estadoPoliza}
+                    tipo={tipoPoliza}
+                    matricula={matricula}
                     nombreCliente={nombreCliente}
                     subBrokerId={subBrokerId}
                     sortField={policySort}
@@ -160,6 +228,8 @@ const UnifiedSearch = () => {
                     onNumeroPolizaChange={setNumeroPoliza}
                     onReferenciaChange={setReferencia}
                     onEstadoChange={setEstadoPoliza}
+                    onTipoChange={setTipoPoliza}
+                    onMatriculaChange={setMatricula}
                     onNombreClienteChange={setNombreCliente}
                     onSubBrokerIdChange={setSubBrokerId}
                     onSortFieldChange={setPolicySort}

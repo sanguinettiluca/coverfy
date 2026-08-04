@@ -21,6 +21,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
     { label: "Dashboard", to: "/", icon: <LayoutDashboard size={18} /> },
+    { label: "Busqueda", to: "/search", icon: <Search size={18} /> },
     { label: "Registro de Usuario", to: "/register", icon: <FileUser size={18} />, roles: ["ADMIN"] },
     {
         label: "Pólizas",
@@ -46,8 +47,6 @@ export const NAV_ITEMS: NavItem[] = [
     { label: "Alta Cobertura", to: "/coverages", icon: <FileCog size={18} />, roles: ["BROKER", "SUB_BROKER"] },
     { label: "Calculadora de comisiones", to: "/comissions", icon: <Calculator size={18} />, roles: ["BROKER", "SUB_BROKER"] },
     { label: "Gráficas", to: "/charts", icon: <BarChart2 size={18} />, roles: ["BROKER", "SUB_BROKER"] },
-    { label: "Listas", to: "/lists", icon: <List size={18} /> },
     { label: "Alertas", to: "/alerts", icon: <Bell size={18} /> },
-    { label: "Busqueda", to: "/search", icon: <Search size={18} /> },
     { label: "Configuración", to: "/settings", icon: <Settings size={18} /> },
 ];

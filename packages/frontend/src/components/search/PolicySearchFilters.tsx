@@ -1,10 +1,13 @@
-import type { PolicySortField, SortOrder, PolicyStatusFilter } from "./search.type";
+import type { PolicySortField, SortOrder, PolicyStatusFilter, InsuranceTypeFilter } from "./search.type";
+import { TIPO_LABEL } from "./search.type";
 import SubBrokerSelect from "./SubBrokerSelect";
 
 type Props = {
     numeroPoliza: string;
     referencia: string;
     estado: PolicyStatusFilter;
+    tipo: InsuranceTypeFilter;
+    matricula: string;
     nombreCliente: string;
     subBrokerId: string;
     sortField: PolicySortField;
@@ -12,6 +15,8 @@ type Props = {
     onNumeroPolizaChange: (v: string) => void;
     onReferenciaChange: (v: string) => void;
     onEstadoChange: (v: PolicyStatusFilter) => void;
+    onTipoChange: (v: InsuranceTypeFilter) => void;
+    onMatriculaChange: (v: string) => void;
     onNombreClienteChange: (v: string) => void;
     onSubBrokerIdChange: (v: string) => void;
     onSortFieldChange: (v: PolicySortField) => void;
@@ -22,6 +27,8 @@ const PolicySearchFilters = ({
     numeroPoliza,
     referencia,
     estado,
+    tipo,
+    matricula,
     nombreCliente,
     subBrokerId,
     sortField,
@@ -29,6 +36,8 @@ const PolicySearchFilters = ({
     onNumeroPolizaChange,
     onReferenciaChange,
     onEstadoChange,
+    onTipoChange,
+    onMatriculaChange,
     onNombreClienteChange,
     onSubBrokerIdChange,
     onSortFieldChange,
@@ -48,6 +57,21 @@ const PolicySearchFilters = ({
                 value={referencia}
                 onChange={(e) => onReferenciaChange(e.target.value)}
             />
+            <input
+                type="text"
+                placeholder="Matrícula..."
+                value={matricula}
+                onChange={(e) => onMatriculaChange(e.target.value)}
+            />
+            <select
+                value={tipo}
+                onChange={(e) => onTipoChange(e.target.value as InsuranceTypeFilter)}
+            >
+                <option value="">Todos los tipos</option>
+                {Object.entries(TIPO_LABEL).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                ))}
+            </select>
             <select
                 value={estado}
                 onChange={(e) => onEstadoChange(e.target.value as PolicyStatusFilter)}

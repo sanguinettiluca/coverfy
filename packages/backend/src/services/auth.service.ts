@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import prisma from "../config/prisma"
+import crypto from "crypto"
 import { CreateUserDTO, JwtPayload, LoginDTO, AuthResponse, PreAuthTokenPayload, LoginResult } from "../domain/user"
 import { AuditAction, Role } from "../generated/prisma"
 import { decrypt } from "../utils/crypto.util"
@@ -92,18 +93,26 @@ export async function createUser(data: CreateUserDTO) {
     return userWithoutPassword
 }
 
-function generateAuthResponse(user: {
+async function generateAuthResponse(user: {
     id: string
     email: string
     name: string
     role: Role
     brokerId: string | null
-}): AuthResponse{
+}): Promise<AuthResponse>{
+    const sessionId = crypto.randomUUID() // Genera un ID de sesión único para poder invalidar el token si es necesario
+
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {currentSessionId: sessionId}
+    })
+
     const payload: JwtPayload = {
         userId: user.id,
         email: user.email,
         role: user.role,
-        brokerId: user.brokerId
+        brokerId: user.brokerId,
+        sessionId
     }
 
     const accessToken = jwt.sign(

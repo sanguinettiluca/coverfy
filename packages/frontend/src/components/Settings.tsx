@@ -1,6 +1,7 @@
 import { useTheme } from "../hooks/useTheme"
 import { useState } from "react";
 import TwoFactorSection from "./twofactor/TwoFactorSection";
+import QuickMessagesSettings from "./quickmessages/QuickMessagesSettings"; // ajustá el path real
 
 const Settings = () => {
     const { isDark, toggleTheme } = useTheme();
@@ -35,24 +36,16 @@ const Settings = () => {
                     />
                 </div>
 
-                <div className="settings-row">
-                    <div className="settings-row-text">
-                        <span className="settings-row-label">Vista compacta</span>
-                        <span className="settings-row-desc">Reduce el espaciado entre elementos</span>
-                    </div>
-                    <button
-                        type="button"
-                        className={`settings-toggle ${vistaCompacta ? "settings-toggle--on" : ""}`}
-                        onClick={() => setVistaCompacta((prev) => !prev)}
-                        aria-pressed={vistaCompacta}
-                        aria-label="Alternar vista compacta"
-                    />
-                </div>
             </div>
 
             <div className="settings-section">
                 <div className="settings-section-title">Seguridad</div>
                 <TwoFactorSection />
+            </div>
+
+            <div className="settings-section">
+                <div className="settings-section-title">Mensajes rápidos</div>
+                <QuickMessagesSettings />
             </div>
 
             <div className="settings-section">

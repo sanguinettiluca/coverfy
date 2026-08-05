@@ -66,7 +66,7 @@ const UnifiedSearch = () => {
     // --- Filtros pólizas ---
     const [numeroPoliza, setNumeroPoliza] = useState(persisted.numeroPoliza ?? "");
     const [referencia, setReferencia] = useState(persisted.referencia ?? "");
-    const [estadoPoliza, setEstadoPoliza] = useState<PolicyStatusFilter>(persisted.estadoPoliza ?? "");
+    const [estadoPoliza, setEstadoPoliza] = useState<PolicyStatusFilter>(persisted.estadoPoliza ?? "ACTIVE");
     const [tipoPoliza, setTipoPoliza] = useState<InsuranceTypeFilter>(persisted.tipoPoliza ?? "");
     const [matricula, setMatricula] = useState(persisted.matricula ?? "");
     const [nombreCliente, setNombreCliente] = useState(persisted.nombreCliente ?? "");
@@ -113,7 +113,8 @@ const UnifiedSearch = () => {
     }, [mode]);
 
     const clientesFiltrados = useMemo(() => {
-        let resultado = clientesRaw;
+        let resultado = clientesRaw.filter((c) => c.isActive !== false);
+        
 
         if (documento) {
             resultado = resultado.filter((c) => c.documentNumber.includes(documento.trim()));
@@ -140,7 +141,7 @@ const UnifiedSearch = () => {
     }, [clientesRaw, documento, nombre, clientSort, clientOrder]);
 
     const polizasFiltradas = useMemo(() => {
-        let resultado = polizasRaw;
+        let resultado = polizasRaw
 
         if (numeroPoliza) {
             resultado = resultado.filter((p) =>
@@ -155,8 +156,11 @@ const UnifiedSearch = () => {
         if (estadoPoliza) {
             resultado = resultado.filter((p) => p.status === estadoPoliza);
         }
-        if (tipoPoliza) {
-            resultado = resultado.filter((p) => p.insuranceType === tipoPoliza);
+        if (nombreCliente) {
+            const q = normalizar(nombreCliente);
+            resultado = resultado.filter((p) =>
+                p.client ? normalizar(`${p.client.firstName} ${p.client.lastName}`).includes(q) : false
+            );
         }
         if (matricula) {
             const q = normalizar(matricula);
@@ -164,12 +168,10 @@ const UnifiedSearch = () => {
                 (p.vehicleDetails?.licensePlate ?? "").toLowerCase().includes(q)
             );
         }
-        if (nombreCliente) {
-            const q = normalizar(nombreCliente);
-            resultado = resultado.filter((p) =>
-                p.client ? normalizar(`${p.client.firstName} ${p.client.lastName}`).includes(q) : false
-            );
+        if (tipoPoliza) {
+            resultado = resultado.filter((p) => p.insuranceType === tipoPoliza);
         }
+        
         if (subBrokerId) {
             resultado = resultado.filter((p) => p.broker?.id === subBrokerId);
         }

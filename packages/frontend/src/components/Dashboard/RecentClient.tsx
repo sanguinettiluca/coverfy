@@ -3,7 +3,7 @@ import api from "../../data/api";
 
 type Client = {
     id: string;
-    fistName: string;
+    firstName: string;
     lastName: string;
     documentNumber: string;
     createdAt: string;
@@ -42,7 +42,7 @@ const RecentClientsCard = () => {
                         <div className="dashboard-widget-item" key={client.id}>
                             <div className="dashboard-widget-item-main">
                                 <span className="dashboard-widget-item-title">
-                                    {client.fistName} {client.lastName}
+                                    {client.firstName} {client.lastName}
                                 </span>
                                 <span className="dashboard-widget-item-sub">Doc. {client.documentNumber}</span>
                             </div>

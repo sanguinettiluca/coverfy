@@ -1,6 +1,6 @@
 import PolizaAccordion from "./PolizaAccordion";
 import DeleteClientButton from "./DelteClientButton";
-import WhatsAppMessage from "./WhatsAppMessage";
+import WhatsAppMessage from "../quickmessages/WhatsAppMessage";
 
 type Policy = {
     id: string;

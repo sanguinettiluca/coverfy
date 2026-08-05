@@ -63,15 +63,12 @@ const PolicySearchFilters = ({
                 value={matricula}
                 onChange={(e) => onMatriculaChange(e.target.value)}
             />
-            <select
-                value={tipo}
-                onChange={(e) => onTipoChange(e.target.value as InsuranceTypeFilter)}
-            >
-                <option value="">Todos los tipos</option>
-                {Object.entries(TIPO_LABEL).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
-                ))}
-            </select>
+            <input
+                type="text"
+                placeholder="Nombre del cliente..."
+                value={nombreCliente}
+                onChange={(e) => onNombreClienteChange(e.target.value)}
+            />
             <select
                 value={estado}
                 onChange={(e) => onEstadoChange(e.target.value as PolicyStatusFilter)}
@@ -82,12 +79,16 @@ const PolicySearchFilters = ({
                 <option value="CANCELLED">Cancelada</option>
                 <option value="SUSPENDED">Suspendida</option>
             </select>
-            <input
-                type="text"
-                placeholder="Nombre del cliente..."
-                value={nombreCliente}
-                onChange={(e) => onNombreClienteChange(e.target.value)}
-            />
+
+            <select
+                value={tipo}
+                onChange={(e) => onTipoChange(e.target.value as InsuranceTypeFilter)}
+            >
+                <option value="">Todos los tipos</option>
+                {Object.entries(TIPO_LABEL).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                ))}
+            </select>
             <SubBrokerSelect value={subBrokerId} onChange={onSubBrokerIdChange} />
             <select
                 value={sortField}

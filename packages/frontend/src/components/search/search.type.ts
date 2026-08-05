@@ -6,6 +6,7 @@ export type Client = {
     phone: string;
     email: string;
     createdAt: string;
+    isActive?: boolean;
 };
 
 export type PolicyClient = {

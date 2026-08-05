@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useSearchParams, Link } from "react-router";
+import {useSearchParams, Link } from "react-router";
 import SearchClientButton from "./SearchClientButton";
 import ClientResult from "./ClientResult";
 import api from "../../data/api";
@@ -60,9 +60,9 @@ type ClientComplete = {
 };
 
 const ClientsSearch = () => {
-    const { register, watch, reset, setValue, formState: { errors } } = useForm<BuscarClienteForm>();
+    const { register, watch, setValue, formState: { errors } } = useForm<BuscarClienteForm>();
 
-    const navigate = useNavigate();
+
     const [searchParams] = useSearchParams();
     const documento = watch("documento");
 
@@ -96,17 +96,6 @@ const ClientsSearch = () => {
         }
     };
 
-    const handleVolver = () => {
-        reset({
-            documento: ""
-        });
-
-        setClient(null);
-        setBuscado(false);
-        setCargandoDetalle(false);
-
-        navigate("/clients/search");
-    };
 
     return (
         <div className="page">

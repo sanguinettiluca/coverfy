@@ -7,7 +7,7 @@ type Props = {
     documento: string;
     onEncontrado: (cliente: Client) => void;
     onNoEncontrado: () => void;
-    autoTrigger?: number; 
+    autoTrigger?: number;
 };
 
 type Client = {
@@ -21,6 +21,7 @@ type Client = {
     email: string;
     address: string;
     notes?: string;
+    isActive?: boolean
 };
 
 const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado, autoTrigger }: Props) => {
@@ -40,13 +41,18 @@ const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado, autoTrigg
 
             const clientes: Client[] = response.data.clients;
 
-
             const cliente = clientes.find(
                 c => c.documentNumber.trim() === documento.trim()
             );
-            if (!cliente) {
 
+            if (!cliente) {
                 toast.error("Cliente no encontrado");
+                onNoEncontrado();
+                return;
+            }
+
+            if (cliente.isActive === false) {
+                toast.error("Este cliente está inactivo");
                 onNoEncontrado();
                 return;
             }

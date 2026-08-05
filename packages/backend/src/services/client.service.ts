@@ -8,7 +8,7 @@ export async function createClient(
     createdById: string
 ){
     const existingClient = await prisma.client.findFirst({
-        where: {documentNumber: data.documentNumber, brokerId, isActive: true}
+        where: {documentNumber: data.documentNumber, brokerId}
     })
 
     if(existingClient){

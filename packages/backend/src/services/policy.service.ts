@@ -19,16 +19,13 @@ const detailsCreateMap: Record<string, string> = {
 // como objeto o undefined si el tipo no tiene detalle registrado (no deberia pasar nunca).
 function buildDetailsCreate(data: CreatePolicyDTO): Record<string, unknown> | undefined{
     const detailsKey = detailsCreateMap[data.insuranceType];
-
     if(!detailsKey){
         return undefined;
     }
-
     const detailsFields = (data as any)[detailsKey];
     if(!detailsFields){
         return undefined;
     }
-
     return { [detailsKey]: { create: detailsFields } };
 }
 
@@ -165,11 +162,9 @@ export async function updatePolicy(id: string, brokerId: string, data: UpdatePol
         tripDetails,
         ...baseFields
     } = data;
-
     // string: las claves vienen en forma de texto, unknown: el valor puede ser cualquier cosa
     // luego se le iran asignando propiedades segun que detalle venga en el request
     const detailsUpdate: Record<string, unknown> = {};
-
     // Si existe liabilityDetails en los datos de UpdatePolicyDTO entonces se agrega
     // para actualizarlo.
     if(liabilityDetails){
@@ -181,49 +176,41 @@ export async function updatePolicy(id: string, brokerId: string, data: UpdatePol
             upsert: {create: liabilityDetails, update: liabilityDetails}
         }
     }
-
     if(bondDetails){
         detailsUpdate.bondDetails = {
             upsert: {create: bondDetails, update: bondDetails}
         }
     }
-
     if(lifeDetails){
         detailsUpdate.lifeDetails = {
             upsert: {create: lifeDetails, update: lifeDetails}
         }
     }
-
     if(otherDetails){
         detailsUpdate.otherDetails = {
             upsert: {create: otherDetails, update: otherDetails}
         }
     }
-
     if(tripDetails){
         detailsUpdate.tripDetails = {
             upsert: {create: tripDetails, update: tripDetails}
         }
     }
-
     if(rentalDetails){
         detailsUpdate.rentalDetails = {
             upsert: {create: rentalDetails, update: rentalDetails}
         }
     }
-
     if(businessDetails){
         detailsUpdate.businessDetails = {
             upsert: {create: businessDetails, update: businessDetails}
         }
     }
-
     if(homeDetails){
         detailsUpdate.homeDetails = {
             upsert: {create: homeDetails, update: homeDetails}
         }
     }
-
     if(vehicleDetails){
         detailsUpdate.vehicleDetails = {
             upsert: {create: vehicleDetails, update: vehicleDetails}
@@ -245,14 +232,14 @@ export async function updatePolicy(id: string, brokerId: string, data: UpdatePol
             tripDetails: true
         }
     });
+
     return updatedPolicy
 }
 
 export async function deletePolicy(id: string, brokerId: string){
     const policy = await prisma.policy.findFirst({
-        where: {id, brokerId}
+        where: {id, client: {brokerId}}
     })
-
     if(!policy){
         throw new Error("Poliza no encontrada");
     }
@@ -266,9 +253,8 @@ export async function deletePolicy(id: string, brokerId: string){
 
 export async function reactivatePolicy(id: string, brokerId: string){
     const policy = await prisma.policy.findFirst({
-        where: {id, brokerId}
+        where: {id, client: {brokerId}}
     })
-
     if(!policy){
         throw new Error("Poliza no encontrada");
     }
@@ -297,10 +283,8 @@ export async function getPolicyById(id: string, brokerId: string){
             tripDetails: true
         }
     })
-
     if(!policy){
         throw new Error("Poliza no encontrada")
     }
-
     return policy
 }

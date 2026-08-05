@@ -35,7 +35,6 @@ const PoliciesNew = () => {
         const basePayload = {
             insuranceType: data.tipoSeguro,
             policyNumber: data.numeroPoliza,
-            referenceNumber: data.numeroReferencia || undefined,
             status: data.estado ? data.estado.toUpperCase() : undefined,
             startDate: data.fechaInicio
                 ? new Date(data.fechaInicio).toISOString()
@@ -211,14 +210,6 @@ const PoliciesNew = () => {
                         {...register("numeroPoliza", { required: true })}
                     />
                     {errors.numeroPoliza && <span className="error">Este campo es requerido</span>}
-
-                    <label htmlFor="numeroReferencia">Número de Referencia</label>
-                    <input
-                        id="numeroReferencia"
-                        type="text"
-                        {...register("numeroReferencia")}
-                    />
-                    {errors.numeroReferencia && <span className="error">Este campo es requerido</span>}
 
                     <label htmlFor="estado">Estado</label>
                     <select id="estado" {...register("estado")}>

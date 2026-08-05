@@ -26,7 +26,6 @@ const PoliciesEdit = () => {
 
             reset({
                 polizaId: poliza.id,
-                numeroReferencia: poliza.referenceNumber ?? "",
                 tipoSeguro: poliza.insuranceType,
                 estado: poliza.status ?? undefined,
                 fechaInicio: poliza.startDate

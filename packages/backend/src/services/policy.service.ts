@@ -29,6 +29,29 @@ function buildDetailsCreate(data: CreatePolicyDTO): Record<string, unknown> | un
     return { [detailsKey]: { create: detailsFields } };
 }
 
+// Genera el proximo numero de referencia para la cartera del broker.
+// referenceNumber se guarda como String en la base, asi que no se puede
+// usar orderBy directo (ordenaria "1000" antes que "999" alfabeticamente).
+// Por eso se traen todos los referenceNumber existentes de la cartera,
+// se parsean a numero, y se toma el mas alto + 1. Si no hay ninguno
+// todavia, arranca en 1000.
+async function generateReferenceNumber(brokerId: string): Promise<string> {
+    const policies = await prisma.policy.findMany({
+        where: { client: { brokerId } },
+        select: { referenceNumber: true }
+    });
+
+    let maxNumber = 999; // arranca en 1000 si no hay ninguna poliza previa
+    for (const policy of policies) {
+        const parsed = parseInt(policy.referenceNumber, 10);
+        if (!isNaN(parsed) && parsed > maxNumber) {
+            maxNumber = parsed;
+        }
+    }
+
+    return String(maxNumber + 1);
+}
+
 export async function createPolicy(data: CreatePolicyDTO, brokerId: string, createdByUserId: string){
     const client = await prisma.client.findFirst({
         where: {id: data.clientId, brokerId}
@@ -57,12 +80,17 @@ export async function createPolicy(data: CreatePolicyDTO, brokerId: string, crea
         clientId,
         companyId,
         coverageId,
+        referenceNumber, 
         ...policyFields
     } = data as any;
+
+    const generatedReferenceNumber = await generateReferenceNumber(brokerId);
+
     const details = buildDetailsCreate(data);
     const policy = await prisma.policy.create({
         data: {
             ...policyFields,
+            referenceNumber: generatedReferenceNumber,
             client: { connect: { id: clientId } },
             company: { connect: { id: companyId } },
             ...(coverageId ? { coverage: { connect: { id: coverageId } } } : {}),

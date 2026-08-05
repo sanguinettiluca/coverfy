@@ -56,8 +56,8 @@ export async function listClaims(brokerId: string, filters: FilterClaimDTO){
             ...where.policy,
             OR: [
                 { policyNumber: { contains: search, mode: "insensitive"} },
+                { referenceNumber: { contains: search, mode: "insensitive"} },
                 { vehicleDetails: { licensePlate: {contains: search, mode: "insensitive"}}},
-                {vehicleDetails: {model: {contains: search, mode: "insensitive"}}},
                 {vehicleDetails: { model: {contains: search, mode: "insensitive"}}}
             ]
         }

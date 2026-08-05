@@ -246,7 +246,7 @@ export async function deletePolicy(id: string, brokerId: string){
 
     const updatedPolicy = await prisma.policy.update({
         where: {id},
-        data: {isActive: false}
+        data: {isActive: false, status: "CANCELLED"}
     })
     return {message: "Poliza dada de baja exitosamente", policy: updatedPolicy}
 }

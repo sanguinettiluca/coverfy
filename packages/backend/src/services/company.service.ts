@@ -20,7 +20,7 @@ export async function createCompany(data: CreateCompanyDTO, brokerId: string) {
 
 export async function listCompanies(brokerId: string) {
     const companies = await prisma.company.findMany({
-        where: { brokerId },
+        where: { brokerId, isActive: true },
         include: {
             coverages: {
                 orderBy: { insuranceType: "asc"}

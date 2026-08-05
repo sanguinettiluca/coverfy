@@ -130,7 +130,7 @@ const ClientsSearch = () => {
                     </div>
 
                      <p className="small">
-                        <Link to="/">Volver al Dashboard</Link>
+                        <Link to="/clients/new">Registrar nuevo cliente</Link>
                     </p>
                 </div>
 

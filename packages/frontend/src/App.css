@@ -27,6 +27,12 @@
     --color-warning-soft: rgba(210, 153, 34, 0.12);
     --color-link: #58a6ff;
     --color-toggle-thumb: #ffffff;
+
+    /* Ícono de flecha reutilizado en TODOS los <select> del proyecto.
+       Antes estaba repetido igual, letra por letra, en 4 lugares distintos
+       (login-form select, search-filters-row select, commissions-select-row
+       select, whatsapp-modal select). Ahora se define una sola vez acá. */
+    --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
 [data-theme="light"] {
@@ -233,7 +239,7 @@ a {
     cursor: pointer;
     transition: border-color 0.15s;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: var(--icon-chevron);
     background-repeat: no-repeat;
     background-position: right 12px center;
 }
@@ -360,7 +366,7 @@ a {
 
 .sidebar-logout:hover {
     color: var(--color-danger);
-    background: rgba(248, 81, 73, 0.08);
+    background: var(--color-danger-soft);
 }
 
 .layout {
@@ -400,7 +406,7 @@ a {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 7px 10px 7px 22px;  
+    padding: 7px 10px 7px 22px;
     font-size: 13px;
     color: var(--color-text-muted);
     text-decoration: none;
@@ -1184,10 +1190,21 @@ a {
     text-align: center;
 }
 
+.dashboard-widget-item-link {
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.dashboard-widget-item-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+}
+
 /* ============================================================
    CONFIRM MODAL
    Modal genérico de confirmación (usado para eliminar registros,
-   y reutilizado como base visual para otros modales como 2FA).
+   y reutilizado como base visual para otros modales como 2FA
+   y mensajes rápidos, que además le suman su propio textarea).
    ============================================================ */
 .confirm-modal-overlay {
     position: fixed;
@@ -1223,6 +1240,29 @@ a {
     margin-bottom: 1.5rem;
 }
 
+.confirm-modal textarea {
+    width: 100%;
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.4;
+}
+
+.confirm-modal textarea::placeholder {
+    color: var(--color-placeholder);
+}
+
+.confirm-modal textarea:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
 .confirm-modal-actions {
     display: flex;
     gap: 10px;
@@ -1246,6 +1286,15 @@ a {
     background: var(--color-border);
 }
 
+.confirm-modal-btn--primary {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.confirm-modal-btn--primary:hover {
+    background: var(--color-accent-hover);
+}
+
 .confirm-modal-btn--danger {
     background: var(--color-danger);
     color: #fff;
@@ -1263,7 +1312,8 @@ a {
 /* ============================================================
    DELETE POLICY BUTTON
    Botón de acción destructiva (eliminar póliza) con estilo
-   diferenciado en rojo suave.
+   diferenciado en rojo suave. Reutilizado también para eliminar
+   siniestros y compañías (misma clase, mismo criterio visual).
    ============================================================ */
 .delete-policy-btn {
     display: inline-flex;
@@ -1364,6 +1414,34 @@ a {
 
 .commissions-select-row {
     margin-bottom: 1.5rem;
+}
+
+.commissions-select-row select {
+    background: var(--color-bg-alt);
+    border: 0.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+    outline: none;
+    width: 100%;
+    max-width: 340px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    appearance: none;
+    background-image: var(--icon-chevron);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.commissions-select-row select:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.commissions-select-row select option {
+    background: var(--color-bg-alt);
+    color: var(--color-text);
 }
 
 .commissions-compania-card {
@@ -1488,38 +1566,11 @@ a {
     color: var(--color-success);
 }
 
-.commissions-select-row select {
-    background: var(--color-bg-alt);
-    border: 0.5px solid var(--color-border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
-    color: var(--color-text);
-    outline: none;
-    width: 100%;
-    max-width: 340px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-}
-
-.commissions-select-row select:focus {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-accent-soft);
-}
-
-.commissions-select-row select option {
-    background: var(--color-bg-alt);
-    color: var(--color-text);
-}
-
 /* ============================================================
    WHATSAPP MESSAGE MODAL
    Modal para redactar y enviar un mensaje de WhatsApp a un
-   cliente desde su ficha (botón verde de marca WhatsApp).
+   cliente desde su ficha (botón verde de marca WhatsApp),
+   con select opcional de plantillas (mensajes rápidos).
    ============================================================ */
 .whatsapp-modal-overlay {
     position: fixed;
@@ -1552,6 +1603,33 @@ a {
     font-size: 13px;
     color: var(--color-text-muted);
     margin-bottom: 1.25rem;
+}
+
+.whatsapp-modal select {
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    appearance: none;
+    background-image: var(--icon-chevron);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.whatsapp-modal select:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.whatsapp-modal select option {
+    background: var(--color-bg-alt);
+    color: var(--color-text);
 }
 
 .whatsapp-modal textarea {
@@ -1850,15 +1928,11 @@ a {
     cursor: pointer;
 }
 
-.confirm-modal-btn--primary {
-    background: var(--color-accent);
-    color: #fff;
-}
-
-.confirm-modal-btn--primary:hover {
-    background: var(--color-accent-hover);
-}
-
+/* ============================================================
+   LINK BUTTON
+   Botón sin fondo con apariencia de link de texto (ej: "Volver
+   al login" en la pantalla de verificación 2FA).
+   ============================================================ */
 .link-button {
     color: var(--color-link);
     font-size: 13px;
@@ -1868,7 +1942,12 @@ a {
     text-decoration: underline;
 }
 
-/* === UNIFIED SEARCH === */
+/* ============================================================
+   UNIFIED SEARCH
+   Búsqueda combinada de clientes/pólizas: selector de modo,
+   fila de filtros dinámica según el modo, y encabezado de
+   resultados con contador + botón de exportar a PDF.
+   ============================================================ */
 .search-mode-toggle {
     display: flex;
     gap: 6px;
@@ -1898,7 +1977,7 @@ a {
 .search-filters-row select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: var(--icon-chevron);
     background-repeat: no-repeat;
     background-position: right 10px center;
     padding-right: 30px;
@@ -1918,17 +1997,11 @@ a {
     gap: 12px;
 }
 
-.dashboard-widget-item-link {
-    cursor: pointer;
-    transition: color 0.15s;
-}
-
-.dashboard-widget-item-link:hover {
-    color: var(--color-accent);
-    text-decoration: underline;
-}
-
-/* === QUICK MESSAGES SETTINGS === */
+/* ============================================================
+   QUICK MESSAGES SETTINGS
+   Lista de plantillas de WhatsApp gestionables desde Settings:
+   header con botón "Nuevo", filas con editar/eliminar.
+   ============================================================ */
 .quickmsg-header {
     display: flex;
     align-items: center;
@@ -1989,53 +2062,103 @@ a {
     flex-shrink: 0;
 }
 
-.confirm-modal textarea {
+/* ============================================================
+   CLAIM EDIT / COVERAGE EDIT
+   Selector de resultado múltiple (varios siniestros encontrados
+   para la misma matrícula/referencia) con opción resaltada al
+   elegir, separador antes del formulario de edición, y edición
+   inline de coberturas dentro de Editar Compañía.
+   ============================================================ */
+.claim-edit-select-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.claim-edit-option {
     width: 100%;
-    background: var(--color-bg);
-    border: 0.5px solid var(--color-border);
+    text-align: left;
     border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
-    color: var(--color-text);
-    outline: none;
-    resize: vertical;
-    font-family: inherit;
-    line-height: 1.4;
-}
-
-.confirm-modal textarea::placeholder {
-    color: var(--color-placeholder);
-}
-
-.confirm-modal textarea:focus {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-accent-soft);
-}
-
-/* Select de plantillas dentro del modal de WhatsApp */
-.whatsapp-modal select {
-    background: var(--color-bg);
-    border: 0.5px solid var(--color-border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
-    color: var(--color-text);
-    outline: none;
-    width: 100%;
     cursor: pointer;
-    transition: border-color 0.15s;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
+    transition: border-color 0.15s, background 0.15s;
+    border: 0.5px solid transparent;
+    padding: 12px 14px;
 }
 
-.whatsapp-modal select:focus {
+.claim-edit-option:hover {
+    background: var(--color-border-soft);
+}
+
+.claim-edit-option--selected {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+}
+
+.claim-edit-form {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid var(--color-border-soft);
+}
+
+.claim-edit-closed-notice {
+    display: block;
+    margin-bottom: -0.4rem;
+}
+
+.coverage-edit-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.coverage-edit-input {
+    flex: 1 1 140px;
+    min-width: 0;
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--color-text);
+    outline: none;
+}
+
+.coverage-edit-input:focus {
     border-color: var(--color-accent);
     box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
-.whatsapp-modal select option {
+.coverage-edit-select {
+    background: var(--color-bg);
+    border: 0.5px solid var(--color-border);
+    border-radius: 6px;
+    /* padding-right extra para no tapar la flecha custom */
+    padding: 6px 26px 6px 10px;
+    font-size: 13px;
+    color: var(--color-text);
+    outline: none;
+    cursor: pointer;
+    flex: 1 1 140px;
+    min-width: 0;
+    /* Antes le faltaba esto: era el único select del proyecto
+       sin flecha custom, quedaba con el ícono nativo feo del
+       navegador. Ahora usa el mismo --icon-chevron que el resto. */
+    appearance: none;
+    background-image: var(--icon-chevron);
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+}
+
+.coverage-edit-select:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.coverage-edit-select option {
     background: var(--color-bg-alt);
     color: var(--color-text);
 }

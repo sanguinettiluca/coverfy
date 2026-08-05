@@ -148,7 +148,7 @@ const PoliciesSearch = () => {
                     </div>
 
                     <p className="small">
-                        <Link to="/">Volver al Dashboard</Link>
+                        <Link to="/policies/new">Registrar nueva póliza</Link>
                     </p>
                 </div>
 

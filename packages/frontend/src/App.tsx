@@ -21,7 +21,11 @@ import ProtectedRoute from './components/constants/ProtecterRoute'
 import ComissionsPage from './components/comissions/ComissionsPage.tsx'
 import ChartsPage from './components/charts/ChartsPage.tsx'
 import UnifiedSearch from './components/search/UnifiedSearch.tsx'
+import ClaimNew from './components/claims/ClaimNew.tsx'
+import ClaimSearch from './components/claims/ClaimSearch.tsx'
+import ClaimEdit from './components/claims/ClaimEdit.tsx'
 import './App.css'
+import CompanyEdit from './components/Companies/CompanyEdit.tsx'
 
 function App() {
   return (
@@ -48,10 +52,14 @@ function App() {
                 <Route path="/clients/search" element={<ClientsSearch />} />
                 <Route path="/clients/edit" element={<ClientsEdit />} />
                 <Route path="/companies" element={<CompanyNew />} />
+                <Route path="/companies/edit" element={<CompanyEdit />} />
                 <Route path="/coverages" element={<CoverageNew />} />
                 <Route path="/comissions" element={<ComissionsPage />} />
                 <Route path="/charts" element={<ChartsPage />} />
                 <Route path="/search" element={<UnifiedSearch />} />
+                <Route path="/claims/new" element={<ClaimNew />} />
+                <Route path="/claims/search" element={<ClaimSearch />} />
+                <Route path="/claims/edit" element={<ClaimEdit />} />
               </Route>
 
               <Route path="/settings" element={<Settings />} />

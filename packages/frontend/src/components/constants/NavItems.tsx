@@ -1,8 +1,8 @@
 import {
-    LayoutDashboard, FileText, BarChart2, List,
-    Bell, Search, Settings, UserPlus,
+    LayoutDashboard, FileText, BarChart2,
+    ShieldAlert, Search, Settings, UserPlus,
     FileSearchIcon, FilePlusIcon, FilePenLine, BookUser, UserSearch, UserPen, FileUser, Building2, FileCog,
-    Calculator
+    Calculator, Pencil
 } from "lucide-react";
 
 export type NavChild = {
@@ -43,10 +43,28 @@ export const NAV_ITEMS: NavItem[] = [
             { label: "Editar Cliente", to: "/clients/edit", icon: <UserPen size={15} /> },
         ],
     },
-    { label: "Alta Compañia", to: "/companies", icon: <Building2 size={18} />, roles: ["BROKER", "SUB_BROKER"] },
-    { label: "Alta Cobertura", to: "/coverages", icon: <FileCog size={18} />, roles: ["BROKER", "SUB_BROKER"] },
+
+    {
+        label: "Compañías", to: "/companies",
+        icon: <Building2 size={18} />,
+        roles: ["BROKER", "SUB_BROKER"],
+        children: [
+            { label: "Alta Compañía", to: "/companies", icon: <Building2 size={15} /> },
+            { label: "Alta Cobertura", to: "/coverages", icon: <FileCog size={15} /> },
+            { label: "Editar Compañía", to: "/companies/edit", icon: <Pencil size={15} /> },
+        ],
+    },
+    {
+        label: "Siniestros",
+        icon: <ShieldAlert size={18} />,
+        roles: ["BROKER", "SUB_BROKER"],
+        children: [
+            { label: "Buscar Siniestro", to: "/claims/search", icon: <FileSearchIcon size={15} /> },
+            { label: "Nuevo Siniestro", to: "/claims/new", icon: <FilePlusIcon size={15} /> },
+            { label: "Editar Siniestro", to: "/claims/edit", icon: <FilePenLine size={15} /> },
+        ],
+    },
     { label: "Calculadora de comisiones", to: "/comissions", icon: <Calculator size={18} />, roles: ["BROKER", "SUB_BROKER"] },
     { label: "Gráficas", to: "/charts", icon: <BarChart2 size={18} />, roles: ["BROKER", "SUB_BROKER"] },
-    { label: "Alertas", to: "/alerts", icon: <Bell size={18} /> },
     { label: "Configuración", to: "/settings", icon: <Settings size={18} /> },
 ];

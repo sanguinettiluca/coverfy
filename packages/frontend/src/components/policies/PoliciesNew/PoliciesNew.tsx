@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import api from "../../../data/api"
 import { toast } from "react-toastify";
+import { Upload, FileCheck } from "lucide-react";
+import { useState } from "react";
 import CompanyCoverageSelect from "../CompanyCoverageSelect";
 import ClientPicker from "../ClientPicker";
 import NewPolicyDetailFields from "./NewPolicyDetailFields";
@@ -18,6 +20,8 @@ const PoliciesNew = () => {
         shouldUnregister: true,
     });
 
+    const [fileName, setFileName] = useState<string | null>(null);
+
     const tipoSeguro = watch("tipoSeguro");
     const numeroPoliza = watch("numeroPoliza");
     const clienteId = watch("clienteId");
@@ -30,6 +34,47 @@ const PoliciesNew = () => {
 
     const isDisabled =
         !tipoSeguro || !numeroPoliza || !clienteId || !companiaId || fechasInvalidas;
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setFileName(file.name);
+            scanPolicyDocument(file);
+        }
+    };
+
+    const scanPolicyDocument = async (file: File) => {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const { data } = await api.post("ocr/poliza", formData);
+
+            if (data.insuranceType) {
+                setValue("tipoSeguro", data.insuranceType, { shouldValidate: true });
+            }
+            if (data.policyNumber) {
+                setValue("numeroPoliza", data.policyNumber, { shouldValidate: true });
+            }
+            if (data.startDate) {
+                setValue("fechaInicio", data.startDate);
+            }
+            if (data.expirationDate) {
+                setValue("fechaVencimiento", data.expirationDate);
+            }
+            if (data.totalAmount != null) {
+                setValue("montoTotal", data.totalAmount);
+            }
+
+            toast.success("Datos extraídos correctamente");
+        } catch (error: any) {
+            if (error.response) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Error al escanear la póliza");
+            }
+        }
+    };
 
     const onSubmit = (data: PolizaForm) => {
         const basePayload = {
@@ -62,7 +107,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "BOND":
                 payload = {
                     ...basePayload,
@@ -73,7 +117,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "LIFE":
                 payload = {
                     ...basePayload,
@@ -83,7 +126,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "OTHER":
                 payload = {
                     ...basePayload,
@@ -92,7 +134,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "RENTAL":
                 payload = {
                     ...basePayload,
@@ -103,7 +144,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "BUSINESS":
                 payload = {
                     ...basePayload,
@@ -114,7 +154,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "HOME":
                 payload = {
                     ...basePayload,
@@ -126,7 +165,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "VEHICLE":
                 payload = {
                     ...basePayload,
@@ -141,7 +179,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             case "TRIP":
                 payload = {
                     ...basePayload,
@@ -157,7 +194,6 @@ const PoliciesNew = () => {
                     },
                 };
                 break;
-
             default:
                 payload = basePayload;
         }
@@ -166,6 +202,7 @@ const PoliciesNew = () => {
             .then(response => {
                 toast.success(response.data.message);
                 reset();
+                setFileName(null);
             })
             .catch(error => {
                 if (error.response) {
@@ -184,6 +221,26 @@ const PoliciesNew = () => {
                 <p className="login-sub">Completa los detalles debajo</p>
 
                 <form className="login-form" autoComplete="on" onSubmit={handleSubmit(onSubmit)}>
+
+                    <label htmlFor="policyFile">Escanear póliza</label>
+                    <div className="file-upload">
+                        <input
+                            id="policyFile"
+                            type="file"
+                            accept=".pdf"
+                            className="file-upload-input"
+                            onChange={handleFileChange}
+                        />
+                        <label htmlFor="policyFile" className="file-upload-label">
+                            {fileName ? <FileCheck size={16} /> : <Upload size={16} />}
+                            {fileName ? "Cambiar archivo" : "Subir PDF de la póliza"}
+                        </label>
+                        {fileName && (
+                            <span className="file-upload-filename file-upload-filename--active">
+                                {fileName}
+                            </span>
+                        )}
+                    </div>
 
                     <label htmlFor="tipoSeguro">Tipo de Seguro</label>
                     <select
@@ -279,6 +336,7 @@ const PoliciesNew = () => {
                         <option value="Transfer">Transferencia</option>
                         <option value="Debit">Débito automático</option>
                     </select>
+
                     <input type="hidden" {...register("clienteId", { required: true })} />
                     <ClientPicker setValue={setValue as any} errors={errors} />
 

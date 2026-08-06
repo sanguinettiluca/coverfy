@@ -21,11 +21,6 @@ const Register = () => {
 
     const role = watch("role");
     const isSubBroker = role === "SUB_BROKER";
-
-    const name = watch("name");
-    const email = watch("email");
-    const password = watch("password");
-    const confirmPassword = watch("confirm_password");
     const brokerId = watch("broker_id");
 
 
@@ -152,7 +147,7 @@ const Register = () => {
                 </form>
 
                 <p className="small">
-                    <Link to="/login">Volver</Link>
+                    <Link to="/dashboard">Volver</Link>
                 </p>
             </div>
         </div>

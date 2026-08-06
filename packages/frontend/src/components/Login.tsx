@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import {useNavigate } from "react-router";
 import api from "../data/api"
 import { toast } from "react-toastify";
 import { loguear } from "../features/user.slice";
@@ -174,10 +174,6 @@ const Login = () => {
                     </button>
                 </form>
 
-                <p className="small">
-                    Tienes algún problema? <Link to="/login">Contactate
-                    </Link>
-                </p>
             </div>
         </div>
     );

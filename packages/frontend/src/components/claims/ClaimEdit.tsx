@@ -9,7 +9,7 @@ const formatDate = (date?: string | null) =>
     date ? new Date(date).toLocaleDateString("es-UY") : "-";
 
 const ClaimEdit = () => {
-    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<UpdateClaimForm>();
+    const { register, handleSubmit, watch, reset} = useForm<UpdateClaimForm>();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [results, setResults] = useState<Claim[]>([]);

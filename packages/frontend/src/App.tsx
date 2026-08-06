@@ -36,7 +36,11 @@ function App() {
 
             {/* Con sidebar */}
             <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
+              {/* Requiere sesión, pero cualquier rol */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
 
               {/* Solo ADMIN */}
               <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
@@ -62,7 +66,6 @@ function App() {
                 <Route path="/claims/edit" element={<ClaimEdit />} />
               </Route>
 
-              <Route path="/settings" element={<Settings />} />
             </Route>
 
             {/* Sin sidebar */}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import {useSearchParams, Link } from "react-router";
+import { useSearchParams, Link } from "react-router";
 import SearchClientButton from "./SearchClientButton";
 import ClientResult from "./ClientResult";
 import api from "../../data/api";
@@ -20,6 +20,7 @@ type Cliente = {
     email: string;
     address: string;
     notes?: string;
+    isActive?: boolean;
 };
 
 type Policy = {
@@ -55,13 +56,13 @@ type ClientComplete = {
     createdById: string;
     brokerId: string;
     createdAt: string;
+    isActive?: boolean;
     createdBy?: { id: string; name: string; role: string };
     policies: Policy[];
 };
 
 const ClientsSearch = () => {
     const { register, watch, setValue, formState: { errors } } = useForm<BuscarClienteForm>();
-
 
     const [searchParams] = useSearchParams();
     const documento = watch("documento");
@@ -71,8 +72,6 @@ const ClientsSearch = () => {
     const [cargandoDetalle, setCargandoDetalle] = useState(false);
     const [autoTrigger, setAutoTrigger] = useState(0);
 
-    // Si llegamos con ?documento=X en la URL, precargamos el campo y
-    // disparamos la búsqueda automáticamente una sola vez al montar.
     useEffect(() => {
         const documentoUrl = searchParams.get("documento");
         if (documentoUrl) {
@@ -82,10 +81,10 @@ const ClientsSearch = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleEncontrado = async (clientFound: Cliente) => {
+    const cargarDetalle = async (clientId: string) => {
         setCargandoDetalle(true);
         try {
-            const detalle = await api.get(`/clientes/${clientFound.id}`);
+            const detalle = await api.get(`/clientes/${clientId}`);
             setClient(detalle.data);
             setBuscado(true);
         } catch {
@@ -96,6 +95,15 @@ const ClientsSearch = () => {
         }
     };
 
+    const handleEncontrado = async (clientFound: Cliente) => {
+        await cargarDetalle(clientFound.id);
+    };
+
+    const handleReactivado = () => {
+        if (client) {
+            cargarDetalle(client.id);
+        }
+    };
 
     return (
         <div className="page">
@@ -149,6 +157,7 @@ const ClientsSearch = () => {
                                     setClient(null);
                                     setBuscado(false);
                                 }}
+                                onReactivado={handleReactivado}
                             />
                         )}
                     </div>

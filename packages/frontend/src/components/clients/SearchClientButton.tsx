@@ -21,13 +21,12 @@ type Client = {
     email: string;
     address: string;
     notes?: string;
-    isActive?: boolean
+    isActive?: boolean;
 };
 
 const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado, autoTrigger }: Props) => {
 
     const handleBuscar = async () => {
-
         if (!documento) {
             toast.error("Ingrese un documento");
             return;
@@ -47,12 +46,6 @@ const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado, autoTrigg
 
             if (!cliente) {
                 toast.error("Cliente no encontrado");
-                onNoEncontrado();
-                return;
-            }
-
-            if (cliente.isActive === false) {
-                toast.error("Este cliente está inactivo");
                 onNoEncontrado();
                 return;
             }

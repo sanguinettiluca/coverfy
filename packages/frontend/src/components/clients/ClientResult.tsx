@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { RotateCcw } from "lucide-react";
+import api from "../../data/api";
+import { toast } from "react-toastify";
 import PolizaAccordion from "./PolizaAccordion";
 import DeleteClientButton from "./DelteClientButton";
 import WhatsAppMessage from "../quickmessages/WhatsAppMessage";
@@ -35,6 +39,7 @@ type Client = {
     createdById: string;
     brokerId: string;
     createdAt: string;
+    isActive?: boolean;
     createdBy?: { id: string; name: string; role: string };
     policies: Policy[];
 };
@@ -42,6 +47,7 @@ type Client = {
 type ClientResultProps = {
     cliente: Client;
     onEliminado: () => void;
+    onReactivado: () => void;
 };
 
 const formatFecha = (fecha?: string | null) =>
@@ -53,8 +59,22 @@ const formatTexto = (valor?: string | null) =>
 const getIniciales = (nombres: string, apellidos: string) =>
     `${nombres.charAt(0)}${apellidos.charAt(0)}`.toUpperCase();
 
-const ClientResult = ({ cliente, onEliminado }: ClientResultProps) => {
+const ClientResult = ({ cliente, onEliminado, onReactivado }: ClientResultProps) => {
     const polizas = cliente.policies ?? [];
+    const [reactivando, setReactivando] = useState(false);
+
+    const handleReactivar = () => {
+        setReactivando(true);
+        api.patch(`/clientes/${cliente.id}/reactivate`)
+            .then((response) => {
+                toast.success(response.data?.message ?? "Cliente reactivado correctamente");
+                onReactivado();
+            })
+            .catch((error) => {
+                toast.error(error.response?.data?.message ?? "No se pudo reactivar el cliente");
+            })
+            .finally(() => setReactivando(false));
+    };
 
     return (
         <div>
@@ -66,18 +86,33 @@ const ClientResult = ({ cliente, onEliminado }: ClientResultProps) => {
                 <div>
                     <div className="client-result-name">
                         {cliente.firstName} {cliente.lastName}
+                        {cliente.isActive === false && (
+                            <span className="client-result-inactive-badge">Inactivo</span>
+                        )}
                     </div>
                     <div className="client-result-doc">Documento {cliente.documentNumber}</div>
                 </div>
             </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-                <DeleteClientButton
-                    clienteId={cliente.id}
-                    nombreCompleto={`${cliente.firstName} ${cliente.lastName}`}
-                    cantidadPolizas={polizas.length}
-                    onEliminado={onEliminado}
-                />
+            <div style={{ marginBottom: "1.5rem", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                {cliente.isActive === false ? (
+                    <button
+                        type="button"
+                        className="twofa-status-btn"
+                        onClick={handleReactivar}
+                        disabled={reactivando}
+                    >
+                        <RotateCcw size={14} />
+                        {reactivando ? "Reactivando..." : "Reactivar cliente"}
+                    </button>
+                ) : (
+                    <DeleteClientButton
+                        clienteId={cliente.id}
+                        nombreCompleto={`${cliente.firstName} ${cliente.lastName}`}
+                        cantidadPolizas={polizas.length}
+                        onEliminado={onEliminado}
+                    />
+                )}
             </div>
 
             <div className="client-result-grid">
@@ -92,7 +127,7 @@ const ClientResult = ({ cliente, onEliminado }: ClientResultProps) => {
                     <WhatsAppMessage phone={cliente.phone} />
                 </div>
 
-                <div className="client-result-field">
+                 <div className="client-result-field">
                     <span className="client-result-label">Celular Alternativo</span>
                     {cliente.alternatePhone ? (
                         <WhatsAppMessage phone={cliente.alternatePhone} />

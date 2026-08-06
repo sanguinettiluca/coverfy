@@ -181,7 +181,7 @@ const ClientsEdit = () => {
                 </form>
 
                 <p className="small">
-                    <Link to="/clientes">Volver</Link>
+                    <Link to="/clients/new">Registrar nuevo cliente</Link>
                 </p>
             </div>
         </div>

@@ -1,33 +1,29 @@
 import { useNavigate } from "react-router";
+import { SearchX } from "lucide-react";
 
 const NotFound = () => {
 
     const navigate = useNavigate();
 
-    return(
+    return (
         <div className="page">
-            <aside className="login-wrapper">
-                <div className="login-card">
-                    <h2 className="brand">404</h2>
-                    <p className="notfound-text">
-                        La página que buscas no existe o fue movida.
-                    </p>
-                    <button className="btn" onClick={() => navigate("/login")}>
-                        Volver al inicio
-                    </button>
+            <div className="login-card notfound-card">
+                <div className="notfound-icon">
+                    <SearchX size={28} />
                 </div>
-            </aside>
-            <main className="welcome">
-                <div className="welcome-overlay">
-                    <div className="welcome-text">
-                        <h1>Oops...</h1>
-                        <p>Parece que te perdiste.</p>
-                    </div>
-                </div>
-            </main>
+
+                <h2 className="notfound-code">404</h2>
+                <h1 className="login-title">Página no encontrada</h1>
+                <p className="login-sub">
+                    La página que buscás no existe o fue movida.
+                </p>
+
+                <button className="btn" onClick={() => navigate("/")}>
+                    Volver al inicio
+                </button>
+            </div>
         </div>
+    );
+};
 
-    )
-}
-
-export default NotFound
+export default NotFound;

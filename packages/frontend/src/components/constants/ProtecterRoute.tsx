@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from "react-router";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store"; 
+import type { RootState } from "../../store/store";
 
 type Role = "ADMIN" | "BROKER" | "SUB_BROKER";
 
 type Props = {
-    allowedRoles: Role[];
+    allowedRoles?: Role[];
 };
 
 const RoleRoute = ({ allowedRoles }: Props) => {
@@ -15,7 +15,7 @@ const RoleRoute = ({ allowedRoles }: Props) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (!allowedRoles.includes(user.role)) {
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
         return <Navigate to="/" replace />;
     }
 

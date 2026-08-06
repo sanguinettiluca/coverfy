@@ -2162,3 +2162,43 @@ a {
     background: var(--color-bg-alt);
     color: var(--color-text);
 }
+
+.client-result-inactive-badge {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-danger);
+    background: var(--color-danger-soft-strong);
+    border-radius: 20px;
+    padding: 2px 9px;
+    vertical-align: middle;
+}
+
+/* === NOT FOUND === */
+.notfound-card {
+    text-align: center;
+}
+
+.notfound-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1.25rem;
+    border-radius: 14px;
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notfound-code {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}

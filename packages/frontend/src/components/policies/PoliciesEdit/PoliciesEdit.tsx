@@ -4,6 +4,7 @@ import SearchPolicyButton from "../SearchPoliciyButton";
 import { toast } from "react-toastify";
 import PolicyDetailFields from "./PolicyDetailField";
 import type { PolizaEditForm, PolizaDetalle } from "./policiesEdit.types";
+import { Link } from "react-router";
 
 const PoliciesEdit = () => {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<PolizaEditForm>();
@@ -389,6 +390,10 @@ const PoliciesEdit = () => {
                         Editar póliza
                     </button>
                 </form>
+
+                <p className="small">
+                    <Link to="/policies/new">Registrar nueva póliza</Link>
+                </p>
 
             </div>
         </div>

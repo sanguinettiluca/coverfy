@@ -2,15 +2,23 @@ import { LogOut } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { desloguear } from "../../features/user.slice";
 import { useNavigate } from "react-router";
- 
+import api from "../../data/api"; 
+
+
 const SidebarFooter = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        dispatch(desloguear());
-        navigate("/login");
+        api.post("/auth/logout")
+            .catch(() => {
+
+            })
+            .finally(() => {
+                localStorage.removeItem("token");
+                dispatch(desloguear());
+                navigate("/login");
+            });
     };
 
     return (

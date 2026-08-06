@@ -75,6 +75,14 @@ export async function deleteCompany(id: string, brokerId: string){
         throw new Error("Compañía no encontrada.");
     }
 
+    const activePoliciesCount = await prisma.policy.count({
+        where: {companyId: id, isActive: true}
+    })
+
+    if(activePoliciesCount > 0){
+        throw new Error("No se puede eliminar la compañía: tiene pólizas activas asociadas.");
+    }
+
     await prisma.$transaction([
         prisma.company.update({
             where: {id},

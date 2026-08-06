@@ -49,7 +49,7 @@ export const NAV_ITEMS: NavItem[] = [
         icon: <Building2 size={18} />,
         roles: ["BROKER", "SUB_BROKER"],
         children: [
-            { label: "Alta Compañía", to: "/companies", icon: <Building2 size={15} /> },
+            { label: "Alta Compañía", to: "/companies/new", icon: <Building2 size={15} /> },
             { label: "Alta Cobertura", to: "/coverages", icon: <FileCog size={15} /> },
             { label: "Editar Compañía", to: "/companies/edit", icon: <Pencil size={15} /> },
         ],

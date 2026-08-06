@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { extractIdCardData } from "../services/ocr.service";
 
-// 4>>>>>>2 toda la vida lloralo yoruga
 export async function scanIdCardController(req: Request, res: Response): Promise<void> {
     try{
         const file = req.file as Express.Multer.File | undefined;

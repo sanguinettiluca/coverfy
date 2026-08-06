@@ -44,14 +44,18 @@ export async function listCoverages(companyId: string, brokerId: string, insuran
         throw new Error('Compañia no encontrada')
     }
 
+    // Solo listar coberturas activas
     const coverages = await prisma.coverage.findMany({
         where:{
             companyId,
+            isActive: true,
             // Si se proporciona un tipo de seguro, filtramos por él
             ...(insuranceType && { insuranceType })
         },
         orderBy: {name: 'asc'}
     })
+
+    console.log('Coverages:', coverages) // Agrega este log para verificar los resultados
 
     return coverages
 }
@@ -86,6 +90,18 @@ export async function deleteCoverage(id: string, brokerId: string) {
 
     if (!coverage) {
         throw new Error('Cobertura no encontrada')
+    }
+
+    const activePolicy = await prisma.policy.findFirst({
+        where: {
+            coverageId: id,
+            status: 'ACTIVE',
+            isActive: true
+        }
+    })
+
+    if (activePolicy) {
+        throw new Error('No se puede eliminar la cobertura porque tiene pólizas activas asociadas')
     }
 
     const updatedCoverage = await prisma.coverage.update({

@@ -19,10 +19,12 @@ export async function createCompany(data: CreateCompanyDTO, brokerId: string) {
 }
 
 export async function listCompanies(brokerId: string) {
+    // Solo listar coverages activas
     const companies = await prisma.company.findMany({
         where: { brokerId, isActive: true },
         include: {
             coverages: {
+                where: { isActive: true },
                 orderBy: { insuranceType: "asc"}
             }
         },

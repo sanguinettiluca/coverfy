@@ -172,10 +172,14 @@ export async function listPolicies(brokerId: string, filters: FilterPolicyDTO) {
 
 export async function updatePolicy(id: string, brokerId: string, data: UpdatePolicyDTO){
     const policy = await prisma.policy.findFirst({
-        where: { id, client: { brokerId } }
+        where: { id, client: { brokerId } },
+        include: { client: { select: { isActive: true } } }
     })
     if (!policy) {
         throw new Error('Póliza no encontrada')
+    }
+    if(data.status === "ACTIVE" && !policy.client.isActive){
+        throw new Error("No se puede activar la póliza porque el cliente está inactivo")
     }
 
     const {

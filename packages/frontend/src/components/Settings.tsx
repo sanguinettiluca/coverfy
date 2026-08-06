@@ -7,7 +7,7 @@ const Settings = () => {
     const { isDark, toggleTheme } = useTheme();
 
     const [notificaciones, setNotificaciones] = useState(true);
-    const [vistaCompacta, setVistaCompacta] = useState(false);
+    //const [vistaCompacta, setVistaCompacta] = useState(false);
 
     return (
         <div className="settings-page">

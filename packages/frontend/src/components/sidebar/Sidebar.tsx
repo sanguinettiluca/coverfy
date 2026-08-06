@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import SidebarBrand from "./SidebarBrand";
 import SidebarNav from "./SidebarNav.tsx";
 import SidebarFooter from "./SidebarFooter.tsx";
 
 const Sidebar = () => {
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
     const location = useLocation();
 
     const [expanded, setExpanded] = useState<string | null>(
@@ -16,18 +16,29 @@ const Sidebar = () => {
         setExpanded((prev) => (prev === label ? null : label));
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/login");
-    };
+    // const handleLogout = () => {
+    //     localStorage.removeItem("token");
+    //     navigate("/login");
+    // };
 
     return (
         <aside className="sidebar">
             <SidebarBrand />
             <SidebarNav expanded={expanded} onToggle={handleToggle} />
-            <SidebarFooter onLogout={handleLogout} />
+            <SidebarFooter />
         </aside>
     );
 };
 
 export default Sidebar;
+
+
+// por si se rompe esto estaba asi antes:
+
+//  return (
+//         <aside className="sidebar">
+//             <SidebarBrand />
+//             <SidebarNav expanded={expanded} onToggle={handleToggle} />
+//             <SidebarFooter onLogout={handleLogout} />
+//         </aside>
+//     );

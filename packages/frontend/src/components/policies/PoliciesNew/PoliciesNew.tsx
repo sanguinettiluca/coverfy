@@ -35,6 +35,10 @@ const PoliciesNew = () => {
     const isDisabled =
         !tipoSeguro || !numeroPoliza || !clienteId || !companiaId || fechasInvalidas;
 
+        if(isDisabled) { // NO SACAR!!! ROMPE EL BUILD
+
+        }
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {

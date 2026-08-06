@@ -4,37 +4,38 @@ import { toast } from "react-toastify";
 import type { Claim } from "./claim.types";
 
 type Props = {
-    busqueda: string;
-    onEncontrados: (claims: Claim[]) => void;
-    onNoEncontrados: () => void;
+    query: string;
+    onFound: (claims: Claim[]) => void;
+    onNotFound: () => void;
 };
 
-const SearchClaimButton = ({ busqueda, onEncontrados, onNoEncontrados }: Props) => {
+const SearchClaimButton = ({ query, onFound, onNotFound }: Props) => {
 
-    const handleBuscar = async () => {
-        if (!busqueda) {
-            toast.error("Ingrese un dato para buscar");
+    const handleSearch = async () => {
+        if (!query) {
+            toast.error("Ingrese un número de póliza");
             return;
         }
         try {
             const response = await api.get("/siniestros", {
-                params: { search: busqueda, perPage: 1000, page: 1 }
+                params: { search: query, perPage: 1000, page: 1 }
             });
 
             const claims: Claim[] = response.data.claims ?? [];
+            const filtered = claims.filter((c) => c.policy.policyNumber === query);
 
-            if (claims.length === 0) {
+            if (filtered.length === 0) {
                 toast.error("No se encontraron siniestros");
-                onNoEncontrados();
+                onNotFound();
                 return;
             }
 
             toast.success(
-                claims.length === 1
+                filtered.length === 1
                     ? "Siniestro encontrado"
-                    : `${claims.length} siniestros encontrados`
+                    : `${filtered.length} siniestros encontrados`
             );
-            onEncontrados(claims);
+            onFound(filtered);
 
         } catch (error) {
             toast.error("Error al buscar siniestros");
@@ -42,7 +43,7 @@ const SearchClaimButton = ({ busqueda, onEncontrados, onNoEncontrados }: Props) 
     };
 
     return (
-        <button type="button" className="sidebar-icon" onClick={handleBuscar}>
+        <button type="button" className="sidebar-icon" onClick={handleSearch}>
             <Search size={18} />
         </button>
     );

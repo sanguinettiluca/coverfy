@@ -5,19 +5,19 @@ import SearchClaimButton from "./SearchClaimButton";
 import ClaimResult from "./ClaimResult";
 import type { Claim } from "./claim.types";
 
-type BuscarClaimForm = {
-    busqueda: string;
+type SearchClaimForm = {
+    query: string;
 };
 
 const ClaimsSearch = () => {
-    const { register, watch, formState: { errors } } = useForm<BuscarClaimForm>();
+    const { register, watch, formState: { errors } } = useForm<SearchClaimForm>();
 
-    const busqueda = watch("busqueda");
+    const query = watch("query");
 
     const [claims, setClaims] = useState<Claim[]>([]);
-    const [buscado, setBuscado] = useState(false);
+    const [searched, setSearched] = useState(false);
 
-    const eliminarDeLaLista = (id: string) => {
+    const removeFromList = (id: string) => {
         setClaims((prev) => prev.filter((c) => c.id !== id));
     };
 
@@ -27,30 +27,30 @@ const ClaimsSearch = () => {
 
                 <div className="login-card">
                     <h1 className="login-title">Buscar Siniestros</h1>
-                    <p className="login-sub">Buscá por número de referencia o matrícula</p>
+                    <p className="login-sub">Buscá por número de póliza</p>
 
                     <div className="login-form">
-                        <label htmlFor="busqueda">Número de referencia</label>
+                        <label htmlFor="query">Número de póliza</label>
                         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                             <input
-                                id="busqueda"
+                                id="query"
                                 type="text"
-                                placeholder="Número de referencia o matrícula"
-                                {...register("busqueda", { required: true })}
+                                placeholder="Número de póliza"
+                                {...register("query", { required: true })}
                             />
                             <SearchClaimButton
-                                busqueda={busqueda ?? ""}
-                                onEncontrados={(encontrados) => {
-                                    setClaims(encontrados);
-                                    setBuscado(true);
+                                query={query ?? ""}
+                                onFound={(found) => {
+                                    setClaims(found);
+                                    setSearched(true);
                                 }}
-                                onNoEncontrados={() => {
+                                onNotFound={() => {
                                     setClaims([]);
-                                    setBuscado(true);
+                                    setSearched(true);
                                 }}
                             />
                         </div>
-                        {errors.busqueda && <span className="error">Este campo es requerido</span>}
+                        {errors.query && <span className="error">Este campo es requerido</span>}
                     </div>
 
                     <p className="small">
@@ -58,7 +58,7 @@ const ClaimsSearch = () => {
                     </p>
                 </div>
 
-                {buscado && (
+                {searched && (
                     <div className="result-card">
                         {claims.length === 0 && (
                             <p className="login-sub">No se encontraron siniestros</p>
@@ -77,7 +77,7 @@ const ClaimsSearch = () => {
                                     >
                                         <ClaimResult
                                             claim={claim}
-                                            onEliminado={() => eliminarDeLaLista(claim.id)}
+                                            onEliminado={() => removeFromList(claim.id)}
                                         />
                                     </div>
                                 ))}

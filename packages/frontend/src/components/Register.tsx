@@ -31,9 +31,6 @@ const Register = () => {
 
 
     const onSubmit = (data: RegisterForm) => {
-        console.log(data);
-        console.log(data.role);
-        console.log(typeof data.role);
 
         api.post("/auth/users", {
             name: data.name,

@@ -5,37 +5,37 @@ import { toast } from "react-toastify";
 import SearchClaimButton from "./SearchClaimButton";
 import type { Claim, UpdateClaimForm } from "./claim.types";
 
-const formatFecha = (fecha?: string | null) =>
-    fecha ? new Date(fecha).toLocaleDateString("es-UY") : "-";
+const formatDate = (date?: string | null) =>
+    date ? new Date(date).toLocaleDateString("es-UY") : "-";
 
 const ClaimEdit = () => {
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<UpdateClaimForm>();
 
-    const [busquedaClaim, setBusquedaClaim] = useState("");
-    const [resultados, setResultados] = useState<Claim[]>([]);
-    const [claimCerrado, setClaimCerrado] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [results, setResults] = useState<Claim[]>([]);
+    const [claimClosed, setClaimClosed] = useState(false);
     const claimId = watch("claimId");
 
-    const isDisabled = !claimId || claimCerrado;
+    const isDisabled = !claimId || claimClosed;
 
-    const handleEncontrados = (claims: Claim[]) => {
-        setResultados(claims);
+    const handleFound = (claims: Claim[]) => {
+        setResults(claims);
         if (claims.length === 1) {
-            handleSeleccionar(claims[0]);
+            handleSelect(claims[0]);
         } else {
             reset({ claimId: undefined, status: undefined, contactDate: "", notes: "" });
-            setClaimCerrado(false);
+            setClaimClosed(false);
         }
     };
 
-    const handleNoEncontrados = () => {
-        setResultados([]);
+    const handleNotFound = () => {
+        setResults([]);
         reset({ claimId: undefined, status: undefined, contactDate: "", notes: "" });
-        setClaimCerrado(false);
+        setClaimClosed(false);
     };
 
-    const handleSeleccionar = (claim: Claim) => {
-        setClaimCerrado(claim.status === "CLOSED");
+    const handleSelect = (claim: Claim) => {
+        setClaimClosed(claim.status === "CLOSED");
         reset({
             claimId: claim.id,
             status: claim.status,
@@ -62,9 +62,9 @@ const ClaimEdit = () => {
                     contactDate: "",
                     notes: "",
                 });
-                setClaimCerrado(false);
-                setBusquedaClaim("");
-                setResultados([]);
+                setClaimClosed(false);
+                setSearchQuery("");
+                setResults([]);
             })
             .catch((error) => {
                 if (error.response) {
@@ -80,46 +80,45 @@ const ClaimEdit = () => {
             <div className="login-card">
 
                 <h1 className="login-title">Editar Siniestro</h1>
-                <p className="login-sub">Buscá por número de referencia o matrícula</p>
+                <p className="login-sub">Buscá por número de póliza</p>
 
                 <div className="login-form">
-                    <label htmlFor="busquedaClaim">Número de referencia</label>
+                    <label htmlFor="searchQuery">Número de póliza</label>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                         <input
-                            id="busquedaClaim"
+                            id="searchQuery"
                             type="text"
-                            placeholder="Número de referencia o matrícula"
-                            value={busquedaClaim}
-                            onChange={(e) => setBusquedaClaim(e.target.value)}
+                            placeholder="Número de póliza"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <SearchClaimButton
-                            busqueda={busquedaClaim}
-                            onEncontrados={handleEncontrados}
-                            onNoEncontrados={handleNoEncontrados}
+                            query={searchQuery}
+                            onFound={handleFound}
+                            onNotFound={handleNotFound}
                         />
                     </div>
                 </div>
 
-                {resultados.length > 1 && (
+                {results.length > 1 && (
                     <div className="login-form claim-edit-form">
                         <span className="claim-edit-select-label">
-                            Se encontraron {resultados.length} siniestros — elegí cuál editar:
+                            Se encontraron {results.length} siniestros — elegí cuál editar:
                         </span>
                         <div className="dashboard-widget-list">
-                            {resultados.map((c) => (
+                            {results.map((c) => (
                                 <button
                                     type="button"
                                     key={c.id}
                                     className={`dashboard-widget-item claim-edit-option ${c.id === claimId ? "claim-edit-option--selected" : ""}`}
-                                    onClick={() => handleSeleccionar(c)}
+                                    onClick={() => handleSelect(c)}
                                 >
                                     <div className="dashboard-widget-item-main">
                                         <span className="dashboard-widget-item-title">
                                             {c.policy.policyNumber}
-                                            {c.policy.referenceNumber ? ` · Ref. ${c.policy.referenceNumber}` : ""}
                                         </span>
                                         <span className="dashboard-widget-item-sub">
-                                            {formatFecha(c.incidentDate)} — {c.status === "OPEN" ? "Abierto" : "Cerrado"}
+                                            {formatDate(c.incidentDate)} — {c.status === "OPEN" ? "Abierto" : "Cerrado"}
                                         </span>
                                     </div>
                                 </button>
@@ -133,21 +132,21 @@ const ClaimEdit = () => {
 
                         <input type="hidden" {...register("claimId")} />
 
-                        {claimCerrado && (
+                        {claimClosed && (
                             <span className="error claim-edit-closed-notice">
                                 Este siniestro está cerrado y no se puede modificar
                             </span>
                         )}
 
                         <label htmlFor="status">Estado</label>
-                        <select id="status" {...register("status")} disabled={claimCerrado}>
+                        <select id="status" {...register("status")} disabled={claimClosed}>
                             <option value="">Sin cambios</option>
                             <option value="OPEN">Abierto</option>
                             <option value="CLOSED">Cerrado</option>
                         </select>
 
                         <label htmlFor="contactDate">Fecha de Contacto</label>
-                        <input id="contactDate" type="date" {...register("contactDate")} disabled={claimCerrado} />
+                        <input id="contactDate" type="date" {...register("contactDate")} disabled={claimClosed} />
 
                         <label htmlFor="notes">Notas</label>
                         <textarea
@@ -155,7 +154,7 @@ const ClaimEdit = () => {
                             className="notas-textarea"
                             rows={4}
                             {...register("notes")}
-                            disabled={claimCerrado}
+                            disabled={claimClosed}
                         />
 
                         <button type="submit" className="btn" disabled={isDisabled}>

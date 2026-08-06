@@ -8,20 +8,20 @@ import type { CreateClaimForm, ClaimPolicySummary } from "./claim.types";
 const ClaimNew = () => {
     const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<CreateClaimForm>();
 
-    const [busquedaReferencia, setBusquedaReferencia] = useState("");
-    const [policyEncontrada, setPolicyEncontrada] = useState<ClaimPolicySummary | null>(null);
+    const [policySearchQuery, setPolicySearchQuery] = useState("");
+    const [foundPolicy, setFoundPolicy] = useState<ClaimPolicySummary | null>(null);
 
     const incidentDate = watch("incidentDate");
 
-    const isDisabled = !policyEncontrada || !incidentDate;
+    const isDisabled = !foundPolicy || !incidentDate;
 
-    const handlePolicyEncontrada = (policy: ClaimPolicySummary) => {
-        setPolicyEncontrada(policy);
+    const handlePolicyFound = (policy: ClaimPolicySummary) => {
+        setFoundPolicy(policy);
         setValue("policyId", policy.id, { shouldValidate: true });
     };
 
-    const handlePolicyNoEncontrada = () => {
-        setPolicyEncontrada(null);
+    const handlePolicyNotFound = () => {
+        setFoundPolicy(null);
         setValue("policyId", "");
     };
 
@@ -39,8 +39,8 @@ const ClaimNew = () => {
             .then((response) => {
                 toast.success(response.data.message);
                 reset();
-                setPolicyEncontrada(null);
-                setBusquedaReferencia("");
+                setFoundPolicy(null);
+                setPolicySearchQuery("");
             })
             .catch((error) => {
                 if (error.response) {
@@ -62,33 +62,33 @@ const ClaimNew = () => {
 
                     <input type="hidden" {...register("policyId", { required: true })} />
 
-                    <label htmlFor="busquedaReferencia">Número de referencia</label>
+                    <label htmlFor="policySearchQuery">Número de póliza</label>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                         <input
-                            id="busquedaReferencia"
+                            id="policySearchQuery"
                             type="text"
-                            placeholder="Número de referencia"
-                            value={busquedaReferencia}
+                            placeholder="Número de póliza"
+                            value={policySearchQuery}
                             onChange={(e) => {
-                                setBusquedaReferencia(e.target.value);
-                                if (policyEncontrada) handlePolicyNoEncontrada();
+                                setPolicySearchQuery(e.target.value);
+                                if (foundPolicy) handlePolicyNotFound();
                             }}
                         />
                         <SearchVehiclePolicyButton
-                            referencia={busquedaReferencia}
-                            onEncontrado={handlePolicyEncontrada}
-                            onNoEncontrado={handlePolicyNoEncontrada}
+                            query={policySearchQuery}
+                            onFound={handlePolicyFound}
+                            onNotFound={handlePolicyNotFound}
                         />
                     </div>
                     {errors.policyId && <span className="error">Debe buscar y seleccionar una póliza</span>}
 
-                    {policyEncontrada && (
+                    {foundPolicy && (
                         <p className="login-sub" style={{ marginTop: "-4px" }}>
-                            {policyEncontrada.policyNumber} — {policyEncontrada.vehicleDetails?.brand}{" "}
-                            {policyEncontrada.vehicleDetails?.model} ({policyEncontrada.vehicleDetails?.licensePlate})
+                            {foundPolicy.policyNumber} — {foundPolicy.vehicleDetails?.brand}{" "}
+                            {foundPolicy.vehicleDetails?.model} ({foundPolicy.vehicleDetails?.licensePlate})
                             {" · "}
-                            {policyEncontrada.client
-                                ? `${policyEncontrada.client.firstName} ${policyEncontrada.client.lastName}`
+                            {foundPolicy.client
+                                ? `${foundPolicy.client.firstName} ${foundPolicy.client.lastName}`
                                 : ""}
                         </p>
                     )}

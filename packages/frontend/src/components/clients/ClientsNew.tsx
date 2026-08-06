@@ -34,7 +34,7 @@ const ClientsNew = () => {
             const formData = new FormData();
             formData.append("file", file);
 
-            console.log(formData.get("archivo"));
+
             const { data } = await api.post("ocr/reconocimiento", formData);
 
             if (data.firstName) {
@@ -67,7 +67,6 @@ const ClientsNew = () => {
     };
 
     const onSubmit = (data: ClienteForm) => {
-        console.log(data);
         api.post("/clientes", {
             firstName: data.nombres,
             lastName: data.apellidos,

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { scanIdCardController } from "../controllers/ocr.controller";
-import { scanIdCard } from "../controllers/gemini.controller";
+import { scanIdCard, scanPolicyDocument } from "../controllers/gemini.controller";
 import { authenticate, authorizeRoles } from "../middlewares/auth.middleware";
 import { Role } from "../generated/prisma";
 
@@ -27,6 +27,14 @@ router.post(
   authorizeRoles(Role.BROKER, Role.SUB_BROKER),
   upload.single("file"),
   scanIdCard
+);
+
+router.post(
+  "/poliza",
+  authenticate,
+  authorizeRoles(Role.BROKER, Role.SUB_BROKER),
+  upload.single("file"),
+  scanPolicyDocument
 );
 
 export default router;

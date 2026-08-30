@@ -294,6 +294,11 @@ a {
     flex-shrink: 0;
 }
 
+.sidebar-logo img {
+    width: 18px;
+    height: 18px;
+}
+
 .sidebar-brand-name {
     font-size: 12px;
     font-weight: 600;

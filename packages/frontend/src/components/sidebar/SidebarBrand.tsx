@@ -1,9 +1,7 @@
-import { Shield } from "lucide-react";
-
 const SidebarBrand = () => (
     <div className="sidebar-brand">
         <div className="sidebar-logo">
-            <Shield size={18} color="#fff" />
+            <img src="/shield.svg" alt="Coverfy" />
         </div>
         <div>
             <p className="sidebar-brand-name">Coverfy</p>

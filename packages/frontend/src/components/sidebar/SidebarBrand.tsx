@@ -1,7 +1,7 @@
 const SidebarBrand = () => (
     <div className="sidebar-brand">
         <div className="sidebar-logo">
-            <img src="/shield.svg" alt="Coverfy" />
+            <img src="/shield.png" alt="Coverfy" />
         </div>
         <div>
             <p className="sidebar-brand-name">Coverfy</p>

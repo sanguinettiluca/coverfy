@@ -32,29 +32,14 @@ const SearchClientButton = ({ documento, onEncontrado, onNoEncontrado, autoTrigg
             return;
         }
         try {
-            const response = await api.get("/clientes", {
-                params: {
-                    busqueda: documento
-                }
-            });
-
-            const clientes: Client[] = response.data.clients;
-
-            const cliente = clientes.find(
-                c => c.documentNumber.trim() === documento.trim()
-            );
-
-            if (!cliente) {
-                toast.error("Cliente no encontrado");
-                onNoEncontrado();
-                return;
-            }
+            const response = await api.get(`/clientes/documento/${documento.trim()}`);
 
             toast.success("Cliente encontrado");
-            onEncontrado(cliente);
+            onEncontrado(response.data);
 
         } catch (error) {
-            toast.error("Error al buscar cliente");
+            toast.error("Cliente no encontrado");
+            onNoEncontrado();
         }
     };
 

@@ -6,7 +6,11 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@google/genai": "^2.13.0",
@@ -29,6 +33,7 @@
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@types/qrcode": "^1.5.6",
     "@types/supertest": "^7.2.1",
     "fast-check": "^4.9.0",

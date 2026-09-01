@@ -27,8 +27,7 @@ const otherDetails = Joi.object({
 const rentalDetails = Joi.object({
     address: Joi.string().trim().min(3).max(200).required(),
     propertyType: Joi.string().trim().min(3).max(100).required(),
-    rentAmount: Joi.number().positive().required(),
-    deposit: Joi.number().positive().required()
+    rentAmount: Joi.number().positive().required()
 })
 
 const businessDetails = Joi.object({
